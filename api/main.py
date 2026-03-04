@@ -61,7 +61,7 @@ def root() -> dict[str, str]:
 
 
 @app.get("/health")
-def health() -> dict[str, str]:
+def health() -> dict[str, str | int]:
     deploy_metadata = _resolve_deploy_metadata()
     return {
         "status": "ok",
@@ -69,4 +69,5 @@ def health() -> dict[str, str]:
         "version": deploy_metadata["version"],
         "git_sha": deploy_metadata["git_sha"],
         "short_sha": deploy_metadata["short_sha"],
+        "metrics_model_version": 1,
     }

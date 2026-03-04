@@ -77,8 +77,15 @@
 
 ## 2. Phase 1 — Product Definition Pack (PRD-lite) + Metrics Inventory
 
-**Status:** PLANNED  
+**Status:** CLOSED (2026-03-04 America/New_York)  
 **Goal:** Freeze what we are building before writing feature code.
+
+**Evidence:**
+- `docs/PRD.md`
+- `docs/DATA_SOURCES.md`
+- `docs/METRICS_CATALOG.md` (con fórmulas v1 + `metrics_model_version`)
+- `docs/GLOSARIO.md`
+- `docs/CHANGELOG.md`
 
 ### 2.1 Deliverables
 - `docs/PRD.md` (lightweight):

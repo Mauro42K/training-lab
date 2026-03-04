@@ -28,9 +28,14 @@
 - VPS host: `root@178.156.251.31`
 - Deploy platform: Coolify running on the VPS.
 - Phase 0 deploy target: FastAPI service from this repository.
+- Stable API domain target: `https://api.training-lab.mauro42k.com`
 - Default start command: `uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}`
 - Local smoke test: `curl -i http://127.0.0.1:8000/health`
-- Remote smoke test: `curl -i http://p8w04c88088gw844okkw80gg.178.156.251.31.sslip.io/health`
+- Remote smoke test: `curl -i https://api.training-lab.mauro42k.com/health`
+
+## Security
+- Never paste tokens into docs, logs, or chat.
+- If a token is exposed, rotate it immediately and document the rotation.
 
 ## How To Work With Codex
 - Always read this file first.

@@ -27,3 +27,6 @@ dist/
 # IDE
 .idea/
 .vscode/
+
+# Build-time deploy metadata
+api/deploy_metadata.json

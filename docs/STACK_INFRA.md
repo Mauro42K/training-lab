@@ -57,3 +57,4 @@
 - Keep application version at `0.0.0` until explicit SemVer release management is introduced.
 - Bake deploy metadata into the image so `/health` can report commit metadata without relying on runtime-only env vars.
 - Never paste tokens into logs or docs; rotate immediately if exposure happens.
+

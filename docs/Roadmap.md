@@ -109,8 +109,16 @@
 
 ## 3. Phase 2 — Design System & Layout (MANDATORY, before feature screens)
 
-**Status:** PLANNED  
+**Status:** CLOSED (2026-03-05 America/New_York)  
 **Goal:** Establish a premium, Apple-like visual language and reusable UI primitives.
+
+**Closure notes:**
+- Tokens finalized with parity in Swift: colors, typography, spacing, radius, shadows/elevation.
+- Chart styling rules v0.1 implemented and documented.
+- Multiplatform component gallery running on iOS + macOS via `DesignSystemDemo`.
+- Visual QA completed with evidence in `docs/Phase2_VisualQA.md` and `docs/qa/phase2/`.
+- Implementation base commit: `3431927`.
+- Documentary closure: `chore(phase2): close docs (roadmap, changelog, qa evidence) + include PRD`.
 
 ### 3.1 Deliverables (Design)
 - **Design tokens** (source of truth):

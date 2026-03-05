@@ -26,6 +26,8 @@ RUN apt-get update \
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY api ./api
+COPY alembic ./alembic
+COPY alembic.ini ./alembic.ini
 COPY --from=metadata /app/api/deploy_metadata.json ./api/deploy_metadata.json
 
 EXPOSE 8000

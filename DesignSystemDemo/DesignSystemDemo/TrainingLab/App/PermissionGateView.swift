@@ -1,5 +1,148 @@
 import SwiftUI
 
-// Phase 3 note:
-// PermissionGateView is currently declared in DesignSystemDemo/App/DesignSystemDemoApp.swift
-// because the Xcode target sources are explicit and this file is not yet wired into PBXSourcesBuildPhase.
+struct PermissionGateView: View {
+    enum GateState: Equatable {
+        case loading
+        case needsPermission
+        case ready
+        case error(String)
+    }
+
+    let environment: AppEnvironment
+    let openGallery: () -> Void
+
+    @State private var state: GateState = .loading
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                DSSectionHeader(title: "Phase 3 Permission Gate") {
+                    Text("Online-first")
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+
+                content
+
+                DSCard(style: .muted) {
+                    VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                        Text("Demo access")
+                            .appTextStyle(AppTypography.headingH3)
+                            .foregroundStyle(AppColors.Text.primary)
+
+                        Text("Open Design System Gallery while sync pipelines are bootstrapping.")
+                            .appTextStyle(AppTypography.bodySmall)
+                            .foregroundStyle(AppColors.Text.secondary)
+
+                        Button(action: openGallery) {
+                            Text("Open Design System Gallery")
+                                .appTextStyle(AppTypography.buttonMedium)
+                                .foregroundStyle(AppColors.Accent.blue)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .padding(AppSpacing.x16)
+        }
+        .background(AppColors.Background.primary.ignoresSafeArea())
+        .task {
+            await bootstrap()
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch state {
+        case .loading:
+            DSLoadingState()
+
+        case .needsPermission:
+            VStack(spacing: AppSpacing.x12) {
+                DSEmptyState(
+                    iconSystemName: "heart.text.square",
+                    title: "Health access required",
+                    message: "Allow HealthKit access to continue online-first sync."
+                )
+
+                retryCard(label: "Retry")
+            }
+
+        case .ready:
+            DSCard {
+                VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                    Text("Sync ready")
+                        .appTextStyle(AppTypography.headingH3)
+                        .foregroundStyle(AppColors.Text.primary)
+
+                    HStack(spacing: AppSpacing.x8) {
+                        DSMetricPill("HealthKit authorized", iconSystemName: "checkmark.circle.fill", variant: .success)
+                        DSMetricPill("API wired", iconSystemName: "network", variant: .info)
+                    }
+
+                    Text("Online-first orchestration initialized. Cache is available as fallback.")
+                        .appTextStyle(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+
+        case let .error(message):
+            VStack(spacing: AppSpacing.x12) {
+                DSEmptyState(
+                    iconSystemName: "exclamationmark.triangle.fill",
+                    title: "Sync failed",
+                    message: message
+                )
+
+                retryCard(label: "Retry")
+            }
+        }
+    }
+
+    private func retryCard(label: String) -> some View {
+        DSCard {
+            Button {
+                Task {
+                    await bootstrap()
+                }
+            } label: {
+                Text(label)
+                    .appTextStyle(AppTypography.buttonMedium)
+                    .foregroundStyle(AppColors.Accent.orange)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func bootstrap() async {
+        state = .loading
+        await environment.ingestionOrchestrator.runInitialSyncIfNeeded()
+
+        do {
+            let syncState = try environment.syncStateStore.loadOrCreate()
+            let lastError = syncState.lastError?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if let lastError, !lastError.isEmpty {
+                state = .error(lastError)
+                return
+            }
+
+            switch syncState.healthAuthStatusRaw {
+            case "authorized":
+                state = .ready
+            case "denied", "notDetermined":
+                state = .needsPermission
+            case "unsupported":
+                state = .error("HealthKit unsupported on this platform")
+            default:
+                state = .error("Sync state unavailable")
+            }
+        } catch {
+            state = .error(error.localizedDescription)
+        }
+    }
+}
+
+#Preview {
+    PermissionGateView(environment: .stub(), openGallery: {})
+}

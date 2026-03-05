@@ -4,10 +4,13 @@ from pathlib import Path
 
 from fastapi import FastAPI
 
+from api.bootstrap import build_v1_router
 from api.version import APP_VERSION
 
 
 app = FastAPI(title="training-lab-api")
+app.include_router(build_v1_router())
+
 DEPLOY_METADATA_PATH = Path(__file__).with_name("deploy_metadata.json")
 ENV_GIT_SHA_KEYS = (
     "COMMIT_SHA",

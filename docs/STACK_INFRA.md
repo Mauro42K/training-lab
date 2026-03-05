@@ -23,8 +23,21 @@
 - Build installs dependencies from `requirements.txt`.
 - Build writes `api/deploy_metadata.json` into the image with version, full `git_sha`, and `short_sha`.
 - Runtime starts the service with `uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}`.
-- `PORT` is the only required runtime environment variable.
+- Runtime environment variables for phase 3:
+  - `PORT=8000`
+  - `DATABASE_URL` (set in Coolify app env for `training-lab-api`)
+  - `TRAINING_LAB_API_KEY` (set in Coolify app env for `training-lab-api`)
+  - `INGEST_MAX_BATCH_SIZE=500` (set in Coolify app env for `training-lab-api`)
 - TLS is terminated by Coolify with Let's Encrypt on `api.training-lab.mauro42k.com`.
+
+## Database (Phase 3)
+- Coolify database resource name: `training-lab-postgres`
+- Engine/image: PostgreSQL (`postgres:18-alpine`)
+- Internal service host on Coolify network: `j8cccgk8o4ock4c0s8sw8k48`
+- Database name: `training_lab`
+- Database user: `training_lab`
+- `DATABASE_URL` is configured in Coolify on the `training-lab-api` service environment variables.
+- Do not store DB passwords in repository docs. Rotate secrets directly in Coolify when needed.
 
 ## Decisions Recorded
 - Use FastAPI for the smallest reliable HTTP skeleton.

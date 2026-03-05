@@ -157,6 +157,8 @@
   - sleep summaries, steps, HRV, RHR, weight/body metrics
 - Deduplication strategy (source/device conflicts).
 - Basic background refresh plan (as feasible).
+- Backend v1 ingest/query endpoints with idempotency and payload limits.
+- Rate limiting moved to **Phase 3.1** (Phase 3 keeps auth + payload guards).
 
 ### 4.2 DoD
 - App can request permissions and ingest at least 30 days of workouts.

@@ -30,6 +30,17 @@
   - `INGEST_MAX_BATCH_SIZE=500` (set in Coolify app env for `training-lab-api`)
 - TLS is terminated by Coolify with Let's Encrypt on `api.training-lab.mauro42k.com`.
 
+## API v1 Contract (Phase 3)
+- `POST /v1/ingest/workouts`
+  - Required headers: `X-API-KEY`, `X-Idempotency-Key`
+  - Enforces batch payload limit from `INGEST_MAX_BATCH_SIZE`
+  - Idempotency semantics documented in `docs/PHASE3_IDEMPOTENCY.md`
+- `GET /v1/workouts?from&to&sport`
+  - Required header: `X-API-KEY`
+- `GET /v1/daily?from&to`
+  - Required header: `X-API-KEY`
+- `/` and `/health` remain public.
+
 ## Database (Phase 3)
 - Coolify database resource name: `training-lab-postgres`
 - Engine/image: PostgreSQL (`postgres:18-alpine`)

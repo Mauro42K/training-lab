@@ -1,0 +1,27 @@
+Phase2 macOS window QA matrix
+timestamp=2026-03-05T04:42:06Z
+
+light-window-small | appearance=light | frame_pref="120 120 860 620 0 0 3440 1410 " | window_id=6650 bounds={
+    Height = 620;
+    Width = 860;
+    X = 120;
+    Y = 700;
+}
+light-window-large | appearance=light | frame_pref="80 60 1280 860 0 0 3440 1410 " | window_id=6663 bounds={
+    Height = 860;
+    Width = 1280;
+    X = 80;
+    Y = 466;
+}
+dark-window-small | appearance=dark | frame_pref="120 120 860 620 0 0 3440 1410 " | window_id=6676 bounds={
+    Height = 620;
+    Width = 860;
+    X = 120;
+    Y = 700;
+}
+dark-window-large | appearance=dark | frame_pref="80 60 1280 860 0 0 3440 1410 " | window_id=6689 bounds={
+    Height = 860;
+    Width = 1280;
+    X = 80;
+    Y = 466;
+}

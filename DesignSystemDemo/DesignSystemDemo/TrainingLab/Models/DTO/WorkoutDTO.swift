@@ -11,6 +11,18 @@ struct WorkoutDTO: Codable, Equatable, Sendable {
     let sourceBundleId: String?
     let deviceName: String?
 
+    enum CodingKeys: String, CodingKey {
+        case uuid = "healthkit_workout_uuid"
+        case sport
+        case start
+        case end
+        case durationSec = "duration_sec"
+        case distanceM = "distance_m"
+        case energyKcal = "energy_kcal"
+        case sourceBundleId = "source_bundle_id"
+        case deviceName = "device_name"
+    }
+
     init(
         uuid: String,
         sport: SportType,
@@ -32,4 +44,8 @@ struct WorkoutDTO: Codable, Equatable, Sendable {
         self.sourceBundleId = sourceBundleId
         self.deviceName = deviceName
     }
+}
+
+struct WorkoutsSummaryDTO: Codable, Equatable, Sendable {
+    let items: [WorkoutDTO]
 }

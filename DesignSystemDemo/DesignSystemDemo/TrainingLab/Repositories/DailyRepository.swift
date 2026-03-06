@@ -72,3 +72,71 @@ final class DailyRepository {
         }
     }
 }
+
+@MainActor
+final class TrainingLoadRepository {
+    private let apiClient: any APIClient
+    private let modelContext: ModelContext
+
+    init(apiClient: any APIClient, modelContext: ModelContext) {
+        self.apiClient = apiClient
+        self.modelContext = modelContext
+    }
+
+    func getTrainingLoad(days: Int = 28, sport: TrainingLoadSportFilter) async throws -> [TrainingLoadItemDTO] {
+        do {
+            let remote = try await apiClient.fetchTrainingLoad(days: days, sport: sport)
+            do {
+                try replaceCache(for: sport, with: remote)
+            } catch {
+                throw RepositoryError.cacheWriteFailed(underlying: error)
+            }
+            return remote
+        } catch {
+            let cached = try fetchCached(days: days, sport: sport)
+            if cached.isEmpty {
+                throw RepositoryError.networkAndNoCache(underlying: error)
+            }
+            return cached
+        }
+    }
+
+    private func replaceCache(for sport: TrainingLoadSportFilter, with items: [TrainingLoadItemDTO]) throws {
+        let predicate = #Predicate<CachedTrainingLoadPoint> { item in
+            item.sportFilterRaw == sport.rawValue
+        }
+        let descriptor = FetchDescriptor<CachedTrainingLoadPoint>(predicate: predicate)
+        let existing = try modelContext.fetch(descriptor)
+        for item in existing {
+            modelContext.delete(item)
+        }
+
+        for item in items {
+            modelContext.insert(
+                CachedTrainingLoadPoint(
+                    date: item.date,
+                    sportFilterRaw: sport.rawValue,
+                    trimp: item.trimp,
+                    updatedAt: Date()
+                )
+            )
+        }
+
+        try modelContext.save()
+    }
+
+    private func fetchCached(days: Int, sport: TrainingLoadSportFilter) throws -> [TrainingLoadItemDTO] {
+        let predicate = #Predicate<CachedTrainingLoadPoint> { item in
+            item.sportFilterRaw == sport.rawValue
+        }
+        let descriptor = FetchDescriptor<CachedTrainingLoadPoint>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\CachedTrainingLoadPoint.date)]
+        )
+        let cached = try modelContext.fetch(descriptor)
+        let sliced = cached.suffix(max(days, 1))
+        return sliced.map { item in
+            TrainingLoadItemDTO(date: item.date, trimp: item.trimp)
+        }
+    }
+}

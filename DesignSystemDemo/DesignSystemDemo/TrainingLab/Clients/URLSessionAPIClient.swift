@@ -15,6 +15,17 @@ struct URLSessionAPIClient: APIClient {
     private let session: URLSession
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
+    private static let internetDateTimeFormatter = ISO8601DateFormatter()
+    private static let internetDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        // Date-only payloads represent calendar days; decode using local time
+        // to avoid shifting the day when rendering/aggregating in the UI.
+        formatter.timeZone = TimeZone.autoupdatingCurrent
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
 
     init(configuration: Configuration = .default, session: URLSession = .shared) {
         self.configuration = configuration
@@ -25,7 +36,20 @@ struct URLSessionAPIClient: APIClient {
         self.encoder = encoder
 
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let raw = try container.decode(String.self)
+            if let dateTime = URLSessionAPIClient.internetDateTimeFormatter.date(from: raw) {
+                return dateTime
+            }
+            if let dateOnly = URLSessionAPIClient.internetDateFormatter.date(from: raw) {
+                return dateOnly
+            }
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unsupported date format: \(raw)"
+            )
+        }
         self.decoder = decoder
     }
 
@@ -69,7 +93,7 @@ struct URLSessionAPIClient: APIClient {
         let (data, response) = try await session.data(for: request)
         _ = try validate(response: response)
 
-        return try decoder.decode([WorkoutDTO].self, from: data)
+        return try decoder.decode(WorkoutsSummaryDTO.self, from: data).items
     }
 
     func fetchDaily(from: Date, to: Date) async throws -> [DailyItemDTO] {
@@ -87,7 +111,24 @@ struct URLSessionAPIClient: APIClient {
         let (data, response) = try await session.data(for: request)
         _ = try validate(response: response)
 
-        return try decoder.decode([DailyItemDTO].self, from: data)
+        return try decoder.decode(DailySummaryDTO.self, from: data).items
+    }
+
+    func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> [TrainingLoadItemDTO] {
+        var components = URLComponents(url: try pathURL("v1/training-load"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            URLQueryItem(name: "days", value: String(days)),
+            URLQueryItem(name: "sport", value: sport.rawValue)
+        ]
+
+        guard let url = components?.url else {
+            throw APIClientError.invalidURL
+        }
+
+        let request = try makeRequest(url: url, method: "GET")
+        let (data, response) = try await session.data(for: request)
+        _ = try validate(response: response)
+        return try decoder.decode(TrainingLoadSummaryDTO.self, from: data).items
     }
 
     private func makeRequest(path: String, method: String) throws -> URLRequest {

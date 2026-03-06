@@ -14,40 +14,55 @@ struct PermissionGateView: View {
     @State private var state: GateState = .loading
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: AppSpacing.x16) {
-                DSSectionHeader(title: "Phase 3 Permission Gate") {
-                    Text("Online-first")
-                        .appTextStyle(AppTypography.labelSmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                }
-
-                content
-
-                DSCard(style: .muted) {
-                    VStack(alignment: .leading, spacing: AppSpacing.x12) {
-                        Text("Demo access")
-                            .appTextStyle(AppTypography.headingH3)
-                            .foregroundStyle(AppColors.Text.primary)
-
-                        Text("Open Design System Gallery while sync pipelines are bootstrapping.")
-                            .appTextStyle(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.Text.secondary)
-
-                        Button(action: openGallery) {
-                            Text("Open Design System Gallery")
-                                .appTextStyle(AppTypography.buttonMedium)
-                                .foregroundStyle(AppColors.Accent.blue)
+        Group {
+            if shouldShowTrainingLoad {
+                TrainingLoadScreen(environment: environment)
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                        DSSectionHeader(title: "Phase 3 Permission Gate") {
+                            Text("Online-first")
+                                .appTextStyle(AppTypography.labelSmall)
+                                .foregroundStyle(AppColors.Text.secondary)
                         }
-                        .buttonStyle(.plain)
+
+                        content
+
+                        DSCard(style: .muted) {
+                            VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                                Text("Demo access")
+                                    .appTextStyle(AppTypography.headingH3)
+                                    .foregroundStyle(AppColors.Text.primary)
+
+                                Text("Open Design System Gallery while sync pipelines are bootstrapping.")
+                                    .appTextStyle(AppTypography.bodySmall)
+                                    .foregroundStyle(AppColors.Text.secondary)
+
+                                Button(action: openGallery) {
+                                    Text("Open Design System Gallery")
+                                        .appTextStyle(AppTypography.buttonMedium)
+                                        .foregroundStyle(AppColors.Accent.blue)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
                     }
+                    .padding(AppSpacing.x16)
                 }
             }
-            .padding(AppSpacing.x16)
         }
         .background(AppColors.Background.primary.ignoresSafeArea())
         .task {
             await bootstrap()
+        }
+    }
+
+    private var shouldShowTrainingLoad: Bool {
+        switch state {
+        case .ready, .error:
+            return true
+        case .loading, .needsPermission:
+            return false
         }
     }
 
@@ -69,22 +84,7 @@ struct PermissionGateView: View {
             }
 
         case .ready:
-            DSCard {
-                VStack(alignment: .leading, spacing: AppSpacing.x12) {
-                    Text("Sync ready")
-                        .appTextStyle(AppTypography.headingH3)
-                        .foregroundStyle(AppColors.Text.primary)
-
-                    HStack(spacing: AppSpacing.x8) {
-                        DSMetricPill("HealthKit authorized", iconSystemName: "checkmark.circle.fill", variant: .success)
-                        DSMetricPill("API wired", iconSystemName: "network", variant: .info)
-                    }
-
-                    Text("Online-first orchestration initialized. Cache is available as fallback.")
-                        .appTextStyle(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                }
-            }
+            EmptyView()
 
         case let .error(message):
             VStack(spacing: AppSpacing.x12) {

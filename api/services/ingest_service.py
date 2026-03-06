@@ -3,10 +3,12 @@ from dataclasses import dataclass
 from sqlalchemy.orm import Session
 
 from api.core.config import get_settings
+from api.repositories.load_repository import get_workout_snapshots_by_uuids
 from api.repositories.idempotency_repository import compute_request_hash, create_record, get_record
 from api.repositories.user_repository import get_or_create_default_user
 from api.repositories.workouts_repository import upsert_workouts
 from api.schemas.ingest import IngestWorkoutsResponse, WorkoutsIngestRequest
+from api.services.trimp_recompute_service import TrimpRecomputeService
 
 
 class IdempotencyConflictError(Exception):
@@ -47,10 +49,24 @@ class IngestService:
             replay_response["idempotent_replay"] = True
             return IngestWorkoutsResponse.model_validate(replay_response)
 
+        workout_uuids = [item.healthkit_workout_uuid for item in payload.workouts]
+        pre_snapshots = get_workout_snapshots_by_uuids(
+            self.db,
+            user_id=user.id,
+            workout_uuids=workout_uuids,
+        )
         inserted, updated = upsert_workouts(
             self.db,
             user_id=user.id,
             workouts=payload.workouts,
+        )
+        recompute_service = TrimpRecomputeService(settings=settings)
+        recompute_service.recompute_for_workout_uuids(
+            self.db,
+            user_id=user.id,
+            user_timezone=user.timezone,
+            workout_uuids=workout_uuids,
+            pre_snapshots=pre_snapshots,
         )
 
         response = IngestWorkoutsResponse(

@@ -11,3 +11,13 @@ enum SportType: String, Codable, CaseIterable, Sendable {
         self = SportType(rawValue: serverValue.lowercased()) ?? .other
     }
 }
+
+enum TrainingLoadSportFilter: String, Codable, CaseIterable, Sendable {
+    case all
+    case run
+    case bike
+    case strength
+    case walk
+
+    var displayName: String { rawValue.capitalized }
+}

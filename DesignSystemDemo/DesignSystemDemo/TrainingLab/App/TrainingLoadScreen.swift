@@ -1,0 +1,138 @@
+import SwiftUI
+
+struct TrainingLoadScreen: View {
+    let environment: AppEnvironment
+
+    @State private var selectedFilter: TrainingLoadSportFilter = .all
+    @State private var points: [TrainingLoadItemDTO] = []
+    @State private var selectedDay: Date?
+    @State private var dayWorkouts: [WorkoutDTO] = []
+    @State private var isLoading = false
+    @State private var isLoadingDay = false
+    @State private var errorMessage: String?
+    @State private var showDaySheet = false
+
+    private let calendar = Calendar.current
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                DSSectionHeader(title: "Training Load") {
+                    Text("Last 28 days")
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+
+                TrainingLoadSummaryRow(
+                    today: todayTotal,
+                    sevenDays: sevenDayTotal,
+                    twentyEightDays: twentyEightDayTotal
+                )
+
+                TrainingLoadFilterControl(selection: $selectedFilter)
+
+                if isLoading {
+                    DSLoadingState()
+                } else {
+                    TrainingLoadChartCard(
+                        points: sortedPoints,
+                        selectedDay: $selectedDay,
+                        onSelectDay: { day in
+                            Task { await selectDay(day) }
+                        }
+                    )
+                }
+
+                if let errorMessage {
+                    DSCard(style: .muted) {
+                        Text(errorMessage)
+                            .appTextStyle(AppTypography.bodySmall)
+                            .foregroundStyle(AppColors.Accent.orange)
+                    }
+                }
+            }
+            .padding(AppSpacing.x16)
+        }
+        .background(AppColors.Background.primary.ignoresSafeArea())
+        .navigationTitle("Training Load")
+        .task(id: selectedFilter) {
+            await loadSeries()
+        }
+        .sheet(isPresented: $showDaySheet) {
+            TrainingLoadDayDetailSheet(
+                day: selectedDay ?? Date(),
+                workouts: dayWorkouts,
+                isLoading: isLoadingDay
+            )
+        }
+    }
+
+    private var sortedPoints: [TrainingLoadItemDTO] {
+        points.sorted { $0.date < $1.date }
+    }
+
+    private var todayTotal: Double {
+        let today = calendar.startOfDay(for: Date())
+        return sortedPoints.first { calendar.isDate($0.date, inSameDayAs: today) }?.trimp ?? 0
+    }
+
+    private var sevenDayTotal: Double {
+        sortedPoints.suffix(7).reduce(0) { $0 + $1.trimp }
+    }
+
+    private var twentyEightDayTotal: Double {
+        sortedPoints.suffix(28).reduce(0) { $0 + $1.trimp }
+    }
+
+    private func loadSeries() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            points = try await environment.trainingLoadRepository.getTrainingLoad(
+                days: 28,
+                sport: selectedFilter
+            )
+            errorMessage = nil
+        } catch {
+            points = []
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
+    }
+
+    private func selectDay(_ day: Date) async {
+        selectedDay = day
+        showDaySheet = true
+        isLoadingDay = true
+        defer { isLoadingDay = false }
+
+        do {
+            let start = calendar.startOfDay(for: day)
+            let end = calendar.date(byAdding: .day, value: 1, to: start)?.addingTimeInterval(-1) ?? start
+            dayWorkouts = try await environment.workoutsRepository.getWorkouts(
+                from: start,
+                to: end,
+                sport: selectedFilter.sportType
+            )
+        } catch {
+            dayWorkouts = []
+        }
+    }
+}
+
+private extension TrainingLoadSportFilter {
+    var sportType: SportType? {
+        switch self {
+        case .all:
+            return nil
+        case .run:
+            return .run
+        case .bike:
+            return .bike
+        case .strength:
+            return .strength
+        case .walk:
+            return .walk
+        }
+    }
+}

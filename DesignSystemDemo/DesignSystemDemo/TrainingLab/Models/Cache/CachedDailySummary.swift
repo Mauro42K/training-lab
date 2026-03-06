@@ -26,3 +26,23 @@ final class CachedDailySummary {
         self.updatedAt = updatedAt
     }
 }
+
+@Model
+final class CachedTrainingLoadPoint {
+    var date: Date
+    var sportFilterRaw: String
+    var trimp: Double
+    var updatedAt: Date
+
+    init(
+        date: Date,
+        sportFilterRaw: String,
+        trimp: Double,
+        updatedAt: Date = Date()
+    ) {
+        self.date = date
+        self.sportFilterRaw = sportFilterRaw
+        self.trimp = trimp
+        self.updatedAt = updatedAt
+    }
+}

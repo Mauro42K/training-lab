@@ -8,19 +8,22 @@ final class IngestionOrchestrator {
     private let syncStateStore: SyncStateStore
     private let workoutsRepository: WorkoutsRepository
     private let dailyRepository: DailyRepository
+    private let trainingLoadRepository: TrainingLoadRepository
 
     init(
         healthKitClient: any HealthKitClient,
         apiClient: any APIClient,
         syncStateStore: SyncStateStore,
         workoutsRepository: WorkoutsRepository,
-        dailyRepository: DailyRepository
+        dailyRepository: DailyRepository,
+        trainingLoadRepository: TrainingLoadRepository
     ) {
         self.healthKitClient = healthKitClient
         self.apiClient = apiClient
         self.syncStateStore = syncStateStore
         self.workoutsRepository = workoutsRepository
         self.dailyRepository = dailyRepository
+        self.trainingLoadRepository = trainingLoadRepository
     }
 
     func runInitialSyncIfNeeded() async {

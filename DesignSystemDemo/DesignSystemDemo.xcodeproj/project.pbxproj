@@ -22,6 +22,14 @@
 		F1C30000000000000000000C /* WorkoutIngestDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000000F /* WorkoutIngestDTO.swift */; };
 		F1C30000000000000000000D /* SportType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000010 /* SportType.swift */; };
 		F1C30000000000000000000E /* SyncStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000011 /* SyncStateStore.swift */; };
+		F1C30000000000000000000F /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000001 /* AppEnvironment.swift */; };
+		F1C300000000000000000010 /* PermissionGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000002 /* PermissionGateView.swift */; };
+		F1C300000000000000000011 /* TrainingLabRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000003 /* TrainingLabRootView.swift */; };
+		F1C300000000000000000012 /* TrainingLoadScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000012 /* TrainingLoadScreen.swift */; };
+		F1C300000000000000000013 /* TrainingLoadSummaryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000013 /* TrainingLoadSummaryRow.swift */; };
+		F1C300000000000000000014 /* TrainingLoadFilterControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000014 /* TrainingLoadFilterControl.swift */; };
+		F1C300000000000000000015 /* TrainingLoadChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000015 /* TrainingLoadChartView.swift */; };
+		F1C300000000000000000016 /* TrainingLoadDayDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */; };
 		01BC7B7228AF959B48D961CB /* AppRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F285DCEC30A1C2818F5048 /* AppRadius.swift */; };
 		13025129FD95684EA31D165A /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FFC3C48C53B49D2AD32DA0 /* AppSpacing.swift */; };
 		1C0F5F5BCD5464DE11F4DFD5 /* DSEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4FA03DDD18FCE69FC040FC /* DSEmptyState.swift */; };
@@ -68,6 +76,11 @@
 		F1B20000000000000000000F /* WorkoutIngestDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutIngestDTO.swift; sourceTree = "<group>"; };
 		F1B200000000000000000010 /* SportType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SportType.swift; sourceTree = "<group>"; };
 		F1B200000000000000000011 /* SyncStateStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncStateStore.swift; sourceTree = "<group>"; };
+		F1B200000000000000000012 /* TrainingLoadScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadScreen.swift; sourceTree = "<group>"; };
+		F1B200000000000000000013 /* TrainingLoadSummaryRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadSummaryRow.swift; sourceTree = "<group>"; };
+		F1B200000000000000000014 /* TrainingLoadFilterControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadFilterControl.swift; sourceTree = "<group>"; };
+		F1B200000000000000000015 /* TrainingLoadChartView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadChartView.swift; sourceTree = "<group>"; };
+		F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadDayDetailSheet.swift; sourceTree = "<group>"; };
 		2BC0FCD6236D8C26920A92BA /* DSMetricPill.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DSMetricPill.swift; path = ../DesignSystem/Components/DSMetricPill.swift; sourceTree = "<group>"; };
 		3214E0495250B71CB8973869 /* AppChartStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppChartStyle.swift; path = ../DesignSystem/Charts/AppChartStyle.swift; sourceTree = "<group>"; };
 		3B97EB7EABA1087E455E41FC /* DesignSystemDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DesignSystemDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -172,6 +185,11 @@
 			children = (
 				F1B200000000000000000001 /* AppEnvironment.swift */,
 				F1B200000000000000000002 /* PermissionGateView.swift */,
+				F1B200000000000000000012 /* TrainingLoadScreen.swift */,
+				F1B200000000000000000013 /* TrainingLoadSummaryRow.swift */,
+				F1B200000000000000000014 /* TrainingLoadFilterControl.swift */,
+				F1B200000000000000000015 /* TrainingLoadChartView.swift */,
+				F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */,
 				F1B200000000000000000003 /* TrainingLabRootView.swift */,
 			);
 			path = App;
@@ -351,6 +369,14 @@
 				7FD6A60335509B166935FA08 /* DSSectionHeader.swift in Sources */,
 				68BD401334457A34D25980ED /* DSSegmentedControl.swift in Sources */,
 				6745A253F4A54EDF0E618392 /* GalleryView.swift in Sources */,
+				F1C30000000000000000000F /* AppEnvironment.swift in Sources */,
+				F1C300000000000000000010 /* PermissionGateView.swift in Sources */,
+				F1C300000000000000000011 /* TrainingLabRootView.swift in Sources */,
+				F1C300000000000000000012 /* TrainingLoadScreen.swift in Sources */,
+				F1C300000000000000000013 /* TrainingLoadSummaryRow.swift in Sources */,
+				F1C300000000000000000014 /* TrainingLoadFilterControl.swift in Sources */,
+				F1C300000000000000000015 /* TrainingLoadChartView.swift in Sources */,
+				F1C300000000000000000016 /* TrainingLoadDayDetailSheet.swift in Sources */,
 				0A5B2C8D9E1F4A6B7C8D9E01 /* IngestionOrchestrator.swift in Sources */,
 				F1C300000000000000000001 /* APIClient.swift in Sources */,
 				F1C300000000000000000002 /* HealthKitClient.swift in Sources */,
@@ -388,6 +414,8 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DesignSystemDemo;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Training Lab reads your workouts to compute training load.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Training Lab may write workout-related data when sync features are enabled.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -471,6 +499,8 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DesignSystemDemo;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Training Lab reads your workouts to compute training load.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Training Lab may write workout-related data when sync features are enabled.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

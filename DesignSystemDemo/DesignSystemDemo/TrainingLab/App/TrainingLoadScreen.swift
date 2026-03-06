@@ -9,6 +9,7 @@ struct TrainingLoadScreen: View {
     @State private var dayWorkouts: [WorkoutDTO] = []
     @State private var isLoading = false
     @State private var isLoadingDay = false
+    @State private var hasLoadedOnce = false
     @State private var errorMessage: String?
     @State private var showDaySheet = false
 
@@ -17,11 +18,11 @@ struct TrainingLoadScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.x16) {
-                DSSectionHeader(title: "Training Load") {
+                DSSectionHeader(title: "Load Trend", actionLabel: {
                     Text("Last 28 days")
                         .appTextStyle(AppTypography.labelSmall)
                         .foregroundStyle(AppColors.Text.secondary)
-                }
+                })
 
                 TrainingLoadSummaryRow(
                     today: todayTotal,
@@ -31,23 +32,28 @@ struct TrainingLoadScreen: View {
 
                 TrainingLoadFilterControl(selection: $selectedFilter)
 
-                if isLoading {
+                if isLoading && !hasLoadedOnce {
                     DSLoadingState()
                 } else {
                     TrainingLoadChartCard(
-                        points: sortedPoints,
-                        selectedDay: $selectedDay,
+                        points: chartPoints,
                         onSelectDay: { day in
                             Task { await selectDay(day) }
                         }
                     )
+                    .opacity(isLoading ? 0.72 : 1)
+                    .animation(.easeInOut(duration: 0.2), value: isLoading)
                 }
 
                 if let errorMessage {
                     DSCard(style: .muted) {
-                        Text(errorMessage)
-                            .appTextStyle(AppTypography.bodySmall)
-                            .foregroundStyle(AppColors.Accent.orange)
+                        HStack(spacing: AppSpacing.x8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(AppColors.Accent.orange)
+                            Text(errorMessage)
+                                .appTextStyle(AppTypography.bodySmall)
+                                .foregroundStyle(AppColors.Text.secondary)
+                        }
                     }
                 }
             }
@@ -69,6 +75,18 @@ struct TrainingLoadScreen: View {
 
     private var sortedPoints: [TrainingLoadItemDTO] {
         points.sorted { $0.date < $1.date }
+    }
+
+    private var chartPoints: [TrainingLoadChartPoint] {
+        sortedPoints.map { item in
+            TrainingLoadChartPoint(
+                id: item.date,
+                date: item.date,
+                value: item.trimp,
+                isToday: calendar.isDateInToday(item.date),
+                isSelected: selectedDay.map { calendar.isDate($0, inSameDayAs: item.date) } ?? false
+            )
+        }
     }
 
     private var todayTotal: Double {
@@ -93,9 +111,11 @@ struct TrainingLoadScreen: View {
                 days: 28,
                 sport: selectedFilter
             )
+            hasLoadedOnce = true
             errorMessage = nil
         } catch {
             points = []
+            hasLoadedOnce = true
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }

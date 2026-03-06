@@ -1,0 +1,5 @@
+// Copy to Runtime.Local.xcconfig and set local dev/staging values.
+// Never place production secrets in app bundle build settings.
+TL_URL_SLASH = /
+TRAINING_LAB_API_BASE_URL = http:$(TL_URL_SLASH)$(TL_URL_SLASH)127.0.0.1:8000
+TRAINING_LAB_API_KEY = dev-local-key

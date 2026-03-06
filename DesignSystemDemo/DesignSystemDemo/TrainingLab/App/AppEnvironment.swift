@@ -2,6 +2,13 @@ import Foundation
 import SwiftData
 
 struct AppEnvironment {
+    private enum RuntimeConfigKey {
+        static let bundleAPIBaseURL = "TrainingLabAPIBaseURL"
+        static let bundleAPIKey = "TrainingLabAPIKey"
+        static let envAPIBaseURL = "TRAINING_LAB_API_BASE_URL"
+        static let envAPIKey = "TRAINING_LAB_API_KEY"
+    }
+
     let apiBaseURL: URL
     let apiKey: String
 
@@ -17,11 +24,17 @@ struct AppEnvironment {
     @MainActor
     static func live() -> AppEnvironment {
         let defaultBaseURL = URL(string: "https://api.training-lab.mauro42k.com")!
-        let baseURL = ProcessInfo.processInfo.environment["TRAINING_LAB_API_BASE_URL"]
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+        let bundleBaseURL = Bundle.main.runtimeConfigValue(forKey: RuntimeConfigKey.bundleAPIBaseURL)
             .flatMap(URL.init(string:))
-            ?? defaultBaseURL
-        let key = ProcessInfo.processInfo.environment["TRAINING_LAB_API_KEY"]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let envBaseURL = ProcessInfo.processInfo.environment[RuntimeConfigKey.envAPIBaseURL]
+            .map { $0.normalizedRuntimeConfigValue }
+            .flatMap(URL.init(string:))
+        let baseURL = envBaseURL ?? bundleBaseURL ?? defaultBaseURL
+
+        let bundleAPIKey = Bundle.main.runtimeConfigValue(forKey: RuntimeConfigKey.bundleAPIKey) ?? ""
+        let envAPIKey = ProcessInfo.processInfo.environment[RuntimeConfigKey.envAPIKey]?.normalizedRuntimeConfigValue ?? ""
+        let key = envAPIKey.isEmpty ? bundleAPIKey : envAPIKey
 
         let container = try! ModelContainer(
             for: CachedWorkout.self,
@@ -75,6 +88,26 @@ struct AppEnvironment {
     @MainActor
     static func stub() -> AppEnvironment {
         live()
+    }
+}
+
+private extension Bundle {
+    func runtimeConfigValue(forKey key: String) -> String? {
+        guard let rawValue = object(forInfoDictionaryKey: key) as? String else {
+            return nil
+        }
+        let normalized = rawValue.normalizedRuntimeConfigValue
+        return normalized.isEmpty ? nil : normalized
+    }
+}
+
+private extension String {
+    var normalizedRuntimeConfigValue: String {
+        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 2, trimmed.hasPrefix("\""), trimmed.hasSuffix("\"") else {
+            return trimmed
+        }
+        return String(trimmed.dropFirst().dropLast())
     }
 }
 

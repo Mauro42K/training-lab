@@ -24,7 +24,7 @@ struct TrainingLabRootView: View {
             NavigationStack {
                 DesignSystemGalleryView()
                     .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
+                        ToolbarItem(placement: .primaryAction) {
                             Button("Done") {
                                 showGallery = false
                             }

@@ -6,6 +6,18 @@
 - Backend validado: `http://127.0.0.1:8000`
 - Simulador iOS: iPhone 17
 
+## Runtime config persistente (iOS/macOS app)
+1. Copiar `DesignSystemDemo/Config/Runtime.Local.example.xcconfig` a `DesignSystemDemo/Config/Runtime.Local.xcconfig`.
+2. Definir:
+   - `TRAINING_LAB_API_BASE_URL`
+   - `TRAINING_LAB_API_KEY`
+3. Ejecutar app sin `launchctl setenv`.
+
+Notas:
+- `Runtime.Local.xcconfig` está ignorado por git.
+- La API key inyectada en build settings queda accesible en metadatos del bundle.
+- Solo usar keys de dev/local/staging. Nunca credenciales sensibles de producción en cliente.
+
 ## Validaciones backend
 ```bash
 curl -sS -H "X-API-Key: $TRAINING_LAB_API_KEY" \

@@ -20,6 +20,7 @@ dist/
 .env
 .env.*
 !.env.example
+DesignSystemDemo/Config/Runtime.Local.xcconfig
 
 # macOS
 .DS_Store

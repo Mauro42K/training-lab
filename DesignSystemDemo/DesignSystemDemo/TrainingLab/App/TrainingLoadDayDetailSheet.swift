@@ -7,7 +7,14 @@ struct TrainingLoadDayDetailSheet: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                if !isLoading {
+                    Text(summaryLine)
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .padding(.horizontal, AppSpacing.x16)
+                }
+
                 if isLoading {
                     DSLoadingState()
                 } else if workouts.isEmpty {
@@ -17,28 +24,58 @@ struct TrainingLoadDayDetailSheet: View {
                         message: "No sessions found for this day and filter."
                     )
                 } else {
-                    List(workouts, id: \.uuid) { workout in
-                        VStack(alignment: .leading, spacing: AppSpacing.x4) {
-                            Text(workout.sport.rawValue.capitalized)
-                                .appTextStyle(AppTypography.headingH3)
-                                .foregroundStyle(AppColors.Text.primary)
-                            Text(Self.timeFormatter.string(from: workout.start))
-                                .appTextStyle(AppTypography.bodySmall)
-                                .foregroundStyle(AppColors.Text.secondary)
-                            Text("Duration \(Self.durationString(workout.durationSec))")
-                                .appTextStyle(AppTypography.bodySmall)
-                                .foregroundStyle(AppColors.Text.secondary)
-                        }
-                        .listRowBackground(AppColors.Background.elevated)
-                    }
-                    .scrollContentBackground(.hidden)
-                    .background(AppColors.Background.primary)
+                    workoutsList
                 }
             }
-            .padding(AppSpacing.x16)
             .background(AppColors.Background.primary.ignoresSafeArea())
             .navigationTitle(Self.dayFormatter.string(from: day))
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
+        }
+    }
+
+    private var workoutsList: some View {
+        let list = List(workouts, id: \.uuid) { workout in
+            VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                Text(workout.sport.rawValue.capitalized)
+                    .appTextStyle(AppTypography.headingH3)
+                    .foregroundStyle(AppColors.Text.primary)
+                Text(Self.timeFormatter.string(from: workout.start))
+                    .appTextStyle(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+                Text("Duration \(Self.durationString(workout.durationSec))")
+                    .appTextStyle(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+            .padding(.vertical, AppSpacing.x4)
+            .listRowBackground(AppColors.Surface.cardMuted)
+        }
+
+        #if os(iOS)
+        return AnyView(
+            list
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
+                .background(AppColors.Background.primary)
+        )
+        #else
+        return AnyView(
+            list
+                .listStyle(.inset)
+                .background(AppColors.Background.primary)
+        )
+        #endif
+    }
+
+    private var summaryLine: String {
+        switch workouts.count {
+        case 0:
+            return "No sessions"
+        case 1:
+            return "1 session"
+        default:
+            return "\(workouts.count) sessions"
         }
     }
 

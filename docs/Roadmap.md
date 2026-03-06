@@ -146,8 +146,20 @@
 
 ## 4. Phase 3 — HealthKit Access & Local Data Model (Foundation)
 
-**Status:** PLANNED  
+**Status:** CLOSED (2026-03-05 America/New_York)  
 **Goal:** Read Apple Health data reliably and normalize it into a local store for fast charts.
+
+**Evidence:**
+- `docs/Phase3_QA.md`
+- `docs/qa/phase3/`
+
+**Closure notes:**
+- Backend online-first foundation completed: PostgreSQL + Alembic + API v1.
+- Auth baseline enforced on `/v1/*` with `X-API-KEY`; `/` and `/health` remain public.
+- Idempotency flow validated end-to-end (replay 200 / conflict 409).
+- iOS shell + permission gate + online-first contracts integrated.
+- Xcode wiring gap for TrainingLab sources closed via `project.pbxproj` update (documented in QA evidence).
+- Rate limiting remains deferred to **Phase 3.1**.
 
 ### 4.1 Deliverables
 - HealthKit permission flow + data access layer.

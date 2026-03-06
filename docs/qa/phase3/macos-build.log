@@ -1,0 +1,403 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project DesignSystemDemo/DesignSystemDemo.xcodeproj -scheme DesignSystemDemo -destination platform=macOS build
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'DesignSystemDemo' in project 'DesignSystemDemo' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 41b2606c50994f15d1580c8774acfdb7
+Build description path: /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/XCBuildData/41b2606c50994f15d1580c8774acfdb7.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk /Users/mauro/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache
+    cd /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -o /Users/mauro/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache
+
+CreateBuildDirectory /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug
+    cd /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo.xcodeproj
+    builtin-create-build-directory /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug
+
+CreateBuildDirectory /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+    cd /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo.xcodeproj
+    builtin-create-build-directory /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo-749759106b35d5d1cbf25f7d48912312-VFS/all-product-headers.yaml
+    cd /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo.xcodeproj
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo-749759106b35d5d1cbf25f7d48912312-VFS/all-product-headers.yaml
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/empty-DesignSystemDemo.plist (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/empty-DesignSystemDemo.plist
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.hmap (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.hmap
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.LinkFileList (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.LinkFileList
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftFileList (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftFileList
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_const_extract_protocols.json (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-OutputFileMap.json (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftConstValuesFileList (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.DependencyStaticMetadataFileList (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.DependencyMetadataFileList (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-project-headers.hmap (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-project-headers.hmap
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-generated-files.hmap (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-generated-files.hmap
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-own-target-headers.hmap (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-all-target-headers.hmap (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-all-non-framework-target-headers.hmap (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-DebugDylibPath-normal-arm64.txt (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-DebugDylibPath-normal-arm64.txt
+
+WriteAuxiliaryFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-DebugDylibInstallName-normal-arm64.txt (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    write-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-DebugDylibInstallName-normal-arm64.txt
+
+MkDir /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /bin/mkdir -p /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents
+
+MkDir /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /bin/mkdir -p /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app
+
+MkDir /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /bin/mkdir -p /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS
+
+Ld /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/__preview.dylib normal (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos26.0 -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -O0 -L/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -F/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -install_name @rpath/DesignSystemDemo.debug.dylib -rdynamic -Xlinker -no_deduplicate -Xlinker -dependency_info -Xlinker /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_dependency_info.dat -o /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/__preview.dylib
+
+ProcessInfoPlistFile /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/Info.plist /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/empty-DesignSystemDemo.plist (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-infoPlistUtility /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/empty-DesignSystemDemo.plist -producttype com.apple.product-type.application -genpkginfo /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/PkgInfo -expandbuildsettings -platform macosx -o /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/Info.plist
+
+SwiftDriver DesignSystemDemo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name DesignSystemDemo -Onone -enforce-exclusivity\=checked @/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos26.0 -g -module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -F /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-generated-files.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-own-target-headers.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-all-target-headers.hmap -Xcc -iquote -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-project-headers.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/include -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources-normal/arm64 -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources/arm64 -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-Swift.h -working-directory /Users/mauro/Training-lab/DesignSystemDemo -experimental-emit-module-separately -disable-cmo
+
+SwiftCompile normal arm64 Compiling\ DSMetricPill.swift,\ DSRing.swift,\ DSSectionHeader.swift,\ DSSegmentedControl.swift,\ GalleryView.swift /Users/mauro/Training-lab/DesignSystem/Components/DSMetricPill.swift /Users/mauro/Training-lab/DesignSystem/Components/DSRing.swift /Users/mauro/Training-lab/DesignSystem/Components/DSSectionHeader.swift /Users/mauro/Training-lab/DesignSystem/Components/DSSegmentedControl.swift /Users/mauro/Training-lab/DesignSystem/Gallery/GalleryView.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSMetricPill.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSRing.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSSectionHeader.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSSegmentedControl.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Gallery/GalleryView.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 Compiling\ DailySummaryDTO.swift,\ WorkoutDTO.swift,\ WorkoutIngestDTO.swift,\ SportType.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/DTO/DailySummaryDTO.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/DTO/WorkoutDTO.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/DTO/WorkoutIngestDTO.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Domain/SportType.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/DTO/DailySummaryDTO.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/DTO/WorkoutDTO.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/DTO/WorkoutIngestDTO.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Domain/SportType.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ DesignSystemDemo (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+EmitSwiftModule normal arm64 (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 Compiling\ IngestionOrchestrator.swift,\ APIClient.swift,\ HealthKitClient.swift,\ HealthKitClientLive.swift,\ HealthKitClientUnsupported.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Services/IngestionOrchestrator.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/APIClient.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/HealthKitClient.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/HealthKitClientLive.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/HealthKitClientUnsupported.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Services/IngestionOrchestrator.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/APIClient.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/HealthKitClient.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/HealthKitClientLive.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/HealthKitClientUnsupported.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 Compiling\ AppShadows.swift,\ AppSizing.swift,\ AppSpacing.swift,\ AppStrokeWidth.swift,\ AppTypography.swift /Users/mauro/Training-lab/DesignSystem/AppShadows.swift /Users/mauro/Training-lab/DesignSystem/AppSizing.swift /Users/mauro/Training-lab/DesignSystem/AppSpacing.swift /Users/mauro/Training-lab/DesignSystem/AppStrokeWidth.swift /Users/mauro/Training-lab/DesignSystem/AppTypography.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppShadows.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppSizing.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppSpacing.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppStrokeWidth.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppTypography.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 Compiling\ SyncStateStore.swift,\ WorkoutsRepository.swift,\ DailyRepository.swift,\ RepositoryError.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Services/SyncStateStore.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Repositories/WorkoutsRepository.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Repositories/DailyRepository.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Repositories/RepositoryError.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Services/SyncStateStore.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Repositories/WorkoutsRepository.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Repositories/DailyRepository.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Repositories/RepositoryError.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 Compiling\ SyncClient.swift,\ URLSessionAPIClient.swift,\ CachedDailySummary.swift,\ CachedSyncState.swift,\ CachedWorkout.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/SyncClient.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/URLSessionAPIClient.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Cache/CachedDailySummary.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Cache/CachedSyncState.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Cache/CachedWorkout.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/SyncClient.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Clients/URLSessionAPIClient.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Cache/CachedDailySummary.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Cache/CachedSyncState.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/TrainingLab/Models/Cache/CachedWorkout.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 Compiling\ AppChartStyle.swift,\ DSCard.swift,\ DSChartCard.swift,\ DSEmptyState.swift,\ DSLoadingState.swift /Users/mauro/Training-lab/DesignSystem/Charts/AppChartStyle.swift /Users/mauro/Training-lab/DesignSystem/Components/DSCard.swift /Users/mauro/Training-lab/DesignSystem/Components/DSChartCard.swift /Users/mauro/Training-lab/DesignSystem/Components/DSEmptyState.swift /Users/mauro/Training-lab/DesignSystem/Components/DSLoadingState.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Charts/AppChartStyle.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSCard.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSChartCard.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSEmptyState.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/Components/DSLoadingState.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 Compiling\ DesignSystemDemoApp.swift,\ GalleryRootView.swift,\ AppColors.swift,\ AppElevation.swift,\ AppRadius.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/App/DesignSystemDemoApp.swift /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/Root/GalleryRootView.swift /Users/mauro/Training-lab/DesignSystem/AppColors.swift /Users/mauro/Training-lab/DesignSystem/AppElevation.swift /Users/mauro/Training-lab/DesignSystem/AppRadius.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/App/DesignSystemDemoApp.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+/Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/App/DesignSystemDemoApp.swift:57:67: warning: backward matching of the unlabeled trailing closure is deprecated; label the argument with 'actionLabel' to suppress this warning
+                DSSectionHeader(title: "Phase 3 Permission Gate") {
+                                                                ~ ^
+                                                                , actionLabel: 
+/Users/mauro/Training-lab/DesignSystem/Components/DSSectionHeader.swift:8:5: note: 'init(title:action:actionLabel:)' declared here
+    init(
+    ^
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystemDemo/DesignSystemDemo/Root/GalleryRootView.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppColors.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppElevation.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftCompile normal arm64 /Users/mauro/Training-lab/DesignSystem/AppRadius.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    
+
+SwiftDriverJobDiscovery normal arm64 Compiling AppShadows.swift, AppSizing.swift, AppSpacing.swift, AppStrokeWidth.swift, AppTypography.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling DailySummaryDTO.swift, WorkoutDTO.swift, WorkoutIngestDTO.swift, SportType.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling IngestionOrchestrator.swift, APIClient.swift, HealthKitClient.swift, HealthKitClientLive.swift, HealthKitClientUnsupported.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SyncStateStore.swift, WorkoutsRepository.swift, DailyRepository.swift, RepositoryError.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for DesignSystemDemo (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriver\ Compilation\ Requirements DesignSystemDemo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name DesignSystemDemo -Onone -enforce-exclusivity\=checked @/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos26.0 -g -module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -F /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-generated-files.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-own-target-headers.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-all-target-headers.hmap -Xcc -iquote -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-project-headers.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/include -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources-normal/arm64 -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources/arm64 -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-Swift.h -working-directory /Users/mauro/Training-lab/DesignSystemDemo -experimental-emit-module-separately -disable-cmo
+
+Copy /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/arm64-apple-macos.swiftmodule /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftmodule (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftmodule /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/arm64-apple-macos.swiftmodule
+
+Copy /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/arm64-apple-macos.swiftdoc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftdoc (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftdoc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/arm64-apple-macos.swiftdoc
+
+Copy /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/arm64-apple-macos.abi.json /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.abi.json (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.abi.json /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/arm64-apple-macos.abi.json
+
+SwiftMergeGeneratedHeaders /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources/DesignSystemDemo-Swift.h /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-Swift.h (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-swiftHeaderTool -arch arm64 /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-Swift.h -o /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources/DesignSystemDemo-Swift.h
+
+Copy /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftsourceinfo (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftsourceinfo /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo
+
+SwiftDriverJobDiscovery normal arm64 Compiling AppChartStyle.swift, DSCard.swift, DSChartCard.swift, DSEmptyState.swift, DSLoadingState.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SyncClient.swift, URLSessionAPIClient.swift, CachedDailySummary.swift, CachedSyncState.swift, CachedWorkout.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling DesignSystemDemoApp.swift, GalleryRootView.swift, AppColors.swift, AppElevation.swift, AppRadius.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling DSMetricPill.swift, DSRing.swift, DSSectionHeader.swift, DSSegmentedControl.swift, GalleryView.swift (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+SwiftDriver\ Compilation DesignSystemDemo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name DesignSystemDemo -Onone -enforce-exclusivity\=checked @/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos26.0 -g -module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -F /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C58-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/mauro/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-generated-files.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-own-target-headers.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-all-target-headers.hmap -Xcc -iquote -Xcc /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-project-headers.hmap -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/include -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources-normal/arm64 -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources/arm64 -Xcc -I/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-Swift.h -working-directory /Users/mauro/Training-lab/DesignSystemDemo -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo.debug.dylib normal (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos26.0 -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -O0 -L/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -L/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -F/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -F/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -filelist /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.LinkFileList -install_name @rpath/DesignSystemDemo.debug.dylib -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -object_path_lto -Xlinker /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -dependency_info -Xlinker /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.swiftmodule @/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo-linker-args.resp -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -framework Foundation -o /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo.debug.dylib
+
+ConstructStubExecutorLinkFileList /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-ExecutorLinkFileList-normal-arm64.txt (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    construct-stub-executor-link-file-list /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-ExecutorLinkFileList-normal-arm64.txt
+note: Using stub executor library with Swift entry point. (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+
+Ld /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo normal (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos26.0 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -O0 -L/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -F/Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker @executable_path/Frameworks -rdynamic -Xlinker -no_deduplicate -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo-ExecutorLinkFileList-normal-arm64.txt /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo.debug.dylib -o /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo
+
+ExtractAppIntentsMetadata (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name DesignSystemDemo --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk --xcode-version 17C529 --platform-family macOS --deployment-target 26.0 --bundle-identifier com.traininglab.designsystemdemo --output /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/Resources --target-triple arm64-apple-macos26.0 --binary-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo --dependency-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo_dependency_info.dat --stringsdata-file /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftFileList --metadata-file-list /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.DependencyMetadataFileList --static-metadata-file-list /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/DesignSystemDemo.DependencyStaticMetadataFileList --swift-const-vals-list /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/Objects-normal/arm64/DesignSystemDemo.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-03-05 23:02:13.901 appintentsmetadataprocessor[3893:3180020] Starting appintentsmetadataprocessor export
+2026-03-05 23:02:13.903 appintentsmetadataprocessor[3893:3180020] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/MacOS/DesignSystemDemo.debug.dylib --scan-folder /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/Frameworks --scan-folder /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/PlugIns --scan-folder /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/Library/SystemExtensions --scan-folder /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/Extensions --scan-folder /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework --platform macosx --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app/Contents/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Intermediates.noindex/DesignSystemDemo.build/Debug/DesignSystemDemo.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+RegisterExecutionPolicyException /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-RegisterExecutionPolicyException /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app
+
+Validate /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    builtin-validationUtility /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app -no-validate-extension -infoplist-subpath Contents/Info.plist
+
+Touch /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /usr/bin/touch -c /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app
+
+RegisterWithLaunchServices /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app (in target 'DesignSystemDemo' from project 'DesignSystemDemo')
+    cd /Users/mauro/Training-lab/DesignSystemDemo
+    /System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister -f -R -trusted /Users/mauro/Library/Developer/Xcode/DerivedData/DesignSystemDemo-aionkuxnoqmfebgqvcexeinzfqqd/Build/Products/Debug/DesignSystemDemo.app
+
+** BUILD SUCCEEDED **
+

@@ -1,0 +1,8 @@
+HTTP/2 200 
+alt-svc: h3=":443"; ma=2592000
+content-type: application/json
+date: Thu, 05 Mar 2026 23:37:28 GMT
+server: uvicorn
+content-length: 163
+
+{"status":"ok","service":"training-lab-api","version":"0.0.0","git_sha":"128b5fb3dbf021951b5b745db5acff87ae1f56cf","short_sha":"128b5fb","metrics_model_version":1}

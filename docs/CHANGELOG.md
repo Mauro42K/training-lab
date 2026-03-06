@@ -2,6 +2,21 @@
 
 This project follows a simple SemVer-style changelog.
 
+## v0.0.3 - 2026-03-05
+
+- Phase 3 closed: online-first data foundation delivered and validated with QA evidence.
+- Backend:
+  - PostgreSQL foundation + Alembic migrations.
+  - API v1 endpoints: `POST /v1/ingest/workouts`, `GET /v1/workouts`, `GET /v1/daily`.
+  - API-key auth baseline for `/v1/*` (`X-API-KEY`).
+  - Idempotency for ingest (`X-Idempotency-Key`) with replay/conflict behavior validated.
+  - Payload guards active; dedicated rate limiting deferred to Phase 3.1.
+- iOS:
+  - TrainingLab shell root + permission gate flow integrated in demo runner.
+  - Online-first contracts added (DTOs, clients, repositories, sync orchestration, SwiftData cache models).
+  - Xcode project wiring fixed so TrainingLab sources compile under target `DesignSystemDemo`.
+- QA evidence consolidated in `docs/Phase3_QA.md` and `docs/qa/phase3/`.
+
 ## v0.0.2 - 2026-03-05
 
 - Phase 2 closed: Design System & Layout delivered and documented.

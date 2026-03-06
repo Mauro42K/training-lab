@@ -184,29 +184,63 @@
 
 ---
 
-## 5. Phase 4 — TRIMP Engine v1 + Home TRIMP Hero Card (MVP)
+## 5. Phase 4.0 — TRIMP Engine v1 + Home TRIMP Hero Card (MVP)
 
-**Status:** PLANNED  
+**Status:** CLOSED (2026-03-06 America/New_York)  
 **Goal:** Deliver the first real value: TRIMP chart usable from day 1.
 
-### 5.1 Deliverables
+**Closure summary:**
+- Backend source of truth for TRIMP delivered:
+  - TRIMP engine v1.
+  - recompute pipeline.
+  - endpoint `GET /v1/training-load`.
+  - backfill operativo por lotes para histórico.
+- iOS integration delivered:
+  - `TrainingLoadScreen` funcional (temporal).
+  - filtros por deporte (`all/run/bike/strength/walk`).
+  - chart diario TRIMP de 28 días.
+  - highlight de today.
+  - tap en día abre detail sheet con soporte multi-session.
+- Critical bug fixed:
+  - mismatch de `Today` entre UI y backend.
+  - validación final: `today_local = 2026-03-06` y último item serie `date = 2026-03-06` (coinciden).
+
+### 5.1 Deliverables (Delivered)
 - TRIMP calculation v1 (documented in `docs/METRICS_CATALOG.md`).
 - Daily TRIMP aggregation:
   - All / Run / Bike / Strength / Walk filters.
   - last 28 days.
-- Home screen:
-  - **TRIMP Hero Card** (bars) + badges (today, 7d, 28d).
-  - Tap day → Day Sheet listing sessions.
+- API contract v1:
+  - `GET /v1/training-load?days=28&sport=...`
+- iOS temporary Training Load screen:
+  - summary badges (today, 7d, 28d),
+  - daily bar chart,
+  - filter control,
+  - day detail sheet.
 
-### 5.2 DoD
-- TRIMP chart loads fast (local cache).
+### 5.2 DoD (Closed)
+- TRIMP chart loads fast from backend/cache path.
 - Filter changes update chart correctly.
 - Day Sheet shows correct sessions and totals.
 
-### 5.3 QA
-- Multi-session day (run + strength).
-- No-HR workouts (fallback rules).
-- 14–21 day gap.
+### 5.3 QA (Closed)
+- Multi-session day (run + strength): PASS.
+- No-HR workouts (fallback rules): PASS.
+- Today alignment UI vs backend: PASS.
+- Evidence:
+  - `docs/Phase4_QA.md`
+  - `docs/qa/phase4/README.md`
+
+### 5.4 Phase 4.1 — Training Load UX Polish
+**Status:** PENDING  
+**Goal:** Improve visual quality of temporary Training Load screen before Home integration.
+
+Planned scope:
+- improve visual hierarchy.
+- reduce scaffold appearance.
+- add minimal temporal axis to chart.
+- remove duplicated title patterns.
+- prepare future reuse inside Home.
 
 ---
 

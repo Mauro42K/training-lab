@@ -2,6 +2,24 @@
 
 This project follows a simple SemVer-style changelog.
 
+## v0.4.0 - 2026-03-06
+
+Phase 4.0 Closed
+
+Added
+- TRIMP engine v1.
+- recompute pipeline.
+- training-load endpoint (`GET /v1/training-load`).
+- iOS Training Load screen.
+- sport filters (`all/run/bike/strength/walk`).
+
+Fixed
+- Today mismatch UI vs backend.
+
+Notes
+- Training Load screen is temporary.
+- It will be replaced by the real Home screen in later phases (Zero Legacy).
+
 ## v0.0.3 - 2026-03-05
 
 - Phase 3 closed: online-first data foundation delivered and validated with QA evidence.

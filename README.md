@@ -1,6 +1,10 @@
 # Training Lab
 
-Training Lab is the repository bootstrap for the product foundation. Phase 0 ships a minimal FastAPI backend that is designed to deploy cleanly on Coolify.
+Training Lab is the repository for the product foundation and iterative phase delivery.
+
+Current status:
+- Phase 4.0 is closed (TRIMP engine + training-load API + iOS Training Load runtime screen).
+- Next phase is Phase 4.1 (Training Load UX Polish).
 
 ## Local API
 1. Create a virtual environment.
@@ -15,3 +19,9 @@ Training Lab is the repository bootstrap for the product foundation. Phase 0 shi
 4. Deploy and verify `/health`.
 
 Detailed operational steps live in `docs/DEPLOY_RUNBOOK.md`.
+
+## Documentation Source of Truth
+- Roadmap: `docs/Roadmap.md`
+- Changelog: `docs/CHANGELOG.md`
+- Codex context: `docs/CODEX_CONTEXT.md`
+- Phase 4 QA closure: `docs/Phase4_QA.md`

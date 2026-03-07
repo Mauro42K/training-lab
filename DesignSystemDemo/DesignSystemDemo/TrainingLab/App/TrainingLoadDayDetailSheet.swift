@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct TrainingLoadDayDetailSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
     let day: Date
     let workouts: [WorkoutDTO]
     let isLoading: Bool
@@ -31,6 +33,16 @@ struct TrainingLoadDayDetailSheet: View {
             .navigationTitle(Self.dayFormatter.string(from: day))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #else
+            .toolbar {
+                ToolbarItem(placement: .automatic) {
+                    Button("Close") {
+                        dismiss()
+                    }
+                    .keyboardShortcut(.cancelAction)
+                }
+            }
+            .frame(minWidth: 440, minHeight: 380)
             #endif
         }
     }

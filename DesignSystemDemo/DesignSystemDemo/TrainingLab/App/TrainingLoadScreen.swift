@@ -5,13 +5,12 @@ struct TrainingLoadScreen: View {
 
     @State private var selectedFilter: TrainingLoadSportFilter = .all
     @State private var points: [TrainingLoadItemDTO] = []
-    @State private var selectedDay: Date?
+    @State private var selectedDay: SelectedTrainingLoadDay?
     @State private var dayWorkouts: [WorkoutDTO] = []
     @State private var isLoading = false
     @State private var isLoadingDay = false
     @State private var hasLoadedOnce = false
     @State private var errorMessage: String?
-    @State private var showDaySheet = false
 
     private let calendar = Calendar.current
 
@@ -64,9 +63,9 @@ struct TrainingLoadScreen: View {
         .task(id: selectedFilter) {
             await loadSeries()
         }
-        .sheet(isPresented: $showDaySheet) {
+        .sheet(item: $selectedDay, onDismiss: clearSelectedDaySelection) { selection in
             TrainingLoadDayDetailSheet(
-                day: selectedDay ?? Date(),
+                day: selection.date,
                 workouts: dayWorkouts,
                 isLoading: isLoadingDay
             )
@@ -84,7 +83,7 @@ struct TrainingLoadScreen: View {
                 date: item.date,
                 value: item.trimp,
                 isToday: calendar.isDateInToday(item.date),
-                isSelected: selectedDay.map { calendar.isDate($0, inSameDayAs: item.date) } ?? false
+                isSelected: selectedDay.map { calendar.isDate($0.date, inSameDayAs: item.date) } ?? false
             )
         }
     }
@@ -121,23 +120,38 @@ struct TrainingLoadScreen: View {
     }
 
     private func selectDay(_ day: Date) async {
-        selectedDay = day
-        showDaySheet = true
+        selectedDay = SelectedTrainingLoadDay(date: day)
         isLoadingDay = true
         defer { isLoadingDay = false }
 
         do {
             let start = calendar.startOfDay(for: day)
             let end = calendar.date(byAdding: .day, value: 1, to: start)?.addingTimeInterval(-1) ?? start
-            dayWorkouts = try await environment.workoutsRepository.getWorkouts(
+            let workouts = try await environment.workoutsRepository.getWorkouts(
                 from: start,
                 to: end,
                 sport: selectedFilter.sportType
             )
+            if selectedDay.map({ calendar.isDate($0.date, inSameDayAs: day) }) == true {
+                dayWorkouts = workouts
+            }
         } catch {
-            dayWorkouts = []
+            if selectedDay.map({ calendar.isDate($0.date, inSameDayAs: day) }) == true {
+                dayWorkouts = []
+            }
         }
     }
+
+    private func clearSelectedDaySelection() {
+        selectedDay = nil
+        dayWorkouts = []
+    }
+}
+
+private struct SelectedTrainingLoadDay: Identifiable, Equatable {
+    let date: Date
+
+    var id: Date { date }
 }
 
 private extension TrainingLoadSportFilter {

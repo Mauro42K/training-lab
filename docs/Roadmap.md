@@ -232,15 +232,32 @@
   - `docs/qa/phase4/README.md`
 
 ### 5.4 Phase 4.1 — Training Load UX Polish
-**Status:** PENDING  
-**Goal:** Improve visual quality of temporary Training Load screen before Home integration.
+**Status:** CLOSED (2026-03-06 America/New_York)  
+**Goal:** Improve visual quality and interaction stability of temporary Training Load screen before Home integration.
+
+Delivered scope:
+- temporal axis polish for fast 28d reading.
+- summary row hierarchy and filter feedback refinement.
+- chart state polish (`selected > today > hover > normal`), baseline/growth-from-bottom fix, sparse-data rendering improvements.
+- robust hover/click/detail interaction, including stable macOS close flow.
+- medium decoupling of chart presentation layer for future Home TrendCard reuse.
+- real macOS compatibility and runtime config persistence via `xcconfig` + bundle config.
+- cache scope isolation by effective `baseURL` to avoid cross-environment cache mix.
+
+Guardrail (explicit):
+- Phase 4.1 closes UX polish + multiplatform stability + runtime config only.
+- Real HealthKit / Apple Fitness ingest alignment is **not** resolved in 4.1.
+- That work moves formally to **Phase 4.2**.
+
+### 5.5 Phase 4.2 — HealthKit Real Ingest Enablement
+**Status:** PLANNED  
+**Goal:** Ensure real Apple Fitness/HealthKit workouts are reliably ingested end-to-end and reflected in training-load calculations.
 
 Planned scope:
-- improve visual hierarchy.
-- reduce scaffold appearance.
-- add minimal temporal axis to chart.
-- remove duplicated title patterns.
-- prepare future reuse inside Home.
+- validate real-device HealthKit sync execution path.
+- verify user identity/source mapping to avoid seed/demo contamination.
+- guarantee production schema/migration alignment for ingest + load endpoints.
+- close ingest observability gaps (pipeline checkpoints and QA evidence).
 
 ---
 

@@ -20,11 +20,11 @@ struct PermissionGateView: View {
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: AppSpacing.x16) {
-                        DSSectionHeader(title: "Phase 3 Permission Gate") {
+                        DSSectionHeader(title: "Phase 3 Permission Gate", actionLabel:  {
                             Text("Online-first")
                                 .appTextStyle(AppTypography.labelSmall)
                                 .foregroundStyle(AppColors.Text.secondary)
-                        }
+                        })
 
                         content
 

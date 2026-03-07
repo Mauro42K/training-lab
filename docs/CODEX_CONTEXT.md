@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 4.0 — CLOSED** (2026-03-06 America/New_York)
+- **Phase 4.1 — CLOSED** (2026-03-06 America/New_York)
 
 ## Phase 4.0 Delivered
 
@@ -29,14 +29,33 @@
   - last training-load item `date = 2026-03-06`
   - values match exactly.
 
+## Phase 4.1 Delivered
+
+### UX/UI + Chart
+- Temporal axis polish for Training Load chart.
+- Summary hierarchy + filter feedback refinement.
+- State polish with explicit priority: `selected > today > hover > normal`.
+- Baseline fix: bars always grow from bottom; `TRIMP=0` stays anchored.
+- Sparse-data rendering polish and lightweight macOS hover tooltip.
+
+### Multiplatform Stability
+- macOS interaction flow stabilized for day detail open/close.
+- iOS/macOS behavior kept consistent without backend/API changes.
+
+### Runtime Config + Data Consistency
+- Persistent runtime config via `xcconfig` + bundle values (no `launchctl` dependency).
+- Cache scope isolation by effective `baseURL` to prevent cross-environment cache mixing.
+
+Guardrail (explicit):
+- Phase 4.1 closes UX polish + multiplatform stability + runtime config only.
+- Real HealthKit / Apple Fitness ingest alignment is not solved here.
+
 ## Next Phase
-- **Phase 4.1 — Training Load UX Polish** (**Pending**)
+- **Phase 4.2 — HealthKit Real Ingest Enablement** (**Planned**)
 - Scope:
-  - improve visual hierarchy.
-  - reduce scaffold appearance.
-  - add minimal temporal axis in chart.
-  - remove title duplication.
-  - prepare reuse inside future Home screen.
+  - validate real HealthKit sync path end-to-end.
+  - ensure correct user/source mapping (no seed/demo drift).
+  - close ingest observability + production alignment gaps.
 
 ## Non-Negotiables
 - Design-first.

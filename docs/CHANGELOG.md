@@ -2,6 +2,30 @@
 
 This project follows a simple SemVer-style changelog.
 
+## v0.4.1 - 2026-03-06
+
+Phase 4.1 Closed
+
+Added
+- Training Load chart temporal axis polish for fast 28d read.
+- macOS hover context tooltip (minimal and non-invasive).
+- runtime config persistence through `xcconfig` + bundle-backed config resolution.
+
+Improved
+- chart states hierarchy and visual readability (`selected > today > hover > normal`).
+- summary row hierarchy and sport filter interaction feedback.
+- Training Load chart reuse readiness for future Home TrendCard integration.
+
+Fixed
+- baseline rendering so bars always grow from bottom (`TRIMP=0` anchored to baseline).
+- macOS day detail interaction and close stability.
+- cache scope isolation by effective `baseURL` to avoid mixing stale environment data.
+
+Notes
+- Phase 4.1 closes UX polish + multiplatform stability + runtime config hardening.
+- Real Apple Health/Fitness ingest remains unresolved in this phase.
+- HealthKit real ingest enablement is formally moved to Phase 4.2.
+
 ## v0.4.0 - 2026-03-06
 
 Phase 4.0 Closed

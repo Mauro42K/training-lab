@@ -1,7 +1,7 @@
 # Phase 4 QA Closure (TRIMP + Training Load)
 
 ## Resumen Ejecutivo
-Phase 4.0 queda cerrada con validación funcional end-to-end:
+Phase 4.0 y 4.1 quedan cerradas con validación funcional end-to-end:
 
 - Backend:
   - TRIMP engine v1 operativo.
@@ -12,6 +12,9 @@ Phase 4.0 queda cerrada con validación funcional end-to-end:
   - `TrainingLoadScreen` funcional con serie de 28 días.
   - Filtros `all/run/bike/strength/walk`.
   - Tap en barra abre detalle diario con sesiones separadas.
+  - Polish UX/UI del chart aplicado (axis/state/baseline/sparse handling).
+  - Interacción macOS estabilizada (hover/click/detail + cierre explícito).
+  - Runtime config persistente (`xcconfig` + bundle values) validado.
 - Fix crítico cerrado:
   - mismatch de `Today` entre UI y backend.
 
@@ -28,7 +31,12 @@ Comprobaciones funcionales:
 ## Evidencia
 - `docs/qa/phase4/README.md`
 
-## DoD Checklist (Phase 4)
+## Guardrail de cierre de fase
+- Phase 4.1 cierra UX polish + estabilidad multiplataforma + runtime config.
+- Real ingest de Apple Fitness/HealthKit no se cierra en 4.1.
+- Ese alcance pasa formalmente a Phase 4.2 (HealthKit Real Ingest Enablement).
+
+## DoD Checklist (Phase 4.0 + 4.1)
 - [x] TRIMP engine v1 backend.
 - [x] Recompute pipeline incremental.
 - [x] Endpoint `GET /v1/training-load` con filtros.
@@ -37,3 +45,7 @@ Comprobaciones funcionales:
 - [x] Chart 28 días con filtros por deporte.
 - [x] Day detail sheet con soporte multi-session.
 - [x] Bug `Today` alignment UI/backend corregido y validado.
+- [x] Temporal axis y state polish del chart.
+- [x] Baseline fix (barras ancladas abajo para `TRIMP=0`).
+- [x] Compatibilidad macOS real en interacción de detalle.
+- [x] Runtime config persistente sin dependencia de `launchctl`.

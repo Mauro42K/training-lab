@@ -77,10 +77,14 @@ final class DailyRepository {
 final class TrainingLoadRepository {
     private let apiClient: any APIClient
     private let modelContext: ModelContext
+    private let cacheScope: String
+    private let baseURLForDebug: URL
 
-    init(apiClient: any APIClient, modelContext: ModelContext) {
+    init(apiClient: any APIClient, modelContext: ModelContext, baseURL: URL, cacheScope: String) {
         self.apiClient = apiClient
         self.modelContext = modelContext
+        self.baseURLForDebug = baseURL
+        self.cacheScope = cacheScope
     }
 
     func getTrainingLoad(days: Int = 28, sport: TrainingLoadSportFilter) async throws -> [TrainingLoadItemDTO] {
@@ -95,15 +99,26 @@ final class TrainingLoadRepository {
         } catch {
             let cached = try fetchCached(days: days, sport: sport)
             if cached.isEmpty {
+                #if DEBUG
+                throw RepositoryError.networkAndNoCache(
+                    underlying: TrainingLoadNetworkContextError(
+                        underlying: error,
+                        baseURL: baseURLForDebug,
+                        sport: sport
+                    )
+                )
+                #else
                 throw RepositoryError.networkAndNoCache(underlying: error)
+                #endif
             }
             return cached
         }
     }
 
     private func replaceCache(for sport: TrainingLoadSportFilter, with items: [TrainingLoadItemDTO]) throws {
+        let scopedSportKey = scopedSportKey(for: sport)
         let predicate = #Predicate<CachedTrainingLoadPoint> { item in
-            item.sportFilterRaw == sport.rawValue
+            item.sportFilterRaw == scopedSportKey
         }
         let descriptor = FetchDescriptor<CachedTrainingLoadPoint>(predicate: predicate)
         let existing = try modelContext.fetch(descriptor)
@@ -115,7 +130,7 @@ final class TrainingLoadRepository {
             modelContext.insert(
                 CachedTrainingLoadPoint(
                     date: item.date,
-                    sportFilterRaw: sport.rawValue,
+                    sportFilterRaw: scopedSportKey,
                     trimp: item.trimp,
                     updatedAt: Date()
                 )
@@ -126,8 +141,9 @@ final class TrainingLoadRepository {
     }
 
     private func fetchCached(days: Int, sport: TrainingLoadSportFilter) throws -> [TrainingLoadItemDTO] {
+        let scopedSportKey = scopedSportKey(for: sport)
         let predicate = #Predicate<CachedTrainingLoadPoint> { item in
-            item.sportFilterRaw == sport.rawValue
+            item.sportFilterRaw == scopedSportKey
         }
         let descriptor = FetchDescriptor<CachedTrainingLoadPoint>(
             predicate: predicate,
@@ -138,5 +154,20 @@ final class TrainingLoadRepository {
         return sliced.map { item in
             TrainingLoadItemDTO(date: item.date, trimp: item.trimp)
         }
+    }
+
+    // Pragmatic namespace isolation without widening SwiftData model scope in Phase 4.1.
+    private func scopedSportKey(for sport: TrainingLoadSportFilter) -> String {
+        "\(cacheScope)|\(sport.rawValue)"
+    }
+}
+
+private struct TrainingLoadNetworkContextError: LocalizedError {
+    let underlying: Error
+    let baseURL: URL
+    let sport: TrainingLoadSportFilter
+
+    var errorDescription: String? {
+        "\(underlying.localizedDescription) [baseURL=\(baseURL.absoluteString) sport=\(sport.rawValue)]"
     }
 }

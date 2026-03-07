@@ -61,7 +61,12 @@ struct AppEnvironment {
         let syncStateStore = SyncStateStore(modelContext: modelContext)
         let workoutsRepository = WorkoutsRepository(apiClient: apiClient, modelContext: modelContext)
         let dailyRepository = DailyRepository(apiClient: apiClient, modelContext: modelContext)
-        let trainingLoadRepository = TrainingLoadRepository(apiClient: apiClient, modelContext: modelContext)
+        let trainingLoadRepository = TrainingLoadRepository(
+            apiClient: apiClient,
+            modelContext: modelContext,
+            baseURL: baseURL,
+            cacheScope: cacheScope(for: baseURL)
+        )
         let ingestionOrchestrator = IngestionOrchestrator(
             healthKitClient: healthKitClient,
             apiClient: apiClient,
@@ -88,6 +93,11 @@ struct AppEnvironment {
     @MainActor
     static func stub() -> AppEnvironment {
         live()
+    }
+
+    private static func cacheScope(for baseURL: URL) -> String {
+        let normalized = baseURL.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        return normalized.lowercased()
     }
 }
 

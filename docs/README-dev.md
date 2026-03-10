@@ -1,5 +1,33 @@
 # README Dev
 
+## Environment targets
+
+Training Lab now has three runtime targets at the app config layer:
+
+- `production`
+  - base URL target: `https://api.training-lab.mauro42k.com`
+- `staging`
+  - canonical target: `https://api-staging.training-lab.mauro42k.com`
+  - active fallback while DNS is pending: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+- `local`
+  - base URL target: `http://127.0.0.1:8000`
+
+## iOS runtime config
+
+1. Copiar `DesignSystemDemo/Config/Runtime.Local.example.xcconfig` a `DesignSystemDemo/Config/Runtime.Local.xcconfig`.
+2. Elegir exactamente un bloque:
+   - `TRAINING_LAB_RUNTIME_ENV = production`
+   - `TRAINING_LAB_RUNTIME_ENV = staging`
+   - `TRAINING_LAB_RUNTIME_ENV = local`
+3. Definir:
+   - `TRAINING_LAB_API_BASE_URL`
+   - `TRAINING_LAB_API_KEY`
+
+Notas:
+- `Runtime.Local.xcconfig` no se versiona.
+- En debug, la app muestra un badge visible con el entorno activo.
+- La key embebida en bundle debe ser solo de dev/staging/local. Nunca una credencial sensible de producción.
+
 ## Ingest pipeline real
 
 Flujo actual validado en Phase 4.2:
@@ -44,3 +72,4 @@ HealthKit -> iOS Client -> POST /v1/ingest/workouts -> PostgreSQL -> load endpoi
 - Backend activo de esta fase: PostgreSQL.
 - El refresh post-ingest debe enviar fechas `YYYY-MM-DD` a `GET /v1/daily`.
 - La validación oficial de ingest real se hace en iPhone físico, no en simulador.
+- Features delicadas de reconciliación histórica o borrado deben probarse primero en staging, no en producción.

@@ -28,6 +28,8 @@
 	<string>$(TRAINING_LAB_API_BASE_URL)</string>
 	<key>TrainingLabAPIKey</key>
 	<string>$(TRAINING_LAB_API_KEY)</string>
+	<key>TrainingLabRuntimeEnvironment</key>
+	<string>$(TRAINING_LAB_RUNTIME_ENV)</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UILaunchScreen</key>

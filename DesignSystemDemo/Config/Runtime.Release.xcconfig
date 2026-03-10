@@ -2,6 +2,7 @@
 TL_URL_SLASH = /
 TRAINING_LAB_API_BASE_URL = https:$(TL_URL_SLASH)$(TL_URL_SLASH)api.training-lab.mauro42k.com
 TRAINING_LAB_API_KEY =
+TRAINING_LAB_RUNTIME_ENV = production
 
 // Optional local overrides for ad-hoc testing.
 #include? "Runtime.Local.xcconfig"

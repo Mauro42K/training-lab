@@ -12,6 +12,7 @@
 ## Runtime config persistente (iOS/macOS app)
 1. Copiar `DesignSystemDemo/Config/Runtime.Local.example.xcconfig` a `DesignSystemDemo/Config/Runtime.Local.xcconfig`.
 2. Definir:
+   - `TRAINING_LAB_RUNTIME_ENV`
    - `TRAINING_LAB_API_BASE_URL`
    - `TRAINING_LAB_API_KEY`
 3. Ejecutar app sin `launchctl setenv`.
@@ -20,6 +21,7 @@ Notas:
 - `Runtime.Local.xcconfig` está ignorado por git.
 - La API key inyectada en build settings queda accesible en metadatos del bundle.
 - Solo usar keys de dev/local/staging. Nunca credenciales sensibles de producción en cliente.
+- En debug, la app muestra un badge visible del entorno activo.
 
 ## Validaciones backend
 ```bash
@@ -76,3 +78,18 @@ Resultado esperado:
 
 ## Phase 4.2 QA Runbook
 - Ver `docs/qa/phase4/PHASE4_2_HEALTHKIT_REAL_INGEST.md` para validación de ingest real en iPhone.
+
+## Validaciones 4.3 staging / environment separation
+- `/health` debe diferenciar explícitamente:
+  - prod -> `environment=production`
+  - staging -> `environment=staging`
+- staging debe usar DB distinta de prod.
+- conteos mínimos comparativos tras clon:
+  - `workouts`
+  - `workout_load`
+  - `daily_load`
+- mientras `api-staging.training-lab.mauro42k.com` no tenga DNS público, QA HTTP de staging puede ejecutarse con el fallback:
+  - `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+
+## Phase 4.3 QA Runbook
+- Ver `docs/qa/phase4/PHASE4_3_STAGING_ENVIRONMENT.md`.

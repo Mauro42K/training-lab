@@ -12,6 +12,17 @@ struct TrainingLabRootView: View {
             }
             .navigationTitle("Training Lab")
             .toolbar {
+                #if DEBUG
+                ToolbarItem(placement: environmentBadgePlacement) {
+                    Text(environment.runtimeEnvironment.badgeLabel)
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.thinMaterial, in: Capsule())
+                        .foregroundStyle(environmentBadgeColor)
+                        .accessibilityIdentifier("runtime-environment-badge")
+                }
+                #endif
                 ToolbarItem(placement: .primaryAction) {
                     Button("Gallery") {
                         showGallery = true
@@ -31,6 +42,27 @@ struct TrainingLabRootView: View {
                         }
                     }
             }
+        }
+    }
+}
+
+private extension TrainingLabRootView {
+    var environmentBadgePlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        return .navigation
+        #else
+        return .topBarLeading
+        #endif
+    }
+
+    var environmentBadgeColor: Color {
+        switch environment.runtimeEnvironment {
+        case .production:
+            return .green
+        case .staging:
+            return .orange
+        case .local:
+            return .blue
         }
     }
 }

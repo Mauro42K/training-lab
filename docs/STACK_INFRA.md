@@ -17,17 +17,20 @@
 - Deployment mode: Git-based Dockerfile build
 - Container port: `8000`
 - Stable public domain: `https://api.training-lab.mauro42k.com`
+- Staging target domain: `https://api-staging.training-lab.mauro42k.com`
+- Staging fallback domain (active): `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 - Public health path: `/health`
 
 ## Build and Runtime Contract
 - Build installs dependencies from `requirements.txt`.
 - Build writes `api/deploy_metadata.json` into the image with version, full `git_sha`, and `short_sha`.
 - Runtime starts the service with `uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}`.
-- Runtime environment variables for phase 3:
+- Runtime environment variables:
   - `PORT=8000`
-  - `DATABASE_URL` (set in Coolify app env for `training-lab-api`)
-  - `TRAINING_LAB_API_KEY` (set in Coolify app env for `training-lab-api`)
-  - `INGEST_MAX_BATCH_SIZE=500` (set in Coolify app env for `training-lab-api`)
+  - `DATABASE_URL`
+  - `TRAINING_LAB_API_KEY`
+  - `INGEST_MAX_BATCH_SIZE=500`
+  - `APP_ENVIRONMENT`
 - TLS is terminated by Coolify with Let's Encrypt on `api.training-lab.mauro42k.com`.
 
 ## API v1 Contract (Phase 3)
@@ -41,14 +44,39 @@
   - Required header: `X-API-KEY`
 - `/` and `/health` remain public.
 
-## Database (Phase 3)
+## Database
 - Coolify database resource name: `training-lab-postgres`
 - Engine/image: PostgreSQL (`postgres:18-alpine`)
 - Internal service host on Coolify network: `j8cccgk8o4ock4c0s8sw8k48`
 - Database name: `training_lab`
 - Database user: `training_lab`
-- `DATABASE_URL` is configured in Coolify on the `training-lab-api` service environment variables.
+- Production `DATABASE_URL` is configured in Coolify on the `training-lab-api` service environment variables.
+- Staging database resource name: `training-lab-postgres-staging`
+- Staging internal service host on Coolify network: `u0wosgo04s008g44k4gkgwok`
+- Staging database name: `training_lab_staging`
+- Staging database user: `training_lab_staging`
+- Staging baseline created from a one-shot logical clone of production.
 - Do not store DB passwords in repository docs. Rotate secrets directly in Coolify when needed.
+
+## Environment Verification
+- `/health` now returns explicit `environment`.
+- Expected values:
+  - production: `environment=production`
+  - staging: `environment=staging`
+- Minimum verification before any destructive or reconciliation test:
+  1. confirm domain/URL target
+  2. confirm `/health.environment`
+  3. confirm Coolify service/resource name
+  4. confirm DB host/resource name
+
+## Staging Status
+- Separate staging API service created in Coolify: `training-lab-api-staging`
+- Separate staging PostgreSQL created in Coolify: `training-lab-postgres-staging`
+- Current clone validation counts:
+  - production: `workouts=3436`, `workout_load=3173`, `daily_load=9720`
+  - staging: `workouts=3436`, `workout_load=3173`, `daily_load=9720`
+- Canonical staging hostname is configured as the target, but external DNS A record is still pending.
+- Until DNS is created, operational QA can use the active sslip fallback URL.
 
 ## Decisions Recorded
 - Use FastAPI for the smallest reliable HTTP skeleton.
@@ -57,4 +85,3 @@
 - Keep application version at `0.0.0` until explicit SemVer release management is introduced.
 - Bake deploy metadata into the image so `/health` can report commit metadata without relying on runtime-only env vars.
 - Never paste tokens into logs or docs; rotate immediately if exposure happens.
-

@@ -1,5 +1,18 @@
-// Copy to Runtime.Local.xcconfig and set local dev/staging values.
+// Copy to Runtime.Local.xcconfig and choose exactly one environment block.
 // Never place production secrets in app bundle build settings.
 TL_URL_SLASH = /
+
+// Production example
+// TRAINING_LAB_RUNTIME_ENV = production
+// TRAINING_LAB_API_BASE_URL = https:$(TL_URL_SLASH)$(TL_URL_SLASH)api.training-lab.mauro42k.com
+// TRAINING_LAB_API_KEY = REPLACE_WITH_PRODUCTION_KEY
+
+// Staging example
+// TRAINING_LAB_RUNTIME_ENV = staging
+// TRAINING_LAB_API_BASE_URL = https:$(TL_URL_SLASH)$(TL_URL_SLASH)api-staging.training-lab.mauro42k.com
+// TRAINING_LAB_API_KEY = REPLACE_WITH_STAGING_KEY
+
+// Optional local example
+TRAINING_LAB_RUNTIME_ENV = local
 TRAINING_LAB_API_BASE_URL = http:$(TL_URL_SLASH)$(TL_URL_SLASH)127.0.0.1:8000
 TRAINING_LAB_API_KEY = dev-local-key

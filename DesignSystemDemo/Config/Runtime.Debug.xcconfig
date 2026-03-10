@@ -2,6 +2,7 @@
 TL_URL_SLASH = /
 TRAINING_LAB_API_BASE_URL = http:$(TL_URL_SLASH)$(TL_URL_SLASH)127.0.0.1:8000
 TRAINING_LAB_API_KEY =
+TRAINING_LAB_RUNTIME_ENV = local
 
 // Local overrides (ignored by git).
 #include? "Runtime.Local.xcconfig"

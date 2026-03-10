@@ -263,7 +263,7 @@ Completion summary:
 - iOS 18 HealthKit deprecation resolved by replacing `totalEnergyBurned` with `HKWorkout.statistics(for: .activeEnergyBurned)`.
 
 ### 5.6 Phase 4.3 — Staging Environment & Environment Separation
-**Status:** PLANNED  
+**Status:** IN PROGRESS  
 **Goal:** Introduce a proper **staging environment** separated from production to allow safe experimentation, schema evolution, and ingest testing without risking the primary dataset.
 
 Context:
@@ -275,16 +275,30 @@ High‑level architecture after this phase:
 
 Production:
 - API: `api.training-lab.mauro42k.com`
-- Database: `/var/data/app.db`
+- Database: PostgreSQL production (`training-lab-postgres`)
 
 Staging:
-- API: `api-staging.training-lab.mauro42k.com`
-- Database: `/var/data/app_staging.db`
+- API target: `api-staging.training-lab.mauro42k.com`
+- Active fallback URL: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+- Database: PostgreSQL staging (`training-lab-postgres-staging`)
+
+Current execution status:
+- separate Coolify `staging` environment created for project `training-lab`
+- separate staging PostgreSQL created and cloned one-shot from production
+- comparative counts after clone:
+  - `workouts = 3436`
+  - `workout_load = 3173`
+  - `daily_load = 9720`
+- separate staging API service created and healthy
+- `/health` now returns explicit `environment` so prod vs staging can be distinguished safely
+- iOS runtime config now supports explicit `production | staging | local`
+- debug builds show a visible runtime environment badge to avoid ambiguity
+- canonical domain `api-staging.training-lab.mauro42k.com` is configured as the target in Coolify, but public DNS resolution is still pending an external A record
 
 ### 5.6.1 Deliverables
 - **Staging API service** deployed in Coolify (separate service from prod).
 - **Database duplication**:
-  - initial clone of `/var/data/app.db` → `/var/data/app_staging.db`.
+  - initial one-shot logical clone of production PostgreSQL into staging PostgreSQL.
 - **Environment configuration separation**:
   - staging and production use different environment variables.
 - **Runtime configuration in iOS app**:
@@ -294,20 +308,31 @@ Staging:
   - `docs/DEPLOY_RUNBOOK.md` includes staging deploy flow.
 
 ### 5.6.2 DoD
-- Staging API reachable at `api-staging.training-lab.mauro42k.com`.
 - Staging database created and populated from production baseline.
 - App can connect to staging environment without affecting production data.
 - Production ingest and metrics remain unchanged.
+- Staging is verifiable without ambiguity by:
+  - distinct service/container in Coolify
+  - distinct PostgreSQL resource
+  - `/health` returning `environment=staging`
+
+Pending before closure:
+- public DNS for `api-staging.training-lab.mauro42k.com`
 
 ### 5.6.3 QA
 - Confirm staging API responds correctly to `/health`.
 - Verify staging DB queries return expected cloned data.
 - Validate that a staging ingest or recompute does **not** modify production DB.
+- Compare prod vs staging counts for:
+  - `workouts`
+  - `workout_load`
+  - `daily_load`
 
 ### 5.6.4 Guardrails
 - Production database must never be modified directly during feature development.
 - All schema experiments, migrations, and ingest tests must run in staging first.
 - Production deploys must come from validated staging builds.
+- iOS debug builds must show the active environment explicitly when not running default production.
 
 ### 5.7 Phase 4.4 — Workout Reconciliation & Historical Cleanup
 **Status:** PLANNED  

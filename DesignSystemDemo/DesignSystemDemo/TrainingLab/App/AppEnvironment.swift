@@ -5,12 +5,42 @@ struct AppEnvironment {
     private enum RuntimeConfigKey {
         static let bundleAPIBaseURL = "TrainingLabAPIBaseURL"
         static let bundleAPIKey = "TrainingLabAPIKey"
+        static let bundleRuntimeEnvironment = "TrainingLabRuntimeEnvironment"
         static let envAPIBaseURL = "TRAINING_LAB_API_BASE_URL"
         static let envAPIKey = "TRAINING_LAB_API_KEY"
+        static let envRuntimeEnvironment = "TRAINING_LAB_RUNTIME_ENV"
+    }
+
+    enum RuntimeEnvironment: String {
+        case production
+        case staging
+        case local
+
+        init(rawValueOrNil: String?, fallbackBaseURL: URL) {
+            if let normalized = rawValueOrNil?.normalizedRuntimeConfigValue.lowercased(),
+               let explicit = RuntimeEnvironment(rawValue: normalized) {
+                self = explicit
+                return
+            }
+
+            let host = fallbackBaseURL.host?.lowercased() ?? ""
+            if host == "127.0.0.1" || host == "localhost" {
+                self = .local
+            } else if host.contains("staging") || host.contains("sslip.io") {
+                self = .staging
+            } else {
+                self = .production
+            }
+        }
+
+        var badgeLabel: String {
+            rawValue.uppercased()
+        }
     }
 
     let apiBaseURL: URL
     let apiKey: String
+    let runtimeEnvironment: RuntimeEnvironment
 
     let modelContainer: ModelContainer
     let apiClient: any APIClient
@@ -31,6 +61,13 @@ struct AppEnvironment {
             .map { $0.normalizedRuntimeConfigValue }
             .flatMap(URL.init(string:))
         let baseURL = envBaseURL ?? bundleBaseURL ?? defaultBaseURL
+
+        let bundleRuntimeEnvironment = Bundle.main.runtimeConfigValue(forKey: RuntimeConfigKey.bundleRuntimeEnvironment)
+        let envRuntimeEnvironment = ProcessInfo.processInfo.environment[RuntimeConfigKey.envRuntimeEnvironment]
+        let runtimeEnvironment = RuntimeEnvironment(
+            rawValueOrNil: envRuntimeEnvironment ?? bundleRuntimeEnvironment,
+            fallbackBaseURL: baseURL
+        )
 
         let bundleAPIKey = Bundle.main.runtimeConfigValue(forKey: RuntimeConfigKey.bundleAPIKey) ?? ""
         let envAPIKey = ProcessInfo.processInfo.environment[RuntimeConfigKey.envAPIKey]?.normalizedRuntimeConfigValue ?? ""
@@ -79,6 +116,7 @@ struct AppEnvironment {
         return AppEnvironment(
             apiBaseURL: baseURL,
             apiKey: key,
+            runtimeEnvironment: runtimeEnvironment,
             modelContainer: container,
             apiClient: apiClient,
             healthKitClient: healthKitClient,

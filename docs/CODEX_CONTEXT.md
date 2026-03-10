@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 4.2 — CLOSED** (2026-03-09 America/Mexico_City)
+- **Phase 4.3 — IN PROGRESS** (2026-03-09 America/Mexico_City)
 
 ## Phase 4.0 Delivered
 
@@ -75,6 +75,37 @@ Guardrail (explicit):
 - Backend database type in active environment: **PostgreSQL**.
 - Batch ingestion remains idempotent through `healthkit_workout_uuid` + request idempotency keys.
 - Deprecated HealthKit energy access replaced with `HKWorkout.statistics(for: .activeEnergyBurned)`.
+
+## Phase 4.3 Current State
+
+### Environment Separation
+- Production and staging are now separated operationally in Coolify.
+- Production API remains `https://api.training-lab.mauro42k.com`.
+- Staging service exists as a separate Coolify application and is currently reachable via `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`.
+- Canonical staging target remains `https://api-staging.training-lab.mauro42k.com`, but public DNS is still pending.
+
+### Databases
+- Active backend database type remains **PostgreSQL**.
+- Production DB resource: `training-lab-postgres`.
+- Staging DB resource: `training-lab-postgres-staging`.
+- Staging baseline was created through a one-shot logical clone from production.
+- Comparative validation after clone:
+  - `workouts = 3436`
+  - `workout_load = 3173`
+  - `daily_load = 9720`
+
+### Environment Verification
+- `/health` now returns explicit `environment`.
+- Current expected values:
+  - production: `environment=production`
+  - staging: `environment=staging`
+- This is the primary non-ambiguous runtime check until canonical staging DNS is live.
+
+### iOS Runtime Config
+- Runtime config now supports explicit `production`, `staging`, and optional `local`.
+- `Runtime.Local.example.xcconfig` documents how to point the app at each environment.
+- Debug builds show a visible runtime environment badge to avoid pointing at the wrong backend silently.
+- Cache isolation by effective `baseURL` remains in place.
 
 ## Next Phase
 - **Phase 4.4 — Workout Reconciliation & Historical Cleanup** (**Planned**)

@@ -4,6 +4,8 @@
 - Phase 0 deploys the FastAPI backend in this repository to Coolify on `root@178.156.251.31`.
 - Stable API URL target for phase 0.1: `https://api.training-lab.mauro42k.com`
 - Bootstrap fallback URL: `http://p8w04c88088gw844okkw80gg.178.156.251.31.sslip.io`
+- Staging target URL: `https://api-staging.training-lab.mauro42k.com`
+- Current staging fallback URL: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 
 ## Local Preparation
 1. Ensure the latest `main` branch is pushed to GitHub.
@@ -75,6 +77,55 @@
 3. Click `Deploy`.
 4. Wait until the deployment logs report the container as healthy.
 5. Run `curl -i https://api.training-lab.mauro42k.com/health`.
+
+## Staging Environment Setup (Phase 4.3)
+1. In Coolify project `training-lab`, create a separate `staging` environment.
+2. Create a separate PostgreSQL resource:
+   - resource name: `training-lab-postgres-staging`
+   - database: `training_lab_staging`
+   - user: `training_lab_staging`
+3. Create a separate application:
+   - resource name: `training-lab-api-staging`
+   - same repository and branch
+   - same Dockerfile build path
+4. Set staging env vars independently:
+   - `DATABASE_URL`
+   - `TRAINING_LAB_API_KEY`
+   - `INGEST_MAX_BATCH_SIZE`
+   - `APP_ENVIRONMENT=staging`
+5. Trigger staging deploy and confirm `/health` returns `environment=staging`.
+
+## Production -> Staging Clone (One-Shot)
+1. Never share the same DB resource between prod and staging.
+2. Create staging DB first.
+3. Run a logical clone from prod into staging.
+4. Validate counts on both sides:
+   - `workouts`
+   - `workout_load`
+   - `daily_load`
+5. After the initial clone, staging is allowed to diverge. No continuous sync.
+
+## Environment Validation Checklist
+Before any destructive or reconciliation experiment:
+1. Confirm the URL you are using:
+   - production: `https://api.training-lab.mauro42k.com`
+   - staging fallback: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+2. Confirm `/health`:
+   - production -> `environment=production`
+   - staging -> `environment=staging`
+3. Confirm the Coolify resource:
+   - production app: `training-lab-api`
+   - staging app: `training-lab-api-staging`
+4. Confirm the DB resource:
+   - production DB: `training-lab-postgres`
+   - staging DB: `training-lab-postgres-staging`
+
+## DNS Note For Canonical Staging Hostname
+- Coolify can be configured with `https://api-staging.training-lab.mauro42k.com` as the canonical target.
+- External routing will remain on the sslip fallback until the public DNS A record is created for `api-staging.training-lab.mauro42k.com`.
+- Do not assume the canonical domain is active until:
+  1. `dig +short api-staging.training-lab.mauro42k.com` resolves
+  2. `curl -i https://api-staging.training-lab.mauro42k.com/health` returns 200
 
 ## Rollback
 1. Open the service in Coolify.

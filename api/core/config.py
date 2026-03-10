@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlsplit, urlunsplit
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -6,6 +7,7 @@ from functools import lru_cache
 @dataclass(frozen=True)
 class Settings:
     database_url: str | None
+    app_environment: str
     training_lab_api_key: str | None
     ingest_max_batch_size: int
     trimp_active_model_version: int
@@ -42,11 +44,29 @@ def _env_float(name: str, default: float) -> float:
     return float(raw)
 
 
+def _normalize_database_url(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    raw = value.strip()
+    if raw == "":
+        return None
+
+    parsed = urlsplit(raw)
+    scheme = parsed.scheme
+
+    if scheme in {"postgres", "postgresql"}:
+        scheme = "postgresql+psycopg"
+
+    return urlunsplit((scheme, parsed.netloc, parsed.path, parsed.query, parsed.fragment))
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     ingest_max_batch_size = _env_int("INGEST_MAX_BATCH_SIZE", 500)
     return Settings(
-        database_url=os.getenv("DATABASE_URL"),
+        database_url=_normalize_database_url(os.getenv("DATABASE_URL")),
+        app_environment=os.getenv("APP_ENVIRONMENT", "production"),
         training_lab_api_key=os.getenv("TRAINING_LAB_API_KEY"),
         ingest_max_batch_size=ingest_max_batch_size,
         trimp_active_model_version=_env_int("TRIMP_ACTIVE_MODEL_VERSION", 1),

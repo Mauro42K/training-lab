@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 
+from api.core.config import get_settings
 from api.routers.v1 import router as v1_router
 from api.version import APP_VERSION
 
@@ -66,8 +67,10 @@ def root() -> dict[str, str]:
 @app.get("/health")
 def health() -> dict[str, str | int]:
     deploy_metadata = _resolve_deploy_metadata()
+    settings = get_settings()
     return {
         "status": "ok",
+        "environment": settings.app_environment,
         "service": "training-lab-api",
         "version": deploy_metadata["version"],
         "git_sha": deploy_metadata["git_sha"],

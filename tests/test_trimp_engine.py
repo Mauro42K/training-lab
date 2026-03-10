@@ -19,6 +19,7 @@ class StaticProfileResolver:
 def make_settings() -> Settings:
     return Settings(
         database_url=None,
+        app_environment="test",
         training_lab_api_key=None,
         ingest_max_batch_size=500,
         trimp_active_model_version=1,

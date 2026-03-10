@@ -1,12 +1,13 @@
 # Phase 4 QA Evidence README
 
 ## Fecha / Entorno
-- Fecha de ejecución: 2026-03-06 (America/New_York)
+- Fecha de cierre documental Phase 4.2: 2026-03-09 (America/Mexico_City)
 - Repo: `/Users/mauro/Training-lab`
 - Backend validado:
   - local: `http://127.0.0.1:8000`
   - real: `https://api.training-lab.mauro42k.com`
 - Simulador iOS: iPhone 17
+- Device real Phase 4.2: iPhone físico con HealthKit autorizado
 
 ## Runtime config persistente (iOS/macOS app)
 1. Copiar `DesignSystemDemo/Config/Runtime.Local.example.xcconfig` a `DesignSystemDemo/Config/Runtime.Local.xcconfig`.
@@ -51,11 +52,27 @@ Resultado esperado:
 - macOS: hover visible y detalle diario cierra correctamente sin bloquear la app.
 - runtime config persistente: sin `launchctl setenv`.
 
+## Validaciones 4.2 ingest real
+- HealthKit authorization en iPhone real: PASS.
+- `fetchWorkouts(since:nil)` histórico: PASS.
+- Dataset histórico HealthKit obtenido: **3436 workouts**.
+- Ingest procesado en **9 batches** hacia `POST /v1/ingest/workouts`: PASS.
+- Persistencia PostgreSQL validada con workouts reales: PASS.
+- `GET /v1/training-load` devuelve valores TRIMP reales tras ingest: PASS.
+- `sync_mode` cambia correctamente de `bootstrap` a `incremental`: PASS.
+- estado final de sync: `ready`: PASS.
+- refresh post-ingest corregido al usar `YYYY-MM-DD` en `GET /v1/daily`: PASS.
+- deprecación `totalEnergyBurned` resuelta con `HKWorkout.statistics(for: .activeEnergyBurned)`: PASS.
+
 ## Cierre de inconsistencia Today
 - `today_local`: `2026-03-06`
 - último item serie `/v1/training-load` (`all`): `date=2026-03-06`
 - estado: PASS (alineados)
 
-## Pendiente trasladado a Phase 4.2
-- HealthKit/Apple Fitness ingest real end-to-end no queda resuelto en Phase 4.1.
-- Ese alcance se mueve formalmente a Phase 4.2 (HealthKit Real Ingest Enablement).
+## Pendiente trasladado a Phase 4.4
+- Reconciliación histórica entre backend y HealthKit.
+- Manejo de workouts borrados/duplicados desde Apple Fitness.
+- Cleanup histórico seguro con recálculo de métricas derivadas.
+
+## Phase 4.2 QA Runbook
+- Ver `docs/qa/phase4/PHASE4_2_HEALTHKIT_REAL_INGEST.md` para validación de ingest real en iPhone.

@@ -2,6 +2,18 @@
 
 This project follows a simple SemVer-style changelog.
 
+## v0.4.2 - 2026-03-09
+
+## Phase 4.2 — HealthKit Real Ingest Enablement
+
+- Implemented real HealthKit ingest pipeline.
+- Added batch ingestion endpoint integration.
+- PostgreSQL persistence validated.
+- Training load calculations validated with real data.
+- Fixed refresh `422` error on `/v1/daily`.
+- Replaced deprecated HealthKit `totalEnergyBurned` property.
+- Completed bootstrap ingest of full historical dataset (3436 workouts).
+
 ## v0.4.1 - 2026-03-06
 
 Phase 4.1 Closed

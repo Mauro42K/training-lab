@@ -250,14 +250,42 @@ Guardrail (explicit):
 - That work moves formally to **Phase 4.2**.
 
 ### 5.5 Phase 4.2 — HealthKit Real Ingest Enablement
-**Status:** PLANNED  
+**Status:** COMPLETED  
 **Goal:** Ensure real Apple Fitness/HealthKit workouts are reliably ingested end-to-end and reflected in training-load calculations.
 
-Planned scope:
-- validate real-device HealthKit sync execution path.
-- verify user identity/source mapping to avoid seed/demo contamination.
-- guarantee production schema/migration alignment for ingest + load endpoints.
-- close ingest observability gaps (pipeline checkpoints and QA evidence).
+Completion summary:
+- real HealthKit bootstrap ingest validated on iPhone.
+- 3436 workouts successfully ingested from the historical HealthKit dataset.
+- backend persistence verified on PostgreSQL.
+- training-load endpoints now produce real TRIMP values.
+- incremental sync confirmed after bootstrap completion.
+- post-ingest refresh `422` fixed by correcting `GET /v1/daily` date formatting.
+- iOS 18 HealthKit deprecation resolved by replacing `totalEnergyBurned` with `HKWorkout.statistics(for: .activeEnergyBurned)`.
+
+### 5.6 Phase 4.4 — Workout Reconciliation & Historical Cleanup
+**Status:** PLANNED  
+**Goal:** Provide mechanisms to reconcile historical workouts between Apple Health and the backend database.
+
+Context:
+- users may discover duplicated workouts in Apple Fitness history.
+- when a workout is deleted in HealthKit, the backend should eventually reflect that change.
+
+Initial scope:
+- detect workouts that no longer exist in HealthKit.
+- allow backend reconciliation.
+- mark workouts as deleted or remove them.
+- trigger recalculation of derived metrics.
+
+Potential capabilities:
+- handle workouts removed from Apple Fitness.
+- support duplicate cleanup.
+- allow safe historical reconciliation.
+- recalculate TRIMP / daily load after deletions.
+
+Guardrails:
+- must be tested in STAGING first.
+- must not risk production data corruption.
+- must maintain idempotency of ingest pipeline.
 
 ---
 

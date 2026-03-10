@@ -3,9 +3,9 @@
 Training Lab is the repository for the product foundation and iterative phase delivery.
 
 Current status:
-- Phase 4.1 is closed (Training Load UX polish + multiplatform interaction stability + runtime config persistence).
-- Next phase is Phase 4.2 (HealthKit Real Ingest Enablement).
-- Explicit guardrail: real Apple Health/Fitness ingest alignment was not closed in 4.1 and is moved to 4.2.
+- Phase 4.2 is closed (real HealthKit ingest pipeline validated end-to-end).
+- Real data now flows from iPhone HealthKit to backend PostgreSQL and Training Load endpoints.
+- Next planned phase is Phase 4.4 (Workout Reconciliation & Historical Cleanup).
 
 ## Local API
 1. Create a virtual environment.
@@ -38,3 +38,4 @@ Detailed operational steps live in `docs/DEPLOY_RUNBOOK.md`.
 - Changelog: `docs/CHANGELOG.md`
 - Codex context: `docs/CODEX_CONTEXT.md`
 - Phase 4 QA closure: `docs/Phase4_QA.md`
+- Dev ingest notes: `docs/README-dev.md`

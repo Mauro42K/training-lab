@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 4.1 — CLOSED** (2026-03-06 America/New_York)
+- **Phase 4.2 — CLOSED** (2026-03-09 America/Mexico_City)
 
 ## Phase 4.0 Delivered
 
@@ -50,12 +50,38 @@ Guardrail (explicit):
 - Phase 4.1 closes UX polish + multiplatform stability + runtime config only.
 - Real HealthKit / Apple Fitness ingest alignment is not solved here.
 
+## Phase 4.2 Delivered
+
+### Ingest Pipeline
+- Real ingest path validated end-to-end:
+  - Apple Health / Fitness
+  - iPhone HealthKit authorization
+  - `fetchWorkouts(since:)`
+  - `POST /v1/ingest/workouts`
+  - PostgreSQL persistence
+  - `GET /v1/workouts`, `GET /v1/daily`, `GET /v1/training-load`
+- Historical bootstrap ingest completed successfully with **3436 workouts** fetched from HealthKit and processed in **9 batches**.
+- Backend persistence verified in PostgreSQL with real training-load values after ingest.
+
+### Sync Lifecycle
+- Sync lifecycle validated on real device:
+  - `bootstrap`
+  - `incremental`
+  - `ready`
+- Cursor tracking in iOS uses `lastSuccessfulIngestAt`.
+- Post-ingest refresh bug closed by sending date-only params to `GET /v1/daily`.
+
+### Runtime / Platform Notes
+- Backend database type in active environment: **PostgreSQL**.
+- Batch ingestion remains idempotent through `healthkit_workout_uuid` + request idempotency keys.
+- Deprecated HealthKit energy access replaced with `HKWorkout.statistics(for: .activeEnergyBurned)`.
+
 ## Next Phase
-- **Phase 4.2 — HealthKit Real Ingest Enablement** (**Planned**)
+- **Phase 4.4 — Workout Reconciliation & Historical Cleanup** (**Planned**)
 - Scope:
-  - validate real HealthKit sync path end-to-end.
-  - ensure correct user/source mapping (no seed/demo drift).
-  - close ingest observability + production alignment gaps.
+  - reconcile historical backend state with current HealthKit reality.
+  - support deleted/duplicated workout cleanup safely.
+  - recalculate derived metrics after historical corrections.
 
 ## Non-Negotiables
 - Design-first.

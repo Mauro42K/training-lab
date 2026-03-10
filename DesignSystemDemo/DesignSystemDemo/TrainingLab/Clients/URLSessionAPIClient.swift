@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 struct URLSessionAPIClient: APIClient {
     struct Configuration: Sendable {
@@ -15,6 +16,9 @@ struct URLSessionAPIClient: APIClient {
     private let session: URLSession
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
+    #if DEBUG
+    private let networkLogger = Logger(subsystem: "com.traininglab.designsystemdemo", category: "network")
+    #endif
     private static let internetDateTimeFormatter = ISO8601DateFormatter()
     private static let internetDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -64,14 +68,37 @@ struct URLSessionAPIClient: APIClient {
             throw APIClientError.encodingFailed
         }
 
-        let (data, response) = try await session.data(for: request)
-        let statusCode = try validate(response: response)
+        #if DEBUG
+        networkLogger.log("ingest request start url=\(request.url?.absoluteString ?? "nil", privacy: .public) workouts=\(payload.workouts.count)")
+        #endif
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            #if DEBUG
+            networkLogger.error("ingest transport_failed error=\(error.localizedDescription, privacy: .public)")
+            #endif
+            throw error
+        }
+        let statusCode = try validate(response: response, data: data)
+        #if DEBUG
+        networkLogger.log("ingest request success status=\(statusCode)")
+        #endif
 
         guard statusCode == 200 else {
             throw APIClientError.unexpectedStatus(statusCode)
         }
 
-        return try decoder.decode(IngestResponseDTO.self, from: data)
+        do {
+            return try decoder.decode(IngestResponseDTO.self, from: data)
+        } catch {
+            #if DEBUG
+            networkLogger.error(
+                "ingest decode_failed error=\(error.localizedDescription, privacy: .public) body=\(summarizedResponseBody(from: data), privacy: .public)"
+            )
+            #endif
+            throw error
+        }
     }
 
     func fetchWorkouts(from: Date, to: Date, sport: SportType?) async throws -> [WorkoutDTO] {
@@ -99,8 +126,8 @@ struct URLSessionAPIClient: APIClient {
     func fetchDaily(from: Date, to: Date) async throws -> [DailyItemDTO] {
         var components = URLComponents(url: try pathURL("v1/daily"), resolvingAgainstBaseURL: false)
         components?.queryItems = [
-            URLQueryItem(name: "from", value: iso8601String(from)),
-            URLQueryItem(name: "to", value: iso8601String(to))
+            URLQueryItem(name: "from", value: dateOnlyString(from)),
+            URLQueryItem(name: "to", value: dateOnlyString(to))
         ]
 
         guard let url = components?.url else {
@@ -108,6 +135,9 @@ struct URLSessionAPIClient: APIClient {
         }
 
         let request = try makeRequest(url: url, method: "GET")
+        #if DEBUG
+        networkLogger.log("daily request start url=\(url.absoluteString, privacy: .public)")
+        #endif
         let (data, response) = try await session.data(for: request)
         _ = try validate(response: response)
 
@@ -149,7 +179,7 @@ struct URLSessionAPIClient: APIClient {
         return url
     }
 
-    private func validate(response: URLResponse) throws -> Int {
+    private func validate(response: URLResponse, data: Data? = nil) throws -> Int {
         guard let http = response as? HTTPURLResponse else {
             throw APIClientError.unexpectedStatus(-1)
         }
@@ -158,10 +188,19 @@ struct URLSessionAPIClient: APIClient {
         case 200:
             return http.statusCode
         case 401:
+            #if DEBUG
+            networkLogger.error("http status=401 detail=\(summarizedResponseBody(from: data), privacy: .public)")
+            #endif
             throw APIClientError.unauthorized
         case 409:
+            #if DEBUG
+            networkLogger.error("http status=409 detail=\(summarizedResponseBody(from: data), privacy: .public)")
+            #endif
             throw APIClientError.conflict
         default:
+            #if DEBUG
+            networkLogger.error("http status=\(http.statusCode) detail=\(summarizedResponseBody(from: data), privacy: .public)")
+            #endif
             throw APIClientError.unexpectedStatus(http.statusCode)
         }
     }
@@ -169,4 +208,26 @@ struct URLSessionAPIClient: APIClient {
     private func iso8601String(_ date: Date) -> String {
         ISO8601DateFormatter().string(from: date)
     }
+
+    private func dateOnlyString(_ date: Date) -> String {
+        URLSessionAPIClient.internetDateFormatter.string(from: date)
+    }
+
+    #if DEBUG
+    private func summarizedResponseBody(from data: Data?) -> String {
+        guard let data, !data.isEmpty else {
+            return "none"
+        }
+
+        if
+            let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let detail = object["detail"]
+        {
+            return String(describing: detail)
+        }
+
+        let raw = String(data: data, encoding: .utf8) ?? "non-utf8-body"
+        return String(raw.prefix(200))
+    }
+    #endif
 }

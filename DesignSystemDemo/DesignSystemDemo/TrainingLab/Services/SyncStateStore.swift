@@ -1,9 +1,14 @@
 import Foundation
+import OSLog
 import SwiftData
 
 @MainActor
 final class SyncStateStore {
     private let modelContext: ModelContext
+    #if DEBUG
+    private let logger = Logger(subsystem: "com.traininglab.designsystemdemo", category: "syncstate")
+    private let isoFormatter = ISO8601DateFormatter()
+    #endif
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -26,6 +31,9 @@ final class SyncStateStore {
         state.lastIngestAttemptAt = date
         state.syncStatusRaw = "syncing"
         try modelContext.save()
+        #if DEBUG
+        logger.log("recordIngestAttempt lastIngestAttemptAt=\(self.debugDateString(date), privacy: .public) syncStatus=\(state.syncStatusRaw, privacy: .public)")
+        #endif
     }
 
     func recordSuccessfulIngest(at date: Date) async throws {
@@ -33,12 +41,27 @@ final class SyncStateStore {
         state.lastSuccessfulIngestAt = date
         state.syncStatusRaw = "idle"
         try modelContext.save()
+        #if DEBUG
+        logger.log("recordSuccessfulIngest lastSuccessfulIngestAt=\(self.debugDateString(date), privacy: .public) syncStatus=\(state.syncStatusRaw, privacy: .public)")
+        #endif
     }
 
     func recordAPIRefresh(at date: Date) async throws {
         let state = try loadOrCreate()
         state.lastAPIRefreshAt = date
         try modelContext.save()
+        #if DEBUG
+        logger.log("recordAPIRefresh lastAPIRefreshAt=\(self.debugDateString(date), privacy: .public)")
+        #endif
+    }
+
+    func markRealHealthKitIngestCompleted() async throws {
+        let state = try loadOrCreate()
+        state.hasCompletedRealHealthKitIngest = true
+        try modelContext.save()
+        #if DEBUG
+        logger.log("markRealHealthKitIngestCompleted hasCompletedRealHealthKitIngest=\(state.hasCompletedRealHealthKitIngest)")
+        #endif
     }
 
     func recordError(_ message: String?) async throws {
@@ -48,5 +71,15 @@ final class SyncStateStore {
             state.syncStatusRaw = "error"
         }
         try modelContext.save()
+        #if DEBUG
+        logger.log("recordError lastError=\((message ?? "nil"), privacy: .public) syncStatus=\(state.syncStatusRaw, privacy: .public)")
+        #endif
     }
+
+    #if DEBUG
+    private func debugDateString(_ date: Date?) -> String {
+        guard let date else { return "nil" }
+        return isoFormatter.string(from: date)
+    }
+    #endif
 }

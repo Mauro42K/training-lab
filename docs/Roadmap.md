@@ -262,7 +262,54 @@ Completion summary:
 - post-ingest refresh `422` fixed by correcting `GET /v1/daily` date formatting.
 - iOS 18 HealthKit deprecation resolved by replacing `totalEnergyBurned` with `HKWorkout.statistics(for: .activeEnergyBurned)`.
 
-### 5.6 Phase 4.4 — Workout Reconciliation & Historical Cleanup
+### 5.6 Phase 4.3 — Staging Environment & Environment Separation
+**Status:** PLANNED  
+**Goal:** Introduce a proper **staging environment** separated from production to allow safe experimentation, schema evolution, and ingest testing without risking the primary dataset.
+
+Context:
+- Phase 4.2 enables real HealthKit ingest with Mauro's real historical dataset.
+- That dataset becomes the **initial production baseline** for Training Lab.
+- From this point forward, development must not run directly against production.
+
+High‑level architecture after this phase:
+
+Production:
+- API: `api.training-lab.mauro42k.com`
+- Database: `/var/data/app.db`
+
+Staging:
+- API: `api-staging.training-lab.mauro42k.com`
+- Database: `/var/data/app_staging.db`
+
+### 5.6.1 Deliverables
+- **Staging API service** deployed in Coolify (separate service from prod).
+- **Database duplication**:
+  - initial clone of `/var/data/app.db` → `/var/data/app_staging.db`.
+- **Environment configuration separation**:
+  - staging and production use different environment variables.
+- **Runtime configuration in iOS app**:
+  - ability to target `staging` or `production` API baseURL.
+- **Documentation updates**:
+  - `docs/STACK_INFRA.md` updated with both environments.
+  - `docs/DEPLOY_RUNBOOK.md` includes staging deploy flow.
+
+### 5.6.2 DoD
+- Staging API reachable at `api-staging.training-lab.mauro42k.com`.
+- Staging database created and populated from production baseline.
+- App can connect to staging environment without affecting production data.
+- Production ingest and metrics remain unchanged.
+
+### 5.6.3 QA
+- Confirm staging API responds correctly to `/health`.
+- Verify staging DB queries return expected cloned data.
+- Validate that a staging ingest or recompute does **not** modify production DB.
+
+### 5.6.4 Guardrails
+- Production database must never be modified directly during feature development.
+- All schema experiments, migrations, and ingest tests must run in staging first.
+- Production deploys must come from validated staging builds.
+
+### 5.7 Phase 4.4 — Workout Reconciliation & Historical Cleanup
 **Status:** PLANNED  
 **Goal:** Provide mechanisms to reconcile historical workouts between Apple Health and the backend database.
 

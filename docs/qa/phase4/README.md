@@ -99,3 +99,4 @@ Resultado esperado:
 
 ## Phase 4.5 Block 7 QA / Hardening
 - Ver `docs/qa/phase4/PHASE4_5_BLOCK7_QA_HARDENING.md`.
+- Estado actual: CLOSED tras deploy `52047a0`, migración Alembic `20260311_01` en staging/production y rerun de smoke HTTP.

@@ -3,7 +3,7 @@
 ## Fecha / contexto
 - Fecha de ejecución: 2026-03-11 (America/Mexico_City)
 - Repo local: `/Users/mauro/Training-lab`
-- SHA local validado: `360e001`
+- SHA local validado: `52047a0`
 - Objetivo del bloque:
   - hardening de contratos ya implementados,
   - validación de consistencia entre dominios,
@@ -136,32 +136,55 @@ curl -sS -D - \
   "https://api-staging.training-lab.mauro42k.com/v1/home/summary?date=2026-03-07"
 ```
 
-### Resultado observado
+### Resultado observado tras deploy + migración
 - `GET /health`: `200`
 - `environment=staging`: PASS
-- staging `short_sha`: `1556888`
+- staging `short_sha`: `52047a0`
+- revisión Alembic previa detectada en DB: `20260306_03`
+- migración aplicada: `20260311_01`
+- revisión Alembic final: `20260311_01 (head)`
 - `GET /v1/training-load?days=3&sport=all`: `200`
 - `GET /v1/daily?...`: `200`
 - nuevos endpoints Phase 4.5:
-  - `GET /v1/daily-domains/sleep`: `404`
-  - `GET /v1/daily-domains/activity`: `404`
-  - `GET /v1/daily-domains/recovery`: `404`
-  - `GET /v1/daily-domains/body-measurements`: `404`
-  - `GET /v1/home/summary`: `404`
+  - `GET /v1/daily-domains/sleep`: `200`
+  - `GET /v1/daily-domains/activity`: `200`
+  - `GET /v1/daily-domains/recovery`: `200`
+  - `GET /v1/daily-domains/body-measurements`: `200`
+  - `GET /v1/home/summary`: `200`
+- caso negativo:
+  - `GET /v1/daily-domains/sleep?from=2026-03-08&to=2026-03-07`: `422`
+
+## QA production remediation
+
+### Resultado observado tras migración
+- `GET /health`: `200`
+- `environment=production`: PASS
+- production `short_sha`: `52047a0`
+- revisión Alembic previa detectada en DB: `20260306_03`
+- migración aplicada: `20260311_01`
+- revisión Alembic final: `20260311_01 (head)`
+- sanity legacy:
+  - `GET /v1/training-load?days=3&sport=all`: `200`
+  - `GET /v1/daily?...`: `200`
+- sanity 4.5:
+  - `GET /v1/daily-domains/sleep`: `200`
+  - `GET /v1/home/summary`: `200`
 
 ## Findings reales
 
-### Finding 1 — staging no tiene desplegada la superficie Phase 4.5
-- Severidad: bloqueante para cierre remoto del bloque.
-- Evidencia:
-  - local SHA validado: `360e001`
-  - staging `/health.short_sha`: `1556888`
-  - staging responde `200` en endpoints antiguos autenticados,
-  - staging responde `404` en todos los endpoints nuevos de Phase 4.5.
+### Finding 1 — despliegue sin migración de DB en staging y production
+- Severidad: bloqueante, ya resuelto.
+- Evidencia inicial:
+  - ambos entornos corrían `short_sha=52047a0`,
+  - endpoints legacy respondían `200`,
+  - endpoints 4.5 respondían `500`,
+  - logs remotos: `psycopg.errors.UndefinedTable: relation "daily_sleep_summary" does not exist`.
 - Conclusión:
-  - no es caída general de staging,
-  - no es problema de auth,
-  - es un desfase de deploy / versión remota.
+  - no era caída general,
+  - no era problema de auth,
+  - el gap operativo real era migración Alembic no aplicada en ambas DBs.
+- Estado actual:
+  - resuelto aplicando `20260311_01` en staging y production.
 
 ### Finding 2 — contrato legacy sigue estable en staging
 - Severidad: informativa.
@@ -179,16 +202,16 @@ curl -sS -D - \
   - `daily_domains_repository.py` sigue reducido respecto al estado anterior, pero no se reabrió refactor grande.
 
 ## Pendientes
-- Desplegar a staging el SHA que contiene Phase 4.5.
-- Reejecutar exactamente los curls de este documento contra staging.
-- Confirmar que staging devuelve `200` y contratos correctos para:
-  - `daily-domains/sleep`
-  - `daily-domains/activity`
-  - `daily-domains/recovery`
-  - `daily-domains/body-measurements`
-  - `home/summary`
-- Solo después de eso puede considerarse cerrado el hardening remoto del bloque.
+- Ningún bloqueante abierto de Bloque 7.
+- Mantener production con auto deploy `OFF`.
+- Mantener staging con auto deploy `ON`.
+- Si se vuelve a desplegar una revisión con cambios de schema, repetir:
+  - `alembic current`
+  - `alembic upgrade head`
+  - smoke HTTP de staging antes de validar production.
 
 ## Decisión operativa
 - Hardening local: suficiente y reproducible.
-- Cierre remoto en staging: pendiente por deploy externo al alcance de este bloque.
+- Hardening remoto staging: PASS.
+- Remediación production: PASS.
+- Bloque 7: CLOSED.

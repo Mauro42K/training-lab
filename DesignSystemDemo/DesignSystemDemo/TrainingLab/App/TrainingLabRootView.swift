@@ -13,14 +13,16 @@ struct TrainingLabRootView: View {
             .navigationTitle("Training Lab")
             .toolbar {
                 #if DEBUG
-                ToolbarItem(placement: environmentBadgePlacement) {
-                    Text(environment.runtimeEnvironment.badgeLabel)
-                        .font(.caption2.weight(.semibold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(.thinMaterial, in: Capsule())
-                        .foregroundStyle(environmentBadgeColor)
-                        .accessibilityIdentifier("runtime-environment-badge")
+                if environment.runtimeEnvironment != .production {
+                    ToolbarItem(placement: environmentBadgePlacement) {
+                        Text(environment.runtimeEnvironment.badgeLabel)
+                            .font(.caption2.weight(.semibold))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.thinMaterial, in: Capsule())
+                            .foregroundStyle(environmentBadgeColor)
+                            .accessibilityIdentifier("runtime-environment-badge")
+                    }
                 }
                 #endif
                 ToolbarItem(placement: .primaryAction) {

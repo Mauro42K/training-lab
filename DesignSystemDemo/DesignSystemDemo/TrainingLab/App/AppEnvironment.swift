@@ -17,24 +17,36 @@ struct AppEnvironment {
         case local
 
         init(rawValueOrNil: String?, fallbackBaseURL: URL) {
+            if let inferred = Self.inferredEnvironment(for: fallbackBaseURL) {
+                self = inferred
+                return
+            }
+
             if let normalized = rawValueOrNil?.normalizedRuntimeConfigValue.lowercased(),
                let explicit = RuntimeEnvironment(rawValue: normalized) {
                 self = explicit
                 return
             }
 
-            let host = fallbackBaseURL.host?.lowercased() ?? ""
-            if host == "127.0.0.1" || host == "localhost" {
-                self = .local
-            } else if host.contains("staging") || host.contains("sslip.io") {
-                self = .staging
-            } else {
-                self = .production
-            }
+            self = .production
         }
 
         var badgeLabel: String {
             rawValue.uppercased()
+        }
+
+        private static func inferredEnvironment(for baseURL: URL) -> RuntimeEnvironment? {
+            let host = baseURL.host?.lowercased() ?? ""
+            if host == "127.0.0.1" || host == "localhost" {
+                return .local
+            }
+            if host.contains("staging") || host.contains("sslip.io") {
+                return .staging
+            }
+            if host == "api.training-lab.mauro42k.com" {
+                return .production
+            }
+            return nil
         }
     }
 

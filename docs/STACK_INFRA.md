@@ -18,7 +18,7 @@
 - Container port: `8000`
 - Stable public domain: `https://api.training-lab.mauro42k.com`
 - Staging target domain: `https://api-staging.training-lab.mauro42k.com`
-- Staging fallback domain (active): `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+- Staging fallback domain (debug/emergency only): `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 - Public health path: `/health`
 
 ## Build and Runtime Contract
@@ -75,8 +75,11 @@
 - Current clone validation counts:
   - production: `workouts=3436`, `workout_load=3173`, `daily_load=9720`
   - staging: `workouts=3436`, `workout_load=3173`, `daily_load=9720`
-- Canonical staging hostname is configured as the target, but external DNS A record is still pending.
-- Until DNS is created, operational QA can use the active sslip fallback URL.
+- Canonical staging hostname is operational:
+  - `api-staging.training-lab.mauro42k.com`
+- Canonical staging DNS resolves to `178.156.251.31`.
+- TLS is issued and valid on the canonical staging hostname.
+- The `sslip` host remains only as fallback/debug access, not as the primary route.
 
 ## Decisions Recorded
 - Use FastAPI for the smallest reliable HTTP skeleton.

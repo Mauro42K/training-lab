@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 4.3 — IN PROGRESS** (2026-03-09 America/Mexico_City)
+- **Phase 4.3 — CLOSED** (2026-03-10 America/Mexico_City)
 
 ## Phase 4.0 Delivered
 
@@ -76,13 +76,14 @@ Guardrail (explicit):
 - Batch ingestion remains idempotent through `healthkit_workout_uuid` + request idempotency keys.
 - Deprecated HealthKit energy access replaced with `HKWorkout.statistics(for: .activeEnergyBurned)`.
 
-## Phase 4.3 Current State
+## Phase 4.3 Delivered
 
 ### Environment Separation
 - Production and staging are now separated operationally in Coolify.
 - Production API remains `https://api.training-lab.mauro42k.com`.
-- Staging service exists as a separate Coolify application and is currently reachable via `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`.
-- Canonical staging target remains `https://api-staging.training-lab.mauro42k.com`, but public DNS is still pending.
+- Staging service exists as a separate Coolify application and is reachable through the canonical host `https://api-staging.training-lab.mauro42k.com`.
+- Staging fallback `sslip` host remains only as an emergency/debug path, not the primary endpoint.
+- Canonical staging DNS resolves publicly and TLS is valid on `https://api-staging.training-lab.mauro42k.com`.
 
 ### Databases
 - Active backend database type remains **PostgreSQL**.
@@ -99,7 +100,7 @@ Guardrail (explicit):
 - Current expected values:
   - production: `environment=production`
   - staging: `environment=staging`
-- This is the primary non-ambiguous runtime check until canonical staging DNS is live.
+- This is the primary non-ambiguous runtime check together with the canonical domain.
 
 ### iOS Runtime Config
 - Runtime config now supports explicit `production`, `staging`, and optional `local`.

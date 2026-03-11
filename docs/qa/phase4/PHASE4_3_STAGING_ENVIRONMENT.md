@@ -18,7 +18,7 @@ Separar producción y staging con:
 
 ### Staging
 - target canónico: `https://api-staging.training-lab.mauro42k.com`
-- fallback activo: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+- fallback debug/emergencia: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 - `/health.environment`: `staging`
 - Coolify app: `training-lab-api-staging`
 - PostgreSQL: `training-lab-postgres-staging`
@@ -54,9 +54,9 @@ Resultado esperado:
 Staging:
 
 ```bash
-curl -sS http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io/health
+curl -sS https://api-staging.training-lab.mauro42k.com/health
 curl -sS -H "X-API-KEY: $TRAINING_LAB_STAGING_API_KEY" \
-  "http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io/v1/training-load?days=7&sport=all"
+  "https://api-staging.training-lab.mauro42k.com/v1/training-load?days=7&sport=all"
 ```
 
 Resultado esperado:
@@ -84,9 +84,8 @@ Validación mínima:
   3. app resource en Coolify
   4. DB resource en Coolify
 
-## DNS pendiente
-- `api-staging.training-lab.mauro42k.com` quedó configurado como dominio objetivo en Coolify.
-- El A record público todavía no existe, por lo que la validación operativa usa el fallback `sslip`.
-- No cerrar Phase 4.3 como completada hasta que:
-  1. `dig +short api-staging.training-lab.mauro42k.com` resuelva
-  2. `curl -i https://api-staging.training-lab.mauro42k.com/health` devuelva `200`
+## DNS + TLS validados
+- `api-staging.training-lab.mauro42k.com` resuelve a `178.156.251.31`.
+- TLS emitido correctamente para el host canónico staging.
+- `curl -i https://api-staging.training-lab.mauro42k.com/health` devuelve `200`.
+- `curl -i -H "X-API-KEY: $TRAINING_LAB_STAGING_API_KEY" "https://api-staging.training-lab.mauro42k.com/v1/training-load?days=7&sport=all"` devuelve `200`.

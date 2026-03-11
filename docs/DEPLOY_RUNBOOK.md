@@ -5,7 +5,7 @@
 - Stable API URL target for phase 0.1: `https://api.training-lab.mauro42k.com`
 - Bootstrap fallback URL: `http://p8w04c88088gw844okkw80gg.178.156.251.31.sslip.io`
 - Staging target URL: `https://api-staging.training-lab.mauro42k.com`
-- Current staging fallback URL: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+- Staging fallback URL (debug/emergency only): `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 
 ## Local Preparation
 1. Ensure the latest `main` branch is pushed to GitHub.
@@ -109,7 +109,8 @@
 Before any destructive or reconciliation experiment:
 1. Confirm the URL you are using:
    - production: `https://api.training-lab.mauro42k.com`
-   - staging fallback: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+   - staging canonical: `https://api-staging.training-lab.mauro42k.com`
+   - staging fallback only if canonical is unavailable: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 2. Confirm `/health`:
    - production -> `environment=production`
    - staging -> `environment=staging`
@@ -120,12 +121,17 @@ Before any destructive or reconciliation experiment:
    - production DB: `training-lab-postgres`
    - staging DB: `training-lab-postgres-staging`
 
-## DNS Note For Canonical Staging Hostname
-- Coolify can be configured with `https://api-staging.training-lab.mauro42k.com` as the canonical target.
-- External routing will remain on the sslip fallback until the public DNS A record is created for `api-staging.training-lab.mauro42k.com`.
-- Do not assume the canonical domain is active until:
-  1. `dig +short api-staging.training-lab.mauro42k.com` resolves
-  2. `curl -i https://api-staging.training-lab.mauro42k.com/health` returns 200
+## Canonical Staging DNS/TLS Validation
+- Canonical staging domain: `https://api-staging.training-lab.mauro42k.com`
+- Required validation:
+  1. `dig +short api-staging.training-lab.mauro42k.com` -> `178.156.251.31`
+  2. `curl -i https://api-staging.training-lab.mauro42k.com/health` -> `200`
+  3. `curl -i -H "X-API-KEY: $TRAINING_LAB_STAGING_API_KEY" "https://api-staging.training-lab.mauro42k.com/v1/training-load?days=7&sport=all"` -> `200`
+- If the canonical route fails but fallback still works, inspect:
+  - Coolify application domain config
+  - persisted `custom_labels`
+  - Traefik router labels
+  - Let's Encrypt issuance logs
 
 ## Rollback
 1. Open the service in Coolify.

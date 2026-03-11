@@ -1,7 +1,7 @@
-# Phase 4 QA Closure (TRIMP + Training Load + HealthKit Real Ingest)
+# Phase 4 QA Closure (TRIMP + Training Load + HealthKit Real Ingest + Staging Separation)
 
 ## Resumen Ejecutivo
-Phase 4.0, 4.1 y 4.2 quedan cerradas con validación funcional end-to-end:
+Phase 4.0, 4.1, 4.2 y 4.3 quedan cerradas con validación funcional end-to-end:
 
 - Backend:
   - TRIMP engine v1 operativo.
@@ -15,7 +15,14 @@ Phase 4.0, 4.1 y 4.2 quedan cerradas con validación funcional end-to-end:
   - Polish UX/UI del chart aplicado (axis/state/baseline/sparse handling).
   - Interacción macOS estabilizada (hover/click/detail + cierre explícito).
   - Runtime config persistente (`xcconfig` + bundle values) validado.
+  - Separación explícita de entorno `production | staging | local` validada.
+  - Badge visible de entorno en debug validado.
   - HealthKit real autorizado y bootstrap histórico ejecutado en iPhone físico.
+- Infra:
+  - staging API separada operativa.
+  - staging PostgreSQL separada operativa.
+  - clon lógico inicial prod -> staging validado.
+  - host canónico staging con DNS + TLS operativos.
 - Fix crítico cerrado:
   - mismatch de `Today` entre UI y backend.
 
@@ -43,6 +50,7 @@ Comprobaciones funcionales:
 ## Evidencia
 - `docs/qa/phase4/README.md`
 - `docs/qa/phase4/PHASE4_2_HEALTHKIT_REAL_INGEST.md`
+- `docs/qa/phase4/PHASE4_3_STAGING_ENVIRONMENT.md`
 
 ## Guardrail de cierre de fase
 - Phase 4.1 cierra UX polish + estabilidad multiplataforma + runtime config.
@@ -51,7 +59,23 @@ Comprobaciones funcionales:
 - Phase 4.2 sí cierra el ingest real end-to-end validado con datos reales.
 - Reconciliación histórica, borrados y cleanup pasan a Phase 4.4.
 
-## DoD Checklist (Phase 4.0 + 4.1 + 4.2)
+## Validación de cierre Phase 4.3
+- staging API service separado: PASS.
+- staging PostgreSQL separada: PASS.
+- clon lógico one-shot prod -> staging: PASS.
+- conteos comparativos validados:
+  - `workouts = 3436`
+  - `workout_load = 3173`
+  - `daily_load = 9720`
+- `/health.environment` distingue `production` vs `staging`: PASS.
+- runtime iOS distingue `production | staging | local`: PASS.
+- host canónico staging `api-staging.training-lab.mauro42k.com`: PASS.
+- DNS resuelve a `178.156.251.31`: PASS.
+- TLS válido emitido para staging: PASS.
+- `GET /health` staging: PASS.
+- `GET /v1/training-load?days=7&sport=all` staging: PASS.
+
+## DoD Checklist (Phase 4.0 + 4.1 + 4.2 + 4.3)
 - [x] TRIMP engine v1 backend.
 - [x] Recompute pipeline incremental.
 - [x] Endpoint `GET /v1/training-load` con filtros.
@@ -69,3 +93,7 @@ Comprobaciones funcionales:
 - [x] Persistencia PostgreSQL validada con datos reales.
 - [x] Sync incremental confirmado después del bootstrap.
 - [x] Refresh post-ingest sin `422` en `/v1/daily`.
+- [x] Staging API separada creada.
+- [x] Staging PostgreSQL separada creada.
+- [x] Clon lógico prod -> staging validado.
+- [x] Host canónico staging con DNS + TLS operativos.

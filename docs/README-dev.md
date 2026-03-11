@@ -8,7 +8,7 @@ Training Lab now has three runtime targets at the app config layer:
   - base URL target: `https://api.training-lab.mauro42k.com`
 - `staging`
   - canonical target: `https://api-staging.training-lab.mauro42k.com`
-  - active fallback while DNS is pending: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+  - optional fallback/debug path: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 - `local`
   - base URL target: `http://127.0.0.1:8000`
 
@@ -27,6 +27,7 @@ Notas:
 - `Runtime.Local.xcconfig` no se versiona.
 - En debug, la app muestra un badge visible con el entorno activo.
 - La key embebida en bundle debe ser solo de dev/staging/local. Nunca una credencial sensible de producción.
+- Para staging, preferir siempre el host canónico `api-staging.training-lab.mauro42k.com`.
 
 ## Ingest pipeline real
 

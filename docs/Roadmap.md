@@ -263,7 +263,7 @@ Completion summary:
 - iOS 18 HealthKit deprecation resolved by replacing `totalEnergyBurned` with `HKWorkout.statistics(for: .activeEnergyBurned)`.
 
 ### 5.6 Phase 4.3 — Staging Environment & Environment Separation
-**Status:** IN PROGRESS  
+**Status:** CLOSED (2026-03-10 America/Mexico_City)  
 **Goal:** Introduce a proper **staging environment** separated from production to allow safe experimentation, schema evolution, and ingest testing without risking the primary dataset.
 
 Context:
@@ -282,7 +282,7 @@ Staging:
 - Active fallback URL: `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
 - Database: PostgreSQL staging (`training-lab-postgres-staging`)
 
-Current execution status:
+Completion summary:
 - separate Coolify `staging` environment created for project `training-lab`
 - separate staging PostgreSQL created and cloned one-shot from production
 - comparative counts after clone:
@@ -293,7 +293,10 @@ Current execution status:
 - `/health` now returns explicit `environment` so prod vs staging can be distinguished safely
 - iOS runtime config now supports explicit `production | staging | local`
 - debug builds show a visible runtime environment badge to avoid ambiguity
-- canonical domain `api-staging.training-lab.mauro42k.com` is configured as the target in Coolify, but public DNS resolution is still pending an external A record
+- canonical staging domain is operational:
+  - `https://api-staging.training-lab.mauro42k.com`
+- DNS resolves correctly to the VPS and TLS is valid
+- staging `/health` and `/v1/training-load` respond `200` through the canonical host
 
 ### 5.6.1 Deliverables
 - **Staging API service** deployed in Coolify (separate service from prod).
@@ -316,8 +319,7 @@ Current execution status:
   - distinct PostgreSQL resource
   - `/health` returning `environment=staging`
 
-Pending before closure:
-- public DNS for `api-staging.training-lab.mauro42k.com`
+- canonical staging DNS and TLS operational on `api-staging.training-lab.mauro42k.com`
 
 ### 5.6.3 QA
 - Confirm staging API responds correctly to `/health`.

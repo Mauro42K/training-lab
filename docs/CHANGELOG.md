@@ -2,6 +2,32 @@
 
 This project follows a simple SemVer-style changelog.
 
+## v0.4.3 - 2026-03-10
+
+## Phase 4.3 — Staging Environment & Environment Separation
+
+Added
+- separate staging API service in Coolify.
+- separate staging PostgreSQL database resource.
+- one-shot logical clone from production into staging baseline.
+- explicit iOS runtime environment selection for `production | staging | local`.
+- visible runtime environment badge in debug builds.
+
+Improved
+- environment verification through `/health.environment`.
+- operational runbooks for staging deploy, DNS/TLS checks, and prod/staging isolation.
+- developer runtime setup for environment-specific `Runtime.Local.xcconfig`.
+
+Fixed
+- canonical staging routing so `api-staging.training-lab.mauro42k.com` resolves and serves the staging app.
+- stale staging proxy labels that were still pinned to the old `sslip` fallback host.
+- staging TLS issuance on the canonical hostname.
+
+Notes
+- production and staging now use different PostgreSQL databases.
+- staging starts from a cloned production baseline and is allowed to diverge afterward.
+- historical reconciliation and cleanup move next to Phase 4.4.
+
 ## v0.4.2 - 2026-03-09
 
 ## Phase 4.2 — HealthKit Real Ingest Enablement

@@ -3,8 +3,9 @@
 Training Lab is the repository for the product foundation and iterative phase delivery.
 
 Current status:
-- Phase 4.2 is closed (real HealthKit ingest pipeline validated end-to-end).
+- Phase 4.3 is closed (staging environment separation validated end-to-end).
 - Real data now flows from iPhone HealthKit to backend PostgreSQL and Training Load endpoints.
+- Production and staging are now separated with distinct API services and PostgreSQL databases.
 - Next planned phase is Phase 4.4 (Workout Reconciliation & Historical Cleanup).
 
 ## Local API

@@ -1,7 +1,7 @@
 # Phase 4 QA Evidence README
 
 ## Fecha / Entorno
-- Fecha de cierre documental Phase 4.2: 2026-03-09 (America/Mexico_City)
+- Fecha de cierre documental Phase 4.3: 2026-03-10 (America/Mexico_City)
 - Repo: `/Users/mauro/Training-lab`
 - Backend validado:
   - local: `http://127.0.0.1:8000`
@@ -88,8 +88,11 @@ Resultado esperado:
   - `workouts`
   - `workout_load`
   - `daily_load`
-- mientras `api-staging.training-lab.mauro42k.com` no tenga DNS público, QA HTTP de staging puede ejecutarse con el fallback:
-  - `http://v0w8cgwwos8go0ggswgg4wgk.178.156.251.31.sslip.io`
+- staging canónico validado:
+  - `dig +short api-staging.training-lab.mauro42k.com` -> `178.156.251.31`
+  - `curl -i https://api-staging.training-lab.mauro42k.com/health` -> `200`
+  - `curl -i -H "X-API-KEY: $TRAINING_LAB_STAGING_API_KEY" "https://api-staging.training-lab.mauro42k.com/v1/training-load?days=7&sport=all"` -> `200`
+- el fallback `sslip` queda solo para debug/emergencia.
 
 ## Phase 4.3 QA Runbook
 - Ver `docs/qa/phase4/PHASE4_3_STAGING_ENVIRONMENT.md`.

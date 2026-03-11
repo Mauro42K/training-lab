@@ -2,10 +2,13 @@
 
 ## Active documentation phase
 
-- Phase 4.5 is formally opened through `docs/PHASE4_5_DAILY_DOMAINS_SUMMARY_CONTRACTS.md`.
-- This opening is documentation-only.
-- No new endpoints, migrations, or implementation contracts are active yet.
-- Phase 4.4 remains on hold and must not be mixed with Phase 4.5 execution.
+- Phase 4.5 is formally closed through `docs/PHASE4_5_DAILY_DOMAINS_SUMMARY_CONTRACTS.md`.
+- Delivered in 4.5:
+  - Apple-first daily domains for sleep, activity, recovery, and body
+  - explicit query contracts for daily domains
+  - `GET /v1/home/summary` as composition-only summary contract
+  - QA closure on staging + production after Alembic migration `20260311_01`
+- Phase 4.4 remains on hold and must not be mixed into the next active phase.
 
 ## Environment targets
 
@@ -43,10 +46,9 @@ Flujo actual validado en Phase 4.2:
 HealthKit -> iOS Client -> POST /v1/ingest/workouts -> PostgreSQL -> load endpoints
 
 Nota Phase 4.5:
-- La siguiente expansión Apple-first documentada cubre sueño, HRV, RHR, activity diaria y body measurements.
-- Esa expansión todavía no cambia el pipeline implementado actual.
-- `GET /v1/daily` permanece como contrato existente y no debe expandirse para absorber los dominios de Phase 4.5.
-- La timezone IANA del device debe considerarse input operativo del sync de Phase 4.5.
+- La expansión Apple-first ya quedó implementada para sueño, HRV, RHR, activity diaria y body measurements.
+- `GET /v1/daily` permanece como contrato legacy y no debe expandirse para absorber los dominios diarios nuevos.
+- La timezone IANA del device forma parte del input operativo de los dominios diarios Apple-first.
 
 ## Modos de sync
 
@@ -67,8 +69,8 @@ Nota Phase 4.5:
 - `syncStatusRaw`: refleja transición operativa (`idle`, `syncing`, `ready`, error según corresponda).
 
 Nota Phase 4.5:
-- la apertura documental todavía no define cursores por dominio,
-- pero sí congela que la timezone IANA debe viajar con el sync/ingest de dominios diarios Apple-first.
+- no se introdujeron todavía cursores dedicados por dominio,
+- pero sí quedó congelado que la timezone IANA debe viajar con el sync/ingest de dominios diarios Apple-first.
 
 ## Batch ingest strategy
 - El cliente agrupa workouts en lotes para `POST /v1/ingest/workouts`.
@@ -91,5 +93,5 @@ Nota Phase 4.5:
 - El refresh post-ingest debe enviar fechas `YYYY-MM-DD` a `GET /v1/daily`.
 - La validación oficial de ingest real se hace en iPhone físico, no en simulador.
 - Features delicadas de reconciliación histórica o borrado deben probarse primero en staging, no en producción.
-- Para Phase 4.5, la semántica nueva debe definirse primero en documentación y luego implementarse por dominios explícitos.
+- Para fases posteriores, la semántica nueva debe seguir reutilizando los dominios explícitos cerrados en Phase 4.5.
 - `missing` en los derivados diarios de Phase 4.5 significa ausencia de row emitida, no row vacía.

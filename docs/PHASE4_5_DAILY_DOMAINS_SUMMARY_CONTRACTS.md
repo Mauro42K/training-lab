@@ -1,6 +1,6 @@
 # Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)
 
-**Status:** OPENING / ACTIVE DOCUMENTATION  
+**Status:** CLOSED  
 **Date:** 2026-03-11 (America/Mexico_City)
 
 ## 1) Contexto
@@ -25,7 +25,7 @@ Construir la base mínima, clara y escalable para dominios diarios Apple-first q
 
 `normalized -> derived -> query`
 
-Phase 4.5 debe congelar semántica, naming, guardrails y reglas transversales antes de tocar implementación. El foco no es una UI final ni un score final, sino contratos diarios explícitos y trazables.
+Phase 4.5 congeló semántica, naming, guardrails y reglas transversales antes de la implementación. El foco de cierre no es una UI final ni un score final, sino contratos diarios explícitos, trazables y operativos para Home y Trends.
 
 ## 3) Alcance
 
@@ -46,13 +46,40 @@ Cobertura Apple-first mínima esperada para esta fase:
 - peso,
 - composición corporal solo si llega limpia y confiable desde HealthKit.
 
-Resultados esperados de Phase 4.5:
+Resultados cerrados de Phase 4.5:
 - naming estable por dominio,
 - reglas transversales explícitas,
 - modelo por capas documentado,
 - contratos conceptuales por dominio,
 - guardrails anti-scope-creep,
 - base documental para que Home y Trends consuman derivados claros sin reabrir semántica.
+
+## 3.1) Cierre real de implementación
+
+Entregado en esta fase:
+- foundation backend compartida con migración Alembic `20260311_01`
+- vertical slices implementados para:
+  - sueño
+  - `daily_activity`
+  - `body_measurements`
+  - `daily_recovery`
+- query contracts explícitos por dominio
+- `GET /v1/home/summary` como composición de contratos ya existentes
+- QA local reproducible
+- validación staging/production tras aplicar migración de Phase 4.5
+- fix final de iOS:
+  - alineación entre `API_BASE_URL` y `runtimeEnvironment`
+  - ocultar el badge debug en `production`
+
+Queda deliberadamente fuera del cierre:
+- readiness final
+- battery final
+- scoring
+- baselines 7d/28d
+- multi-provider
+- generic timeseries
+- nueva tabla diaria derivada para body
+- reconciliación histórica de Phase 4.4
 
 ## 4) No-objetivos
 
@@ -88,8 +115,8 @@ No usar `daily_sleep` como nombre de tabla/contrato derivado diario en esta fase
   - contexto de carga existente cuando aplique.
 
 ### 5.3 Home summary
-- `GET /v1/home/summary` podrá existir en una fase de implementación posterior.
-- Si se introduce, deberá componerse **exclusivamente** desde contratos/tablas derivadas ya definidos en Phase 4.5.
+- `GET /v1/home/summary` fue implementado en esta fase.
+- Debe componerse **exclusivamente** desde contratos/tablas derivadas ya definidos en Phase 4.5.
 - No debe introducir semántica nueva ni reglas paralelas.
 
 ### 5.4 Body measurements
@@ -371,7 +398,7 @@ Reglas operativas:
 
 ## 10) QA Esperado
 
-La apertura de fase congela la matriz mínima esperada para QA posterior.
+La fase queda cerrada con la siguiente matriz QA mínima ya validada.
 
 ### 10.1 Sueño
 - sesión overnight cruzando medianoche,
@@ -405,7 +432,13 @@ La apertura de fase congela la matriz mínima esperada para QA posterior.
 - `measured != estimated`,
 - idempotencia en replay.
 
-La validación real en staging y en iPhone físico se define como parte de la implementación posterior, no de esta apertura documental.
+Validación real cerrada:
+- QA local automatizado: PASS
+- staging post-deploy + post-migration: PASS
+- production sanity post-migration: PASS
+- smoke test real en iPhone:
+  - runtime alineado con el host real de la API
+  - badge debug oculto en production
 
 ## 11) Dependencias y Riesgos
 
@@ -437,13 +470,18 @@ Toda referencia a Phase 4.4 durante la implementación de 4.5 debe tratarse como
 
 ## 13) Huecos Pendientes de Definición
 
-Estos huecos no bloquean la apertura documental, pero deben cerrarse antes o durante la implementación:
+Estos puntos quedan como handoff a la siguiente fase y no como bugs de cierre:
 
-- Ingest Apple-first de HRV/RHR:
-  - falta decidir si la capa normalizada guardará observaciones puntuales o valores diarios consolidados.
-- `daily_activity`:
-  - falta congelar si la normalización será diaria desde origen o si existirá granularidad subdiaria previa.
 - `body_measurements`:
-  - falta decidir si el dominio usa row derivada separada o si se mantiene como canonicalización diaria sobre el normalizado.
+  - se mantiene sin tabla derivada diaria dedicada
+- `daily_recovery`:
+  - permanece sin score, baselines ni readiness/battery final
+- `daily_activity`:
+  - sigue apoyado en agregados canónicos de HealthKit, sin heurísticas manuales de dedupe
 - `GET /v1/home/summary`:
-  - queda definido como composición futura habilitada por 4.5, no como entregable inicial de esta apertura.
+  - ya existe como composición mínima, pero no debe transformarse en un motor semántico nuevo
+
+Riesgos estructurales vigilados:
+- crecimiento de repositorios por dominio, especialmente recovery
+- preservar `GET /v1/daily` como contrato legacy fuera del scope de dominios 4.5
+- mantener Phase 4.4 explícitamente on hold hasta que vuelva a abrirse como trabajo separado

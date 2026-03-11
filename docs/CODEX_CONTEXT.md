@@ -5,7 +5,30 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 4.5 — OPENING / ACTIVE DOCUMENTATION** (2026-03-11 America/Mexico_City)
+- **Phase 4.5 — CLOSED** (2026-03-11 America/Mexico_City)
+
+### Phase 4.5 Closure Summary
+- Apple-first daily-domain foundation delivered end-to-end:
+  - `sleep_sessions`
+  - `daily_sleep_summary`
+  - `daily_activity`
+  - `body_measurements`
+  - `recovery_signals`
+  - `daily_recovery`
+- Query contracts delivered:
+  - `GET /v1/daily-domains/sleep`
+  - `GET /v1/daily-domains/activity`
+  - `GET /v1/daily-domains/recovery`
+  - `GET /v1/daily-domains/body-measurements`
+  - `GET /v1/home/summary`
+- QA/hardening closed:
+  - local automated QA passed
+  - staging and production validated after Alembic migration `20260311_01`
+  - production auto deploy turned `OFF`
+  - staging auto deploy remains `ON`
+- Minor iOS closure fix delivered:
+  - runtime environment now aligns with the API host
+  - debug runtime badge stays visible for `local` / `staging` and hidden for `production`
 
 ## Phase 4.0 Delivered
 
@@ -109,16 +132,15 @@ Guardrail (explicit):
 - Cache isolation by effective `baseURL` remains in place.
 
 Closure note:
-- Phase 4.3 remains the last completed implementation phase.
-- Phase 4.5 is now the active documentation phase for daily-domain semantics.
+- Phase 4.3 remains the last completed pre-daily-domains environment phase.
+- Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)** (**Opening / Planned**)
-- Scope:
-  - establish explicit Apple-first daily domains for `sleep`, `daily_recovery`, `daily_activity`, and `body_measurements`.
-  - preserve the `normalized -> derived -> query` pattern already validated in load/TRIMP.
-  - freeze explicit rules for `local_date`, timezone, completeness, provenance, idempotency, and affected-date recompute.
-  - document the foundation that will unblock Home and Trends without introducing generic multi-provider abstractions.
+- **Phase 5 — Home v1 (Rings + Drivers Cards)** (**Planned**)
+- Focus:
+  - compose Home from the explicit 4.5 daily-domain contracts already delivered,
+  - preserve transparency and data completeness semantics,
+  - avoid introducing hidden scoring logic before driver presentation is explicit.
 
 ## On Hold Phase
 - **Phase 4.4 — Workout Reconciliation & Historical Cleanup** (**On Hold**)

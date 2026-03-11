@@ -362,7 +362,7 @@ Guardrails:
 - must maintain idempotency of ingest pipeline.
 
 ### 5.8 Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)
-**Status:** OPENING / PLANNED  
+**Status:** CLOSED (2026-03-11 America/Mexico_City)  
 **Goal:** Establish the minimum Apple-first daily-domain foundation that will unblock Home and Trends without adopting a generic multi-provider architecture.
 
 Closure decisions carried into this phase:
@@ -380,6 +380,21 @@ Closure decisions carried into this phase:
   - `daily_recovery`
   - `daily_activity`
   - `body_measurements`
+- Backend foundation + migrations delivered for:
+  - normalized daily-domain storage
+  - derived daily summaries
+  - affected-date recompute
+- Vertical slices delivered for:
+  - sleep
+  - daily activity
+  - body measurements
+  - daily recovery
+- Query contracts delivered:
+  - `GET /v1/daily-domains/sleep`
+  - `GET /v1/daily-domains/activity`
+  - `GET /v1/daily-domains/recovery`
+  - `GET /v1/daily-domains/body-measurements`
+  - `GET /v1/home/summary`
 - Explicit cross-domain rules for:
   - `local_date`
   - timezone
@@ -411,9 +426,14 @@ Closure decisions carried into this phase:
 - Relation to Phase 4.4 on hold is explicit and non-ambiguous.
 - `missing` is explicitly represented as no emitted derived row.
 - `primary_device_name` resolution is explicitly constrained to confidence-only, without complex heuristics.
+- staging and production validated after Alembic migration `20260311_01`.
+- iPhone smoke test validated runtime alignment with production host and no debug badge in production.
 
 ### 5.8.3 QA
 - Documentation review for naming and scope consistency.
+- Local automated QA: PASS.
+- staging smoke validation post-migration: PASS.
+- production sanity validation post-migration: PASS.
 - Validate explicit handling of:
   - overnight sleep assignment
   - naps without reliable stages
@@ -434,6 +454,16 @@ Closure decisions carried into this phase:
 - No generic timeseries endpoint.
 - No multi-provider abstractions.
 - No extra async infrastructure in this phase.
+
+### 5.8.5 Handoff
+- Phase 4.4 remains ON HOLD and is not reopened by this closure.
+- The next logical implementation focus is Phase 5 Home v1 using the daily-domain contracts already delivered.
+- Deferred-by-decision, not bugs:
+  - no recovery score yet
+  - no readiness/battery final
+  - no baselines 7d/28d
+  - no body daily derived table
+  - no generic timeseries
 
 ---
 

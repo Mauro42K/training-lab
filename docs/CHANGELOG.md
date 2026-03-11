@@ -2,6 +2,40 @@
 
 This project follows a simple SemVer-style changelog.
 
+## v0.4.5 - 2026-03-11
+
+## Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)
+
+Added
+- Apple-first backend foundation for:
+  - `sleep_sessions`
+  - `daily_sleep_summary`
+  - `daily_activity`
+  - `body_measurements`
+  - `recovery_signals`
+  - `daily_recovery`
+- explicit query contracts:
+  - `GET /v1/daily-domains/sleep`
+  - `GET /v1/daily-domains/activity`
+  - `GET /v1/daily-domains/recovery`
+  - `GET /v1/daily-domains/body-measurements`
+  - `GET /v1/home/summary`
+- QA evidence for Block 7 closure on staging and production after Alembic migration `20260311_01`
+
+Improved
+- daily-domain semantics now run on the documented `normalized -> derived -> query` pattern.
+- staging and production operational flow hardened with explicit migration validation before HTTP QA.
+- iOS runtime environment now aligns with the API host, preventing debug environment drift when the app points to production.
+
+Fixed
+- remote `500` failures on Phase 4.5 endpoints caused by missing DB migration in staging and production.
+- debug runtime badge visibility in production-like iPhone smoke tests.
+
+Notes
+- Phase 4.5 is now formally closed.
+- Phase 4.4 remains on hold.
+- the next logical focus moves to Phase 5 Home v1 on top of the contracts delivered here.
+
 ## v0.4.4 - 2026-03-11
 
 ## Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)

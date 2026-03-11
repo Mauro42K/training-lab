@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "status": "draft-approved-for-audit-rerun",
+  "pairs": [
+    {
+      "left": "com.garmin.connect.mobile",
+      "right": "com.strava.stravaride",
+      "preferred": "com.garmin.connect.mobile",
+      "confidence": "high",
+      "basis": "human_sample_review",
+      "applies_only_when": [
+        "cluster_size == 2",
+        "reasons == ['conflicting_source_bundle_id']"
+      ],
+      "exceptions_policy": "If additional metric divergence or larger cluster size appears, keep the cluster in manual review.",
+      "exceptions": []
+    },
+    {
+      "left": "com.rungap.RunGap",
+      "right": "com.strava.stravaride",
+      "preferred": "com.rungap.RunGap",
+      "confidence": "high",
+      "basis": "human_sample_review",
+      "applies_only_when": [
+        "cluster_size == 2",
+        "reasons == ['conflicting_source_bundle_id']"
+      ],
+      "exceptions_policy": "If additional metric divergence or larger cluster size appears, keep the cluster in manual review.",
+      "exceptions": []
+    }
+  ]
+}

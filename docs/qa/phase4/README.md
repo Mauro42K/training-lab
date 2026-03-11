@@ -100,3 +100,9 @@ Resultado esperado:
 ## Phase 4.5 Block 7 QA / Hardening
 - Ver `docs/qa/phase4/PHASE4_5_BLOCK7_QA_HARDENING.md`.
 - Estado actual: CLOSED tras deploy `52047a0`, migración Alembic `20260311_01` en staging/production y rerun de smoke HTTP.
+
+## Phase 4.4.1 QA / Data Remediation
+- Duplicate audit (Block 2): `docs/qa/phase4/PHASE4_4_1_DUPLICATE_AUDIT.md`
+- Source precedence calibration (Block 3): `docs/qa/phase4/PHASE4_4_1_SOURCE_PRECEDENCE_CALIBRATION.md`
+- Source precedence decision (Block 4): `docs/qa/phase4/PHASE4_4_1_SOURCE_PRECEDENCE_DECISION.md`
+- Staging cleanup execution (Block 5): `docs/qa/phase4/PHASE4_4_1_STAGING_CLEANUP.md`

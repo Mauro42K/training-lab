@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 4.3 — CLOSED** (2026-03-10 America/Mexico_City)
+- **Phase 4.5 — OPENING / ACTIVE DOCUMENTATION** (2026-03-11 America/Mexico_City)
 
 ## Phase 4.0 Delivered
 
@@ -108,12 +108,22 @@ Guardrail (explicit):
 - Debug builds show a visible runtime environment badge to avoid pointing at the wrong backend silently.
 - Cache isolation by effective `baseURL` remains in place.
 
+Closure note:
+- Phase 4.3 remains the last completed implementation phase.
+- Phase 4.5 is now the active documentation phase for daily-domain semantics.
+
 ## Next Phase
-- **Phase 4.4 — Workout Reconciliation & Historical Cleanup** (**Planned**)
+- **Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)** (**Opening / Planned**)
 - Scope:
-  - reconcile historical backend state with current HealthKit reality.
-  - support deleted/duplicated workout cleanup safely.
-  - recalculate derived metrics after historical corrections.
+  - establish explicit Apple-first daily domains for `sleep`, `daily_recovery`, `daily_activity`, and `body_measurements`.
+  - preserve the `normalized -> derived -> query` pattern already validated in load/TRIMP.
+  - freeze explicit rules for `local_date`, timezone, completeness, provenance, idempotency, and affected-date recompute.
+  - document the foundation that will unblock Home and Trends without introducing generic multi-provider abstractions.
+
+## On Hold Phase
+- **Phase 4.4 — Workout Reconciliation & Historical Cleanup** (**On Hold**)
+- Status note:
+  - historical workout reconciliation, deleted workout cleanup, and duplicate cleanup remain paused and must not be mixed into Phase 4.5.
 
 ## Non-Negotiables
 - Design-first.

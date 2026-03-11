@@ -2,6 +2,34 @@
 
 This project follows a simple SemVer-style changelog.
 
+## v0.4.4 - 2026-03-11
+
+## Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)
+
+Added
+- primary phase-opening document: `docs/PHASE4_5_DAILY_DOMAINS_SUMMARY_CONTRACTS.md`.
+- explicit documentary freeze for Apple-first daily domains:
+  - `sleep_sessions`
+  - `daily_sleep_summary`
+  - `daily_recovery`
+  - `daily_activity`
+  - `body_measurements`
+- explicit cross-domain rules for `local_date`, timezone, completeness, provenance, idempotency, and affected-date recompute.
+
+Improved
+- repository context updated so the active next phase is now 4.5.
+- roadmap, README, dev notes, data sources, and metrics documentation aligned with the new Apple-first scope.
+- provenance minimum frozen for Phase 4.5 as:
+  - `provider`
+  - `source_count`
+  - `has_mixed_sources`
+  - `primary_device_name`
+
+Notes
+- this is a documentation-only opening of Phase 4.5.
+- no implementation, migrations, endpoints, or runtime contracts were added in this step.
+- Phase 4.4 is now explicitly on hold and must not be mixed into 4.5 execution.
+
 ## v0.4.3 - 2026-03-10
 
 ## Phase 4.3 — Staging Environment & Environment Separation

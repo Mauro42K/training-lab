@@ -25,10 +25,41 @@ Cada score/metric debe exponer:
 - `inputs_missing`: lista de inputs faltantes
 - `completeness_ratio`: ejemplo 3/5 drivers
 
+Para Phase 4.5:
+- `complete` = están presentes todos los inputs requeridos del dominio
+- `partial` = existe row emitida, pero faltan uno o más inputs requeridos/objetivo
+- `missing` = no existe row derivada emitida para ese día
+
+Guardrail:
+- no usar rows vacías con `nulls` para representar `missing` en los dominios diarios de Phase 4.5
+
 ### 0.3 Etiquetas obligatorias
 - Si una métrica es estimada: `Estimated` / `Estimado`
 - Si es proxy: `Proxy`
 - Si no hay data suficiente: `Insufficient data` / `Datos insuficientes`
+
+### 0.4 Apertura documental Phase 4.5
+
+Phase 4.5 abre la foundation Apple-first de dominios diarios sin introducir todavía scores finales nuevos.
+
+Guardrails explícitos:
+- `daily_recovery` en Phase 4.5 es una capa de inputs consolidados, no un score `0-100`.
+- No se introducen baselines `7d/28d`, scoring ni explicabilidad premium en esta apertura.
+- `GET /v1/daily` no se expande para cubrir los dominios de Phase 4.5.
+- Naming congelado:
+  - `sleep_sessions`
+  - `daily_sleep_summary`
+
+Provenance mínima obligatoria para derivados diarios de Phase 4.5:
+- `provider`
+- `source_count`
+- `has_mixed_sources`
+- `primary_device_name`
+
+Regla para `primary_device_name`:
+- si puede determinarse con confianza, se llena
+- si no puede determinarse con confianza, queda `null`
+- no introducir heurísticas complejas de resolución en Phase 4.5
 
 ---
 
@@ -161,6 +192,10 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 
 ## 4) Battery / Recovery (transparente)
 
+Nota de alcance:
+- Las definiciones de score de esta sección siguen siendo referencia de producto futura.
+- Phase 4.5 no implementa todavía este score final.
+
 ### 4.1 Battery (Score + drivers)
 **UI term:** Battery (o Readiness — decidir UI final)  
 **Qué es:** Preparación para entrenar hoy, explicada por drivers.
@@ -178,6 +213,17 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 - RHR
 - Exertion_7d (o Fatigue)
 - Steps + walking distance
+
+Nota Phase 4.5:
+- la capa `daily_recovery` no implementa todavía este score
+- condición mínima de emisión:
+  - `daily_sleep_summary` o HRV o RHR
+- `complete`:
+  - requiere sleep + HRV + RHR
+- `partial`:
+  - row emitida con al menos uno de esos inputs, pero no todos
+- `missing`:
+  - no se emite row derivada
 
 **Cálculo (v1 — estructura)**
 - Score 0–100 con combinación ponderada de drivers:
@@ -206,7 +252,32 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 **Qué es:** Indicadores de sueño usados para Battery y trends.
 
 **Inputs**
-- sleepAnalysis (duración total, y si es posible “asleep” vs “in bed”)
+- `daily_sleep_summary` derivado de `sleep_sessions`
+- prioridad v1 foundation:
+  - duración total
+  - sesión principal
+  - naps
+  - correcta asignación por `local_date`
+- `asleep` vs `in_bed` y sleep stages solo si la señal es consistente
+
+Definiciones operativas Phase 4.5:
+- `main_sleep`:
+  - episodio más largo del día
+  - `>= 3h`
+  - `end_at_local` entre `03:00` y `15:00`
+  - fusionando bloques con gap `<= 30 min`
+- tie-breaker:
+  - si hay empate, gana el `end_at` más tardío
+- fallback:
+  - si no existe candidato `>= 3h`, usar el episodio más largo `>= 90 min` y degradar a `partial`
+- `nap`:
+  - no-main sleep
+  - `>= 20 min` y `< 180 min`
+  - `start_at_local` entre `09:00` y `21:00`
+- si no hay stages:
+  - no bloquea el dominio
+- si hay múltiples bloques nocturnos:
+  - fusionar gaps cortos antes de elegir el `main_sleep`
 
 **Cálculo (v1)**
 - SleepDurationHours (principal)
@@ -240,9 +311,16 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 **Qué es:** Movimiento fuera de entrenamientos.
 
 **Inputs**
+- `daily_activity`
 - Steps
 - Walking Distance
 - Active Energy (solo detalle)
+
+Semántica Phase 4.5:
+- `daily_activity` representa el agregado diario canónico Apple Health del movimiento del día
+- no intenta aislar algorítmicamente “solo no-workout movement”
+- no sustituye workouts ni load
+- la consolidación anti-doble-conteo se delega a HealthKit
 
 **Cálculo (v1)**
 - Ring progress basado en Steps + Distance (definir target)
@@ -271,11 +349,18 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 ### 9.1 Weight
 **UI term:** Weight  
 **Inputs**
-- HealthKit bodyMass o manual
+- `body_measurements.weight_kg` como mínimo útil
+- HealthKit bodyMass o manual en fase posterior
 
 **Cálculo**
 - Promedios móviles simples (SMA) 7d y 28d para mostrar, y permitir seleccionar ventanas 30/90/365 para rango de gráfico.
 - Dedup por fecha
+
+**Regla Phase 4.5**
+- `body_measurements` se mantiene pragmático.
+- composición corporal solo se usa si llega limpia y confiable desde HealthKit.
+- para múltiples mediciones válidas el mismo día, gana la última medición válida por métrica.
+- no se emite row diaria útil del dominio si no existe `weight_kg` válido.
 
 ---
 

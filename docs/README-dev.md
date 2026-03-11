@@ -1,5 +1,12 @@
 # README Dev
 
+## Active documentation phase
+
+- Phase 4.5 is formally opened through `docs/PHASE4_5_DAILY_DOMAINS_SUMMARY_CONTRACTS.md`.
+- This opening is documentation-only.
+- No new endpoints, migrations, or implementation contracts are active yet.
+- Phase 4.4 remains on hold and must not be mixed with Phase 4.5 execution.
+
 ## Environment targets
 
 Training Lab now has three runtime targets at the app config layer:
@@ -35,6 +42,12 @@ Flujo actual validado en Phase 4.2:
 
 HealthKit -> iOS Client -> POST /v1/ingest/workouts -> PostgreSQL -> load endpoints
 
+Nota Phase 4.5:
+- La siguiente expansión Apple-first documentada cubre sueño, HRV, RHR, activity diaria y body measurements.
+- Esa expansión todavía no cambia el pipeline implementado actual.
+- `GET /v1/daily` permanece como contrato existente y no debe expandirse para absorber los dominios de Phase 4.5.
+- La timezone IANA del device debe considerarse input operativo del sync de Phase 4.5.
+
 ## Modos de sync
 
 ### Bootstrap mode
@@ -52,6 +65,10 @@ HealthKit -> iOS Client -> POST /v1/ingest/workouts -> PostgreSQL -> load endpoi
 - `lastSuccessfulIngestAt`: último sync remoto exitoso usado para incremental.
 - `hasCompletedRealHealthKitIngest`: define si el siguiente sync corre en bootstrap o incremental.
 - `syncStatusRaw`: refleja transición operativa (`idle`, `syncing`, `ready`, error según corresponda).
+
+Nota Phase 4.5:
+- la apertura documental todavía no define cursores por dominio,
+- pero sí congela que la timezone IANA debe viajar con el sync/ingest de dominios diarios Apple-first.
 
 ## Batch ingest strategy
 - El cliente agrupa workouts en lotes para `POST /v1/ingest/workouts`.
@@ -74,3 +91,5 @@ HealthKit -> iOS Client -> POST /v1/ingest/workouts -> PostgreSQL -> load endpoi
 - El refresh post-ingest debe enviar fechas `YYYY-MM-DD` a `GET /v1/daily`.
 - La validación oficial de ingest real se hace en iPhone físico, no en simulador.
 - Features delicadas de reconciliación histórica o borrado deben probarse primero en staging, no en producción.
+- Para Phase 4.5, la semántica nueva debe definirse primero en documentación y luego implementarse por dominios explícitos.
+- `missing` en los derivados diarios de Phase 4.5 significa ausencia de row emitida, no row vacía.

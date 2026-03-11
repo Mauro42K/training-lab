@@ -96,3 +96,6 @@ Resultado esperado:
 
 ## Phase 4.3 QA Runbook
 - Ver `docs/qa/phase4/PHASE4_3_STAGING_ENVIRONMENT.md`.
+
+## Phase 4.5 Block 7 QA / Hardening
+- Ver `docs/qa/phase4/PHASE4_5_BLOCK7_QA_HARDENING.md`.

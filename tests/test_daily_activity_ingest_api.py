@@ -1,0 +1,62 @@
+import datetime as dt
+import os
+import unittest
+
+from unittest.mock import MagicMock, patch
+
+from fastapi.testclient import TestClient
+
+os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test_db")
+
+from api.db.session import get_db
+from api.dependencies.auth import require_api_key
+from api.main import app
+from api.schemas.ingest import IngestDailyActivityResponse
+
+
+class DailyActivityIngestApiTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.db = MagicMock()
+        app.dependency_overrides[get_db] = lambda: self.db
+        app.dependency_overrides[require_api_key] = lambda: None
+        self.client = TestClient(app)
+
+    def tearDown(self) -> None:
+        app.dependency_overrides.clear()
+
+    def test_post_daily_activity_ingest_returns_service_response(self) -> None:
+        service_response = IngestDailyActivityResponse(
+            inserted=1,
+            updated=0,
+            total_received=1,
+            rebuilt_dates=1,
+            invalidated_daily_recovery_dates=1,
+            idempotent_replay=False,
+        )
+        with patch(
+            "api.routers.v1.ingest.DailyActivityIngestService.ingest_daily_activity",
+            return_value=service_response,
+        ) as ingest_mock:
+            response = self.client.post(
+                "/v1/ingest/daily-activity",
+                headers={"X-Idempotency-Key": "activity-key-1", "X-API-KEY": "test-key"},
+                json={
+                    "timezone": "America/Mexico_City",
+                    "daily_activity": [
+                        {
+                            "bucket_start": dt.datetime(2026, 3, 3, 6, 0, tzinfo=dt.UTC).isoformat(),
+                            "steps": 8000,
+                            "walking_running_distance_m": 6200.0,
+                            "active_energy_kcal": None,
+                        }
+                    ],
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["inserted"], 1)
+        ingest_mock.assert_called_once()
+
+
+if __name__ == "__main__":
+    unittest.main()

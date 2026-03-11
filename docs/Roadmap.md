@@ -337,7 +337,7 @@ Completion summary:
 - iOS debug builds must show the active environment explicitly when not running default production.
 
 ### 5.7 Phase 4.4 — Workout Reconciliation & Historical Cleanup
-**Status:** PLANNED  
+**Status:** ON HOLD  
 **Goal:** Provide mechanisms to reconcile historical workouts between Apple Health and the backend database.
 
 Context:
@@ -360,6 +360,80 @@ Guardrails:
 - must be tested in STAGING first.
 - must not risk production data corruption.
 - must maintain idempotency of ingest pipeline.
+
+### 5.8 Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)
+**Status:** OPENING / PLANNED  
+**Goal:** Establish the minimum Apple-first daily-domain foundation that will unblock Home and Trends without adopting a generic multi-provider architecture.
+
+Closure decisions carried into this phase:
+- do not convert Training Lab into a generic platform,
+- do not adopt `open-wearables` as the architectural base,
+- do not expand `GET /v1/daily` to cover heterogeneous daily domains,
+- do not introduce Redis/Celery/OAuth/webhooks/portal web,
+- do not persist full raw blobs,
+- keep Phase 4.4 on hold and out of active execution scope.
+
+### 5.8.1 Deliverables
+- Documentary opening and semantic freeze for:
+  - `sleep_sessions`
+  - `daily_sleep_summary`
+  - `daily_recovery`
+  - `daily_activity`
+  - `body_measurements`
+- Explicit cross-domain rules for:
+  - `local_date`
+  - timezone
+  - completeness
+  - provenance
+  - idempotency
+  - affected-date recompute
+- Layer model frozen as:
+  - normalized -> derived -> query
+- `daily_recovery` defined as consolidated inputs only:
+  - no final score `0-100`
+- explicit emission/completeness rules for `daily_recovery`:
+  - emit only if sleep or HRV or RHR exists
+  - `complete` requires sleep + HRV + RHR
+  - `missing` means no row emitted
+- explicit timezone and `local_date` semantics by domain
+- explicit `main_sleep` / `nap` rules
+- explicit daily canonicalization for `body_measurements`
+- minimum provenance frozen as:
+  - `provider`
+  - `source_count`
+  - `has_mixed_sources`
+  - `primary_device_name`
+
+### 5.8.2 DoD
+- Phase 4.5 has a primary source-of-truth document in `docs/`.
+- Naming is frozen and consistent across roadmap, context, data-sources, and metrics docs.
+- Scope boundaries and anti-scope-creep rules are explicit.
+- Relation to Phase 4.4 on hold is explicit and non-ambiguous.
+- `missing` is explicitly represented as no emitted derived row.
+- `primary_device_name` resolution is explicitly constrained to confidence-only, without complex heuristics.
+
+### 5.8.3 QA
+- Documentation review for naming and scope consistency.
+- Validate explicit handling of:
+  - overnight sleep assignment
+  - naps without reliable stages
+  - HRV/RHR missing data
+  - steps-only day
+  - weight present with body-composition absent
+  - `null != 0`
+  - timezone/local-date shifts
+  - `missing` without empty rows
+  - `primary_device_name = null` when not confidently resolvable
+
+### 5.8.4 Guardrails
+- No readiness final.
+- No battery final.
+- No baselines `7d/28d`.
+- No scoring.
+- No premium explainability layer.
+- No generic timeseries endpoint.
+- No multi-provider abstractions.
+- No extra async infrastructure in this phase.
 
 ---
 

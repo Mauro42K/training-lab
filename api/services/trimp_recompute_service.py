@@ -14,6 +14,7 @@ from api.repositories.load_repository import (
     rebuild_daily_load_for_dates,
     upsert_workout_load_rows,
 )
+from api.services.daily_recovery_recompute_service import DailyRecoveryRecomputeService
 from api.services.local_date import resolve_local_date
 from api.services.trimp_engine import TrimpEngineService
 
@@ -34,6 +35,7 @@ class TrimpRecomputeService:
     ) -> None:
         self.settings = settings or get_settings()
         self.trimp_engine = trimp_engine or TrimpEngineService(settings=self.settings)
+        self.daily_recovery_recompute_service = DailyRecoveryRecomputeService(settings=self.settings)
 
     def recompute_for_workout_uuids(
         self,
@@ -120,6 +122,11 @@ class TrimpRecomputeService:
             user_id=user_id,
             dates=affected_dates,
             trimp_model_version=self.settings.trimp_active_model_version,
+        )
+        self.daily_recovery_recompute_service.recompute_for_dates(
+            db,
+            user_id=user_id,
+            dates=sorted(affected_dates),
         )
 
         return RecomputeSummary(

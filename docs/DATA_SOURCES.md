@@ -57,6 +57,37 @@
 
 ---
 
+## 2.1 Apertura documental Phase 4.5 (Apple-first daily domains)
+
+Phase 4.5 abre la base documental para dominios diarios Apple-first explícitos.
+
+Dominios en scope:
+- `sleep_sessions`
+- `daily_sleep_summary`
+- `daily_recovery`
+- `daily_activity`
+- `body_measurements`
+
+Tipos mínimos de HealthKit implicados:
+- **Sueño**: `HKCategoryTypeIdentifier.sleepAnalysis`
+- **HRV**: `HKQuantityTypeIdentifier.heartRateVariabilitySDNN`
+- **RHR**: `HKQuantityTypeIdentifier.restingHeartRate`
+- **Pasos**: `HKQuantityTypeIdentifier.stepCount`
+- **Distancia caminando/corriendo**: `HKQuantityTypeIdentifier.distanceWalkingRunning`
+- **Energía activa**: `HKQuantityTypeIdentifier.activeEnergyBurned` (opcional)
+- **Peso**: `HKQuantityTypeIdentifier.bodyMass`
+- **% grasa**: `HKQuantityTypeIdentifier.bodyFatPercentage` (solo si llega limpia)
+- **Masa magra**: `HKQuantityTypeIdentifier.leanBodyMass` (solo si llega limpia)
+
+Guardrails documentales de Phase 4.5:
+- No endpoint genérico `/timeseries`.
+- No multi-provider.
+- No blobs raw completos.
+- No expandir `GET /v1/daily` para cubrir estos dominios.
+- `daily_recovery` es capa de inputs consolidados, no score final.
+
+---
+
 ## 3) Normalización (modelo interno recomendado)
 
 ### 3.1 Entidades base
@@ -86,6 +117,36 @@ Deduplicar sesiones potencialmente duplicadas comparando:
 
 **Resultado:** 1 sola sesión canónica. Las demás se marcan como “merged/duplicate” y **no suman**.
 
+### 3.3 Foundation naming Phase 4.5
+
+Naming congelado para la apertura documental:
+- `sleep_sessions`: capa normalizada de sesiones de sueño
+- `daily_sleep_summary`: capa derivada diaria de sueño
+- `daily_activity`: derivado diario de movimiento no-workout
+- `body_measurements`: normalizado pragmático de métricas corporales
+- `daily_recovery`: derivado diario de inputs consolidados
+
+Reglas transversales obligatorias:
+- `local_date` explícita en derivados diarios
+- timezone IANA explícita
+- recompute por fechas afectadas
+- `null != 0`
+- `measured != estimated`
+- `missing` = no row derivada emitida para ese día
+- provenance mínima:
+  - `provider`
+  - `source_count`
+  - `has_mixed_sources`
+  - `primary_device_name`
+
+Timezone autoritativa en Phase 4.5:
+- iOS envía timezone IANA en cada sync/ingest
+- backend deriva `local_date` con esa timezone
+- backend actualiza la timezone persistida del usuario como default operativo actual
+- fallback:
+  - timezone persistida del usuario
+  - fallback backend solo como última defensa
+
 ---
 
 ## 4) Reglas de “missing data” (comportamiento UX)
@@ -101,6 +162,18 @@ Deduplicar sesiones potencialmente duplicadas comparando:
   - **data completeness** (ej. 3/5 drivers presentes)
 - Si faltan drivers críticos (ej. sin HRV y sin sueño) → Battery se muestra como “Datos insuficientes” o se degrada con explicación.
 
+Nota Phase 4.5:
+- `daily_recovery` no define todavía el score final de Battery/Readiness.
+- En esta fase solo se abre la capa diaria de inputs consolidados y completitud.
+- condición mínima de emisión:
+  - `daily_sleep_summary` o HRV o RHR
+- `complete`:
+  - requiere sleep + HRV + RHR
+- `partial`:
+  - row emitida, pero faltan uno o más de esos inputs
+- `missing`:
+  - no se emite row derivada
+
 ### 4.3 Stress
 - Si no hay “señal real” de stress, usamos **Stress (proxy)** SOLO si hay inputs mínimos (definidos en METRICS_CATALOG).
 - Si inputs insuficientes → ocultar card o mostrar “Insufficient data”.
@@ -113,6 +186,11 @@ Deduplicar sesiones potencialmente duplicadas comparando:
 ### 4.5 Body
 - Si no hay peso en HealthKit → permitir entrada manual (Phase correspondiente).
 - Si hay mezcla de fuentes → priorizar HealthKit, manual como fallback, deduplicar por fecha.
+
+Nota Phase 4.5:
+- `weight_kg` es la métrica mínima obligatoria.
+- body composition solo se utiliza si llega limpia y confiable desde HealthKit.
+- para múltiples mediciones válidas el mismo día, gana la última medición válida por métrica.
 
 ---
 
@@ -133,6 +211,17 @@ Deduplicar sesiones potencialmente duplicadas comparando:
 - Caso C: 14–21 días sin entrenar.
 - Caso D: sleep/HRV faltante → Battery degrada y lo explica.
 - Caso E: potencial duplicado (misma sesión importada dos veces) → no suma doble.
+
+QA adicional esperado para la foundation de Phase 4.5:
+- sueño overnight asignado al día correcto,
+- naps sin sleep stages confiables,
+- HRV/RHR faltantes sin inventar score,
+- día con solo pasos,
+- peso presente y composición corporal ausente,
+- `null != 0`,
+- provenance mínima siempre presente,
+- `missing` sin row vacía,
+- `primary_device_name = null` cuando no pueda resolverse con confianza.
 
 ---
 

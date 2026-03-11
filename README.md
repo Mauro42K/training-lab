@@ -6,7 +6,8 @@ Current status:
 - Phase 4.3 is closed (staging environment separation validated end-to-end).
 - Real data now flows from iPhone HealthKit to backend PostgreSQL and Training Load endpoints.
 - Production and staging are now separated with distinct API services and PostgreSQL databases.
-- Next planned phase is Phase 4.4 (Workout Reconciliation & Historical Cleanup).
+- Phase 4.5 is now opened at the documentation level: Daily Domains & Summary Contracts (Apple-first).
+- Phase 4.4 (Workout Reconciliation & Historical Cleanup) is on hold and out of active scope.
 
 ## Local API
 1. Create a virtual environment.
@@ -38,5 +39,6 @@ Detailed operational steps live in `docs/DEPLOY_RUNBOOK.md`.
 - Roadmap: `docs/Roadmap.md`
 - Changelog: `docs/CHANGELOG.md`
 - Codex context: `docs/CODEX_CONTEXT.md`
+- Phase 4.5 opening: `docs/PHASE4_5_DAILY_DOMAINS_SUMMARY_CONTRACTS.md`
 - Phase 4 QA closure: `docs/Phase4_QA.md`
 - Dev ingest notes: `docs/README-dev.md`

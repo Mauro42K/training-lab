@@ -62,6 +62,9 @@ class TrimpRecomputeServiceTests(unittest.TestCase):
             patch("api.services.trimp_recompute_service.upsert_workout_load_rows") as upsert_mock,
             patch("api.services.trimp_recompute_service.delete_workout_load_rows") as delete_mock,
             patch("api.services.trimp_recompute_service.rebuild_daily_load_for_dates") as rebuild_mock,
+            patch(
+                "api.services.trimp_recompute_service.DailyRecoveryRecomputeService.recompute_for_dates"
+            ),
         ):
             summary = self.service.recompute_for_workout_uuids(
                 db=object(),
@@ -89,6 +92,9 @@ class TrimpRecomputeServiceTests(unittest.TestCase):
             patch("api.services.trimp_recompute_service.upsert_workout_load_rows") as upsert_mock,
             patch("api.services.trimp_recompute_service.delete_workout_load_rows"),
             patch("api.services.trimp_recompute_service.rebuild_daily_load_for_dates") as rebuild_mock,
+            patch(
+                "api.services.trimp_recompute_service.DailyRecoveryRecomputeService.recompute_for_dates"
+            ),
         ):
             self.service.recompute_for_workout_uuids(
                 db=object(),
@@ -119,6 +125,9 @@ class TrimpRecomputeServiceTests(unittest.TestCase):
             patch("api.services.trimp_recompute_service.upsert_workout_load_rows") as upsert_mock,
             patch("api.services.trimp_recompute_service.delete_workout_load_rows") as delete_mock,
             patch("api.services.trimp_recompute_service.rebuild_daily_load_for_dates") as rebuild_mock,
+            patch(
+                "api.services.trimp_recompute_service.DailyRecoveryRecomputeService.recompute_for_dates"
+            ),
         ):
             self.service.recompute_for_workout_uuids(
                 db=object(),
@@ -139,6 +148,9 @@ class TrimpRecomputeServiceTests(unittest.TestCase):
             patch("api.services.trimp_recompute_service.upsert_workout_load_rows") as upsert_mock,
             patch("api.services.trimp_recompute_service.delete_workout_load_rows") as delete_mock,
             patch("api.services.trimp_recompute_service.rebuild_daily_load_for_dates") as rebuild_mock,
+            patch(
+                "api.services.trimp_recompute_service.DailyRecoveryRecomputeService.recompute_for_dates"
+            ),
         ):
             summary = self.service.recompute_for_workout_uuids(
                 db=object(),
@@ -177,6 +189,9 @@ class TrimpRecomputeServiceTests(unittest.TestCase):
             patch("api.services.trimp_recompute_service.upsert_workout_load_rows", side_effect=capture_rows),
             patch("api.services.trimp_recompute_service.delete_workout_load_rows"),
             patch("api.services.trimp_recompute_service.rebuild_daily_load_for_dates"),
+            patch(
+                "api.services.trimp_recompute_service.DailyRecoveryRecomputeService.recompute_for_dates"
+            ),
         ):
             self.service.recompute_for_workout_uuids(
                 db=object(),
@@ -221,6 +236,9 @@ class TrimpRecomputeServiceTests(unittest.TestCase):
             patch("api.services.trimp_recompute_service.upsert_workout_load_rows"),
             patch("api.services.trimp_recompute_service.delete_workout_load_rows"),
             patch("api.services.trimp_recompute_service.rebuild_daily_load_for_dates") as rebuild_mock,
+            patch(
+                "api.services.trimp_recompute_service.DailyRecoveryRecomputeService.recompute_for_dates"
+            ),
         ):
             summary = self.service.recompute_for_workout_uuids(
                 db=object(),

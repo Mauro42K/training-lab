@@ -243,3 +243,262 @@ class BackfillJobState(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
     )
+
+
+class SleepSession(Base):
+    __tablename__ = "sleep_sessions"
+    __table_args__ = (
+        UniqueConstraint("user_id", "healthkit_sleep_uuid", name="uq_sleep_sessions_user_hk_uuid"),
+        CheckConstraint("end_at >= start_at", name="sleep_sessions_time_range"),
+        CheckConstraint("provider = 'apple_health'", name="sleep_sessions_provider_allowed"),
+        CheckConstraint("source_count >= 1", name="sleep_sessions_source_count_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    healthkit_sleep_uuid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    start_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    end_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    local_date: Mapped[date] = mapped_column(Date, nullable=False)
+    category_value: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    source_bundle_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, server_default=text("'apple_health'"))
+    source_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+    has_mixed_sources: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    primary_device_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class RecoverySignal(Base):
+    __tablename__ = "recovery_signals"
+    __table_args__ = (
+        UniqueConstraint("user_id", "healthkit_signal_uuid", name="uq_recovery_signals_user_hk_uuid"),
+        CheckConstraint(
+            "signal_type IN ('hrv_sdnn','resting_hr')",
+            name="recovery_signals_type_allowed",
+        ),
+        CheckConstraint("signal_value >= 0", name="recovery_signals_value_non_negative"),
+        CheckConstraint("provider = 'apple_health'", name="recovery_signals_provider_allowed"),
+        CheckConstraint("source_count >= 1", name="recovery_signals_source_count_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    healthkit_signal_uuid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    signal_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    measured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    local_date: Mapped[date] = mapped_column(Date, nullable=False)
+    signal_value: Mapped[float] = mapped_column(Float, nullable=False)
+    source_bundle_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, server_default=text("'apple_health'"))
+    source_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+    has_mixed_sources: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    primary_device_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class BodyMeasurement(Base):
+    __tablename__ = "body_measurements"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "healthkit_measurement_uuid",
+            name="uq_body_measurements_user_hk_uuid",
+        ),
+        CheckConstraint(
+            "measurement_type IN ('weight_kg','body_fat_pct','lean_body_mass_kg')",
+            name="body_measurements_type_allowed",
+        ),
+        CheckConstraint("measurement_value >= 0", name="body_measurements_value_non_negative"),
+        CheckConstraint("provider = 'apple_health'", name="body_measurements_provider_allowed"),
+        CheckConstraint("source_count >= 1", name="body_measurements_source_count_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    healthkit_measurement_uuid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    measurement_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    measured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    local_date: Mapped[date] = mapped_column(Date, nullable=False)
+    measurement_value: Mapped[float] = mapped_column(Float, nullable=False)
+    source_bundle_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, server_default=text("'apple_health'"))
+    source_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+    has_mixed_sources: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    primary_device_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class DailySleepSummary(Base):
+    __tablename__ = "daily_sleep_summary"
+    __table_args__ = (
+        UniqueConstraint("user_id", "local_date", name="uq_daily_sleep_summary_user_date"),
+        CheckConstraint(
+            "completeness_status IN ('complete','partial')",
+            name="daily_sleep_summary_completeness_allowed",
+        ),
+        CheckConstraint("total_sleep_sec >= 0", name="daily_sleep_summary_total_non_negative"),
+        CheckConstraint(
+            "main_sleep_duration_sec >= 0",
+            name="daily_sleep_summary_main_duration_non_negative",
+        ),
+        CheckConstraint("naps_count >= 0", name="daily_sleep_summary_naps_count_non_negative"),
+        CheckConstraint(
+            "naps_total_sleep_sec >= 0",
+            name="daily_sleep_summary_naps_total_non_negative",
+        ),
+        CheckConstraint(
+            "main_sleep_end_at >= main_sleep_start_at",
+            name="daily_sleep_summary_main_sleep_range",
+        ),
+        CheckConstraint("provider = 'apple_health'", name="daily_sleep_summary_provider_allowed"),
+        CheckConstraint("source_count >= 1", name="daily_sleep_summary_source_count_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    local_date: Mapped[date] = mapped_column(Date, nullable=False)
+    total_sleep_sec: Mapped[int] = mapped_column(Integer, nullable=False)
+    main_sleep_start_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    main_sleep_end_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    main_sleep_duration_sec: Mapped[int] = mapped_column(Integer, nullable=False)
+    naps_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    naps_total_sleep_sec: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    completeness_status: Mapped[str] = mapped_column(String(16), nullable=False)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, server_default=text("'apple_health'"))
+    source_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+    has_mixed_sources: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    primary_device_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class DailyActivity(Base):
+    __tablename__ = "daily_activity"
+    __table_args__ = (
+        UniqueConstraint("user_id", "local_date", name="uq_daily_activity_user_date"),
+        CheckConstraint(
+            "completeness_status IN ('complete','partial')",
+            name="daily_activity_completeness_allowed",
+        ),
+        CheckConstraint("steps IS NULL OR steps >= 0", name="daily_activity_steps_non_negative"),
+        CheckConstraint(
+            "walking_running_distance_m IS NULL OR walking_running_distance_m >= 0",
+            name="daily_activity_distance_non_negative",
+        ),
+        CheckConstraint(
+            "active_energy_kcal IS NULL OR active_energy_kcal >= 0",
+            name="daily_activity_energy_non_negative",
+        ),
+        CheckConstraint(
+            "(steps IS NOT NULL OR walking_running_distance_m IS NOT NULL OR active_energy_kcal IS NOT NULL)",
+            name="daily_activity_has_value",
+        ),
+        CheckConstraint("provider = 'apple_health'", name="daily_activity_provider_allowed"),
+        CheckConstraint("source_count >= 1", name="daily_activity_source_count_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    local_date: Mapped[date] = mapped_column(Date, nullable=False)
+    steps: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    walking_running_distance_m: Mapped[float | None] = mapped_column(Float, nullable=True)
+    active_energy_kcal: Mapped[float | None] = mapped_column(Float, nullable=True)
+    completeness_status: Mapped[str] = mapped_column(String(16), nullable=False)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, server_default=text("'apple_health'"))
+    source_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+    has_mixed_sources: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    primary_device_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class DailyRecovery(Base):
+    __tablename__ = "daily_recovery"
+    __table_args__ = (
+        UniqueConstraint("user_id", "local_date", name="uq_daily_recovery_user_date"),
+        CheckConstraint(
+            "completeness_status IN ('complete','partial')",
+            name="daily_recovery_completeness_allowed",
+        ),
+        CheckConstraint(
+            "sleep_total_sec IS NULL OR sleep_total_sec >= 0",
+            name="daily_recovery_sleep_total_non_negative",
+        ),
+        CheckConstraint(
+            "hrv_sdnn_ms IS NULL OR hrv_sdnn_ms >= 0",
+            name="daily_recovery_hrv_non_negative",
+        ),
+        CheckConstraint(
+            "resting_hr_bpm IS NULL OR resting_hr_bpm >= 0",
+            name="daily_recovery_rhr_non_negative",
+        ),
+        CheckConstraint(
+            "(sleep_total_sec IS NOT NULL OR hrv_sdnn_ms IS NOT NULL OR resting_hr_bpm IS NOT NULL)",
+            name="daily_recovery_requires_physiological_input",
+        ),
+        CheckConstraint("provider = 'apple_health'", name="daily_recovery_provider_allowed"),
+        CheckConstraint("source_count >= 1", name="daily_recovery_source_count_positive"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    local_date: Mapped[date] = mapped_column(Date, nullable=False)
+    sleep_total_sec: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    hrv_sdnn_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    resting_hr_bpm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    activity_present: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    load_present: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    inputs_present: Mapped[list[str]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"))
+    inputs_missing: Mapped[list[str]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"))
+    completeness_status: Mapped[str] = mapped_column(String(16), nullable=False)
+    has_estimated_inputs: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default=text("false"),
+    )
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, server_default=text("'apple_health'"))
+    source_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("1"))
+    has_mixed_sources: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    primary_device_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )

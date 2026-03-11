@@ -337,29 +337,80 @@ Completion summary:
 - iOS debug builds must show the active environment explicitly when not running default production.
 
 ### 5.7 Phase 4.4 — Workout Reconciliation & Historical Cleanup
-**Status:** ON HOLD  
-**Goal:** Provide mechanisms to reconcile historical workouts between Apple Health and the backend database.
+**Status:** ON HOLD / CONDITIONAL  
+**Goal:** Keep the broader historical reconciliation umbrella available without making it the active execution phase.
 
 Context:
 - users may discover duplicated workouts in Apple Fitness history.
 - when a workout is deleted in HealthKit, the backend should eventually reflect that change.
+- this remains the broader conceptual phase for historical reconciliation, cleanup, and parity with HealthKit history.
 
-Initial scope:
+Potential scope if reactivated:
 - detect workouts that no longer exist in HealthKit.
 - allow backend reconciliation.
 - mark workouts as deleted or remove them.
 - trigger recalculation of derived metrics.
+- support duplicate cleanup when the problem exceeds a targeted remediation subphase.
 
-Potential capabilities:
-- handle workouts removed from Apple Fitness.
-- support duplicate cleanup.
-- allow safe historical reconciliation.
-- recalculate TRIMP / daily load after deletions.
+Reactivation rule:
+- Phase 4.4 does not return as the primary immediate phase.
+- It only reactivates if Phase 4.4.1 reveals broader corruption/scope than targeted cleanup can safely handle.
+- It also reactivates if true deletion/reconciliation requirements become validated needs beyond duplicate remediation.
 
 Guardrails:
 - must be tested in STAGING first.
 - must not risk production data corruption.
 - must maintain idempotency of ingest pipeline.
+
+### 5.7.1 Phase 4.4.1 — Workout History Dedup & Recompute
+**Status:** PLANNED  
+**Goal:** Resolve historical duplicate workouts already present in the dataset through a surgical cleanup and recompute path, without reopening full Phase 4.4 by default.
+
+Scope:
+- duplicate audit
+- exact canonical dedupe rule
+- impact estimation
+- staging-first cleanup
+- recompute
+- post-cleanup validation
+- escalation gate to reload if needed
+
+Non-goals:
+- no full Phase 4.4 reopening
+- no new user-facing features
+- no provider abstraction
+- no production reset as first move
+
+Deliverables:
+- duplicate audit report
+- canonical dedupe rule
+- backup/snapshot checkpoint of affected staging set before cleanup
+- cleanup procedure/runbook
+- recompute procedure
+- manual-review report for ambiguous clusters
+- final decision: cleanup sufficient vs reload escalation
+
+Risks:
+- false-positive dedupe
+- incomplete recompute
+- too-weak identity rule
+
+Exit criteria:
+- affected set quantified
+- exact rule frozen
+- ambiguous clusters excluded from auto-cleanup
+- staging cleanup validated
+- production path explicitly chosen
+
+Execution approach:
+- audit first, cleanup second
+- backup/snapshot of affected staging rows before mutation is mandatory
+- strongest stable source identity must be frozen as an exact rule before execution
+- ambiguous clusters are excluded from auto-cleanup and sent to report/manual review
+
+Decision note:
+- Preferred strategy: targeted cleanup first
+- Escalation: full reload only if audit/validation fails viability thresholds
 
 ### 5.8 Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)
 **Status:** CLOSED (2026-03-11 America/Mexico_City)  

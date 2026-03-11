@@ -142,6 +142,13 @@ Closure note:
   - preserve transparency and data completeness semantics,
   - avoid introducing hidden scoring logic before driver presentation is explicit.
 
+### Tactical Remediation Track
+- Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**
+- Purpose: historical duplicate audit, targeted cleanup, and recompute
+- Status: planned, staging-first, non-product
+- It does not replace Phase 5 as the next product phase.
+- Phase 4.4 remains on hold unless 4.4.1 findings force broader reconciliation scope.
+
 ## On Hold Phase
 - **Phase 4.4 — Workout Reconciliation & Historical Cleanup** (**On Hold**)
 - Status note:

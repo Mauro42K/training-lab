@@ -2,6 +2,10 @@
 
 This project follows a simple SemVer-style changelog.
 
+## Planning
+
+- Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
+
 ## v0.4.5 - 2026-03-11
 
 ## Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)

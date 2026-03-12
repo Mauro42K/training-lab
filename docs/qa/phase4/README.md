@@ -106,4 +106,4 @@ Resultado esperado:
 - Source precedence calibration (Block 3): `docs/qa/phase4/PHASE4_4_1_SOURCE_PRECEDENCE_CALIBRATION.md`
 - Source precedence decision (Block 4): `docs/qa/phase4/PHASE4_4_1_SOURCE_PRECEDENCE_DECISION.md`
 - Staging cleanup execution (Block 5): `docs/qa/phase4/PHASE4_4_1_STAGING_CLEANUP.md`
-- Production cleanup runbook (next step, no mutation yet): `docs/qa/phase4/PHASE4_4_1_PRODUCTION_CLEANUP_RUNBOOK.md`
+- Production freeze/preflight + not-needed outcome: `docs/qa/phase4/PHASE4_4_1_PRODUCTION_CLEANUP_RUNBOOK.md`

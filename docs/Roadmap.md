@@ -363,7 +363,7 @@ Guardrails:
 - must maintain idempotency of ingest pipeline.
 
 ### 5.7.1 Phase 4.4.1 — Workout History Dedup & Recompute
-**Status:** PLANNED  
+**Status:** CLOSED (2026-03-11 America/Mexico_City)  
 **Goal:** Resolve historical duplicate workouts already present in the dataset through a surgical cleanup and recompute path, without reopening full Phase 4.4 by default.
 
 Scope:
@@ -411,6 +411,13 @@ Execution approach:
 Decision note:
 - Preferred strategy: targeted cleanup first
 - Escalation: full reload only if audit/validation fails viability thresholds
+
+Closure summary:
+- duplicate audit completed with explicit source-precedence policy for the dominant conflict pairs.
+- targeted cleanup was executed and validated in staging only.
+- production freeze/preflight confirmed the correct production target and found `0` auto-cleanup eligible clusters.
+- production matched the residual post-cleanup manual-review surface already validated in staging.
+- no production cleanup was needed for the currently approved eligible subset.
 
 ### 5.8 Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)
 **Status:** CLOSED (2026-03-11 America/Mexico_City)  

@@ -1,0 +1,14 @@
+{
+  "generated_at_utc": "2026-03-11T23:28:28.280158+00:00",
+  "items": [],
+  "summary": {
+    "affected_local_date_count": 0,
+    "affected_local_dates": [],
+    "eligible_cluster_count": 0,
+    "keep_workout_count": 0,
+    "remove_workout_count": 0,
+    "source_precedence_policy_clusters": 0
+  },
+  "user_id": "c3a75670-7ea9-4ff3-b2b1-66472744fabd",
+  "user_timezone": "America/New_York"
+}

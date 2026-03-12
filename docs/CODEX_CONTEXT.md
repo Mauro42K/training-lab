@@ -145,9 +145,14 @@ Closure note:
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**
 - Purpose: historical duplicate audit, targeted cleanup, and recompute
-- Status: planned, staging-first, non-product
+- Status: closed, staging cleanup validated, production cleanup not needed
 - It does not replace Phase 5 as the next product phase.
 - Phase 4.4 remains on hold unless 4.4.1 findings force broader reconciliation scope.
+- Closure note:
+  - staging cleanup executed successfully over the approved eligible subset,
+  - production freeze/preflight confirmed the correct production target,
+  - production already matched the residual post-cleanup manual-review surface and had `0` auto-cleanup eligible clusters,
+  - no production mutation was required.
 
 ## On Hold Phase
 - **Phase 4.4 — Workout Reconciliation & Historical Cleanup** (**On Hold**)

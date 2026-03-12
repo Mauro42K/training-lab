@@ -6,6 +6,29 @@ This project follows a simple SemVer-style changelog.
 
 - Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
 
+## v0.4.4.1 - 2026-03-11
+
+## Phase 4.4.1 — Workout History Dedup & Recompute
+
+Added
+- duplicate-audit evidence and source-precedence decision artifacts for the historical workout dedupe subset.
+- staging cleanup evidence with keep/remove traceability, bounded recompute, and post-cleanup validation.
+- production freeze/preflight artifacts:
+  - `phase4_4_1_prod_duplicate_audit_with_policy.json`
+  - `phase4_4_1_prod_cleanup_plan.json`
+  - `phase4_4_1_prod_cleanup_plan.csv`
+  - `phase4_4_1_prod_cleanup_plan.sha256`
+
+Improved
+- operational confidence around historical dedupe by validating the subset in staging before any production action.
+- production decision hygiene by freezing and checksumming the candidate subset before any mutation.
+
+Notes
+- Phase 4.4.1 is now formally closed.
+- staging cleanup was executed and validated successfully.
+- production cleanup was not needed because production already matched the residual post-cleanup manual-review surface and had `0` auto-cleanup eligible clusters under the approved policy.
+- Phase 4.4 remains on hold / conditional.
+
 ## v0.4.5 - 2026-03-11
 
 ## Phase 4.5 — Daily Domains & Summary Contracts (Apple-first)

@@ -3,8 +3,8 @@
 ## Status
 - Date: 2026-03-11 (America/Mexico_City)
 - Environment: production
-- Mode: runbook only
-- Production mutation in this document: not executed yet
+- Mode: freeze + preflight executed, no mutation
+- Production mutation in this document: not needed for the approved subset
 
 ## Purpose
 - execute the same policy-bounded cleanup already validated in staging
@@ -19,6 +19,29 @@ This runbook does **not**:
 - touch manual-review clusters
 - perform a full reload
 - replace a production-specific go/no-go review
+
+## Freeze outcome
+
+Freeze/preflight outcome for production:
+- target validated as production app + production DB host
+- approved policy applied successfully
+- generated artifacts:
+  - `docs/qa/phase4/artifacts/phase4_4_1_prod_duplicate_audit_with_policy.json`
+  - `docs/qa/phase4/artifacts/phase4_4_1_prod_cleanup_plan.json`
+  - `docs/qa/phase4/artifacts/phase4_4_1_prod_cleanup_plan.csv`
+  - `docs/qa/phase4/artifacts/phase4_4_1_prod_cleanup_plan.sha256`
+- result:
+  - `auto_cleanup_eligible_clusters = 0`
+  - `auto_cleanup_eligible_rows = 0`
+  - production matched the residual post-cleanup manual-review surface already validated in staging
+
+Representative spot-check:
+- keep IDs from the validated staging subset remained present in production
+- corresponding loser IDs from that subset were already absent in production
+
+Operational conclusion:
+- no real production cleanup was executed
+- no real production cleanup was needed for the currently approved subset
 
 ## Inputs / prerequisites
 

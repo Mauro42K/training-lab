@@ -15,6 +15,10 @@ Este glosario define los **términos oficiales de UI** y su **significado**.
 
 ## 2) Términos oficiales (v0.1)
 
+Regla congelada para Home v1:
+- **Readiness** es el término rector del hero principal de Home.
+- **Battery** se conserva solo como alias histórico/documental controlado para referencias previas a Phase 5.0.
+
 > Nota: “Etiqueta ES” es opcional; si no aporta claridad, el término se deja en inglés.
 
 | Término (UI EN) | Etiqueta ES sugerida | Definición corta (ES) | Notas |
@@ -23,10 +27,10 @@ Este glosario define los **términos oficiales de UI** y su **significado**.
 | **Load** | Load | Medida agregada de carga (no solo volumen). | Evitar “Carga” por ambigüedad. |
 | **Training Load** | Training Load | Evolución de Load en el tiempo (ej. Fitness/Fatigue/Form). | Se usa en Trends. |
 | **Exertion** | Esfuerzo | Cuánta carga acumulaste recientemente (basada en TRIMP/Load). | Debe ser transparente. |
-| **Recovery** | Recuperación | Estado de recuperación (driver principal del Battery/Readiness). | No es médico. |
-| **Battery** | Battery | Score de preparación/recuperación con desglose de drivers. | Siempre “transparente”. |
-| **Readiness** | Readiness | Preparación para entrenar hoy (similar a Battery). | Elegir uno en UI final. |
-| **Sleep** | Sueño | Métricas de sueño (duración/calidad) desde HealthKit. | Driver del Battery. |
+| **Recovery** | Recuperación | Estado de recuperación usado como parte del estado de Readiness. | No es médico. |
+| **Battery** | Battery | Alias histórico/documental del score de preparación. | No es el término rector de Home nuevo. |
+| **Readiness** | Readiness | Preparación para entrenar hoy con drivers y completitud visibles. | Término rector del hero principal de Home. |
+| **Sleep** | Sueño | Métricas de sueño (duración/calidad) desde HealthKit. | Driver del Readiness. |
 | **Stress** | Stress | Estrés (si no hay señal real: **Stress (proxy)**). | Siempre indicar proxy. |
 | **Stress (proxy)** | Stress (proxy) | Estimación basada en drivers (HRV/RHR/Sleep/Load) cuando falte señal real. | No presentarlo como “real”. |
 | **HRV** | HRV | Heart Rate Variability (SDNN) desde HealthKit. | Driver clave. |

@@ -68,7 +68,7 @@ Regla para `primary_device_name`:
 ### 1.1 TRIMP (Real, con HR)
 **UI label:** TRIMP  
 **Qué es:** Carga interna del entrenamiento basada en intensidad y duración.  
-**Dónde aparece:** Home (Hero), Trends, Workouts detail.
+**Dónde aparece:** Home (Trend Card / contexto de carga), Trends, Workouts detail.
 
 **Inputs (HealthKit / normalizado)**
 - Duración del workout (segundos)
@@ -171,6 +171,32 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 
 ---
 
+### 2.3 Capacity (Home Trend Card / Load domain)
+**UI term:** Capacity  
+**Qué es:** Métrica del dominio de carga usada para soportar el bloque Home **Load vs Capacity**. No pertenece al dominio de recovery/readiness.
+
+**Estado**
+- Phase 5.0 decidió que `Capacity` permanece dentro del contrato oficial del Trend Card.
+- Su definición detallada y su implementación se trabajan en **Phase 5.1**.
+- No debe mostrarse en UI antes de quedar formalmente definida en este catálogo.
+
+**Inputs esperados**
+- Serie diaria `Load_day`
+- Modelo existente de Training Load (`Fitness` / `Fatigue` / `Form`)
+- Cualquier derivado adicional del dominio de carga que se justifique explícitamente en Phase 5.1
+
+**Guardrails**
+- `Capacity` debe derivarse del dominio de carga, no del dominio de `daily_recovery`.
+- No reutilizar `Readiness`/`Recovery` como sustituto de `Capacity`.
+- No congelar fórmula final en Phase 5.0 sin justificación técnica suficiente.
+
+**Pendiente Phase 5.1**
+- formal definition
+- exact calculation model
+- UI copy and interpretation rules for `Load vs Capacity`
+
+---
+
 ## 3) Exertion (Home ring)
 
 **UI term:** Exertion  
@@ -190,14 +216,15 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 
 ---
 
-## 4) Battery / Recovery (transparente)
+## 4) Readiness / Recovery (transparente)
 
 Nota de alcance:
 - Las definiciones de score de esta sección siguen siendo referencia de producto futura.
 - Phase 4.5 no implementa todavía este score final.
 
-### 4.1 Battery (Score + drivers)
-**UI term:** Battery (o Readiness — decidir UI final)  
+### 4.1 Readiness (Score + drivers)
+**UI term:** Readiness  
+**Alias histórico/documental controlado:** Battery  
 **Qué es:** Preparación para entrenar hoy, explicada por drivers.
 
 **Drivers v1**
@@ -249,7 +276,7 @@ Nota Phase 4.5:
 ## 5) Sleep (Home ring + driver)
 
 **UI term:** Sleep  
-**Qué es:** Indicadores de sueño usados para Battery y trends.
+**Qué es:** Indicadores de sueño usados para Readiness y trends.
 
 **Inputs**
 - `daily_sleep_summary` derivado de `sleep_sessions`
@@ -340,7 +367,7 @@ Semántica Phase 4.5:
 **Cálculo (v1)**
 - StrengthMinutesWeek
 - `SecondaryStrengthLoad = strength_minutes_day * 0.35` (heurístico)
-- NO se suma 1:1 a TRIMP/Exertion; puede aparecer como driver en Battery con contribución explícita.
+- NO se suma 1:1 a TRIMP/Exertion; puede aparecer como driver en Readiness con contribución explícita.
 
 ---
 
@@ -367,6 +394,7 @@ Semántica Phase 4.5:
 ## 10) Pendientes para v0.2 (cuando tengamos datos)
 - Calibrar factores de TRIMP estimado con datos reales.
 - Definir/ajustar “optimal range” para Training Load.
+- Definir `Capacity` dentro del dominio de carga para soportar Home `Load vs Capacity`.
 - Definir objetivos (targets) del ring Movement.
-- Refinar Battery weights/baselines con evidencia y feedback.
+- Refinar Readiness weights/baselines con evidencia y feedback.
 - Refinar Stress proxy thresholds.

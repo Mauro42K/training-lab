@@ -5,6 +5,26 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
+- **Phase 5.0 — CLOSED** (2026-03-13 America/New_York)
+
+### Phase 5.0 Closure Summary
+- Home documentary investigation/alignment completed.
+- `Readiness` is now the governing Home hero term.
+- `Battery` remains only as a controlled historical/documentary alias.
+- `Recommended Today` is frozen as contextual guidance-only.
+- Home `Trend Card` remains **Load vs Capacity**.
+- `Capacity` is confirmed as a load-domain metric to be defined and implemented in **Phase 5.1**.
+- Official Phase 5 order is now:
+  - 5.0 investigation / decisions / alignment
+  - 5.1 Trend Card (Load vs Capacity)
+  - 5.2 Hero Readiness
+  - 5.3 Core Metrics
+  - 5.4 Drivers / Explainability
+  - 5.5 Recommended Today
+  - 5.6 Data Completeness / Confidence
+  - 5.7 Deep QA / Home integration
+
+## Previous Phase
 - **Phase 4.5 — CLOSED** (2026-03-11 America/Mexico_City)
 
 ### Phase 4.5 Closure Summary
@@ -136,11 +156,11 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 5 — Home v1 (Rings + Drivers Cards)** (**Planned**)
+- **Phase 5.1 — Trend Card (Load vs Capacity)** (**Next**) 
 - Focus:
-  - compose Home from the explicit 4.5 daily-domain contracts already delivered,
-  - preserve transparency and data completeness semantics,
-  - avoid introducing hidden scoring logic before driver presentation is explicit.
+  - define `Capacity` as a formal load-domain metric,
+  - build the Home Trend Card on top of the existing training-load foundation,
+  - preserve the MVP load narrative while moving Home to its final PRD structure.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**
@@ -161,8 +181,8 @@ Closure note:
 
 ## Non-Negotiables
 - Design-first.
-- Battery transparent.
-- TRIMP hero.
+- Readiness transparent.
+- TRIMP chart remains the validated MVP load anchor, not the final Home hero.
 
 ## Product Tabs
 - Home

@@ -14,7 +14,7 @@
 
 ### 0.1 Non-negotiables
 - **Design-first is mandatory:** no feature screens are coded until the Design System (tokens + components + layout rules) is defined and approved.
-- **Battery is transparent:** any score shown to the user must include a clear **breakdown (“drivers”)** and a **data completeness** indicator.
+- **Readiness is transparent:** any readiness score shown to the user must include a clear **breakdown (“drivers”)** and a **data completeness** indicator.
 - **Running-first, multi-sport-aware:** running is the primary narrative, but bike/strength/walk must be represented without distorting endurance load.
 - **Zero confusion:** avoid duplicated data, hidden assumptions, and opaque scores.
 
@@ -27,7 +27,7 @@
 - **Coach** (future)
 
 ### 0.3 MVP anchor
-- **Home hero card = TRIMP chart** (usable from day 1).
+- **TRIMP chart usable from day 1** as the MVP load anchor before final Home composition.
 
 ---
 
@@ -515,7 +515,8 @@ Closure decisions carried into this phase:
 
 ### 5.8.5 Handoff
 - Phase 4.4 remains ON HOLD and is not reopened by this closure.
-- The next logical implementation focus is Phase 5 Home v1 using the daily-domain contracts already delivered.
+- The documentary alignment layer for Home is now closed as **Phase 5.0**.
+- The next executable Home block is **Phase 5.1 — Trend Card (Load vs Capacity)**.
 - Deferred-by-decision, not bugs:
   - no recovery score yet
   - no readiness/battery final
@@ -525,27 +526,254 @@ Closure decisions carried into this phase:
 
 ---
 
-## 6. Phase 5 — Home v1 (Rings + Drivers Cards)
+## 6. Phase 5 — Home v1 (committee-aligned rollout)
 
-**Status:** PLANNED  
-**Goal:** Build the “Today” page like Athlytic but improved: TRIMP first, then state rings & drivers.
+**Status:** ACTIVE  
+**Goal:** Deliver Home in the approved execution order, keeping PRD semantics, `Readiness` naming, and load-domain contracts aligned across product, metrics, and implementation.
 
-### 6.1 Deliverables
-- Rings row:
-  - Recovery (Battery), Sleep, Exertion, Movement.
-- Driver cards:
-  - Health (HRV + RHR), Stress (if available), Battery breakdown, Steps/Goal, Strength & Cross.
-- Transparent Battery v1:
-  - score + breakdown + data completeness.
+### 6.1 Phase-level guardrails
+- PRD is the source of truth for Home semantics and product intent.
+- `docs/METRICS_CATALOG.md` is the source of truth for metrics, models, fallbacks, completeness, and edge cases.
+- `docs/GLOSARIO.md` is the source of truth for UI terminology.
+- Phase 2 documentation (`docs/DesignSystem.md`, `docs/Phase2_Checklist.md`) remains the source of truth for reusable UI primitives and layout rules.
+- Phase 4.5 documentation (`docs/PHASE4_5_DAILY_DOMAINS_SUMMARY_CONTRACTS.md`) remains the source of truth for daily-domain contracts and `GET /v1/home/summary` composition rules.
+- Figma Home prototype is a visual reference only; it does not redefine functional meaning or metric semantics.
+- `Readiness` is the governing Home hero term. `Battery` remains only as a historical/documentary alias where legacy references still exist.
+- `Recommended Today` remains a contextual guidance block only. It does not absorb Coach scope.
+- `Trend Card` remains **Load vs Capacity**. `Capacity` belongs to the load domain and enters active definition/implementation scope in **Phase 5.1**.
+- Every Phase 5 subphase follows: **Definition -> Plan -> Implement -> QA**.
 
-### 6.2 DoD
-- Each ring/card navigates to a detail view (even if minimal at first).
-- Battery shows “why” (drivers) and shows missing-data warnings.
+### 6.2 Phase 5.0 — Home investigation / decisions / alignment
+**Status:** CLOSED (2026-03-13 America/New_York)  
+**Goal:** Close the documentary investigation and committee alignment required before Home implementation starts.
 
-### 6.3 QA
-- Missing HRV or missing sleep.
-- Very high load day.
-- Steps-only day.
+**Closure summary**
+- Required documentary investigation was completed across PRD, Metrics Catalog, Glossary, Roadmap, Design System, and Phase 4.5 contracts.
+- `Readiness` was approved as the governing Home hero term.
+- `Battery` was demoted to controlled historical/documentary alias status.
+- `Recommended Today` was bounded as guidance-only contextual output using `Readiness + recent load + confidence/completeness`.
+- `Trend Card` was confirmed as **Load vs Capacity** and `Capacity` was assigned to the load domain for definition/implementation in Phase 5.1.
+- The old MVP TRIMP hero chart was reclassified as an MVP load anchor, not the final Home hero.
+- The official execution order for Home was frozen.
+
+**Definition of Done**
+- Naming ambiguity that would block Home execution is closed.
+- The Phase 5 sequence is explicit and approved.
+- The next implementation block is unambiguous: **Phase 5.1 — Trend Card (Load vs Capacity)**.
+
+**QA focus**
+- Documentary consistency across Roadmap, Metrics Catalog, Glossary, Context, and PRD.
+
+### 6.3 Phase 5.1 — Trend Card (Load vs Capacity)
+**Goal:** Define and implement the first final Home block: `Load vs Capacity`.
+
+**Why this block exists**
+- It carries forward the validated load narrative from the MVP while moving Home toward its final PRD structure.
+
+**Scope**
+- Define `Capacity` as a formal metric inside the load domain using the existing training-load model as the foundation.
+- Implement the Home Trend Card as `Load vs Capacity`.
+- Resolve the MVP inheritance by moving the temporary TRIMP hero narrative into the final Home Trend Card layer.
+
+**Main dependencies**
+- Phase 5.0 closure
+- TRIMP, Load, Training Load foundations from Phases 4.0 / 4.1
+- `GET /v1/training-load`
+- Phase 2 chart system
+- `docs/METRICS_CATALOG.md`
+
+**Deliverables**
+- `Capacity` documented in the Metrics Catalog with justified scope and formal ownership in the load domain
+- Trend Card contract and implementation plan
+- Final Trend Card delivery for Home
+
+**Definition of Done**
+- `Capacity` is explicitly documented before implementation is considered complete.
+- Trend Card semantics are stable and no longer rely on the temporary MVP hero framing.
+
+**QA focus**
+- Today alignment
+- Sparse load history
+- Visual consistency with Phase 2 charts
+
+### 6.4 Phase 5.2 — Hero Readiness
+**Goal:** Deliver the final Home hero that answers "How am I today?" through `Readiness`.
+
+**Why this block exists**
+- The PRD defines Home around the athlete's current state, and committee alignment closed `Readiness` as the governing term.
+
+**Scope**
+- Implement the final `Readiness` hero using documented recovery/readiness semantics.
+- Keep `Battery` out of active product naming except as legacy documentary alias.
+- Preserve transparency, drivers, and missing-data behavior.
+
+**Main dependencies**
+- Phase 5.0 closure
+- `daily_recovery`
+- `daily_sleep_summary`
+- Load/exertion context from documented metrics
+- Phase 2 card/layout rules
+
+**Deliverables**
+- Final Home hero contract for `Readiness`
+- Hero UI and state model
+- Explicit transparency entry into drivers and completeness
+
+**Definition of Done**
+- Hero naming, semantics, and missing-data behavior are fully aligned.
+
+**QA focus**
+- Missing HRV / RHR / sleep
+- Partial readiness inputs
+- State label clarity
+
+### 6.5 Phase 5.3 — Core Metrics
+**Goal:** Add the compact Home metrics block that contextualizes current training state.
+
+**Why this block exists**
+- Home needs immediate recent-load context without sending the user to Trends.
+
+**Scope**
+- Implement the PRD Core Metrics block using only catalog-defined load-domain metrics.
+- Current target metrics:
+  - `7-Day Load`
+  - `Fitness`
+  - `Fatigue`
+
+**Main dependencies**
+- Phase 5.0 closure
+- Training Load series
+- `docs/METRICS_CATALOG.md`
+- Phase 2 metric/card components
+
+**Deliverables**
+- Core Metrics contract
+- Core Metrics implementation
+
+**Definition of Done**
+- Every metric in the block already exists in the Metrics Catalog and is consistently named in UI/docs.
+
+**QA focus**
+- Sparse history
+- Mixed real vs estimated TRIMP days
+- Multi-sport recent load
+
+### 6.6 Phase 5.4 — Drivers / Explainability
+**Goal:** Make `Readiness` transparent through an explicit driver layer.
+
+**Why this block exists**
+- `Readiness` is only acceptable if the user can see why it moved.
+
+**Scope**
+- Implement the driver breakdown for documented inputs such as Sleep, HRV, RHR, Load/Exertion, Movement, and explicit secondary strength context when applicable.
+- Use proxy/estimated labels only where the Metrics Catalog already allows them.
+
+**Main dependencies**
+- Phase 5.2 hero contract
+- `docs/METRICS_CATALOG.md`
+- `daily_recovery`, `daily_activity`, `daily_sleep_summary`
+- `docs/GLOSARIO.md`
+
+**Deliverables**
+- Drivers/explainability contract
+- Driver surfaces aligned with Design System rules
+
+**Definition of Done**
+- Every displayed driver maps to a documented input or metric.
+
+**QA focus**
+- Missing drivers
+- Proxy labels
+- Secondary strength narrative
+
+### 6.7 Phase 5.5 — Recommended Today
+**Goal:** Add the contextual recommendation block without expanding into Coach.
+
+**Why this block exists**
+- Home must answer "What should I do today?" but without absorbing planner/chat/adaptive coaching scope.
+
+**Scope**
+- Implement `Recommended Today` as guidance-only contextual output.
+- Inputs expected:
+  - `Readiness`
+  - recent load
+  - confidence/completeness
+
+**Main dependencies**
+- Phase 5.2 hero readiness
+- Phase 5.3 Core Metrics
+- Phase 5.6 completeness/confidence layer
+- PRD Home semantics
+
+**Deliverables**
+- Recommendation contract
+- Recommendation implementation with bounded scope
+
+**Definition of Done**
+- The block is explicitly guidance-only and does not introduce Coach behaviors.
+
+**QA focus**
+- No-data day
+- Conflicting signals
+- Guardrail against Coach scope creep
+
+### 6.8 Phase 5.6 — Data Completeness / Confidence
+**Goal:** Add the Home-wide trust layer for partial, missing, or mixed data.
+
+**Why this block exists**
+- Home cannot be trustworthy without explicit completeness/confidence semantics.
+
+**Scope**
+- Surface completeness states across Home blocks.
+- Surface provenance/confidence cues already allowed by Phase 4.5.
+- Keep `missing` distinct from empty synthetic values.
+
+**Main dependencies**
+- Phase 5.0 closure
+- Phase 4.5 completeness/provenance rules
+- `docs/METRICS_CATALOG.md`
+- Phases 5.1-5.5 contracts
+
+**Deliverables**
+- Shared Home completeness/confidence contract
+- Warning and fallback patterns
+
+**Definition of Done**
+- Every Home block declares how it behaves under `complete`, `partial`, and `missing`.
+
+**QA focus**
+- `complete` vs `partial` vs `missing`
+- Mixed-source days
+- `primary_device_name = null`
+
+### 6.9 Phase 5.7 — Deep QA / Home integration
+**Goal:** Validate Home as one coherent surface once all blocks are present.
+
+**Why this block exists**
+- Block-level delivery is not enough; Home must work as a single product surface.
+
+**Scope**
+- Integrate Trend Card, Hero, Core Metrics, Drivers, Recommended Today, and Completeness layers.
+- Validate navigation, state transitions, cross-platform presentation, and regression against the existing load experience.
+
+**Main dependencies**
+- Phases 5.1-5.6
+- Phase 2 Design System
+- Phase 3 / 4 / 4.5 data foundations
+
+**Deliverables**
+- Integrated Home v1
+- Deep QA matrix and evidence
+
+**Definition of Done**
+- Home answers the PRD questions coherently and without semantic contradiction.
+
+**QA focus**
+- Missing-data days
+- Very high load day
+- Steps-only day
+- Multi-session day
+- iPhone + Mac consistency
 
 ---
 

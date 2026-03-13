@@ -483,6 +483,31 @@ Closure decisions carried into this phase:
 - Visual consistency with Phase 2 charts
 - Legacy cache migration and offline fallback on real device
 
+### Phase 5.1.1 — App Identity Baseline
+**Status:** CLOSED (2026-03-13 America/New_York)  
+**Goal:** Remove the remaining demo shell identity before opening the next Home block.
+
+**Closure summary**
+- The visible iPhone app name now resolves to `Training Lab` instead of the previous demo label.
+- The iOS app now ships with a configured `AppIcon` asset set built from the approved product image source.
+- Validation in simulator and real iPhone confirmed:
+  - the icon is no longer the generic white placeholder
+  - the visible app name is `Training Lab`
+  - the app installs and launches without asset-catalog or signing regressions from this identity update
+
+**Why this block exists**
+- The product should no longer present itself as a design-system demo before Home v1 continues.
+
+**Scope**
+- Visible iOS app name
+- Real iPhone app icon asset
+- Validation on simulator and iPhone
+
+**Definition of Done**
+- Demo-facing iPhone identity is removed.
+- The app icon is configured through the real asset catalog path used by the target.
+- The next product phase remains **Phase 5.2 — Hero Readiness** with no roadmap ambiguity.
+
 ### Phase 5.2 — Hero Readiness
 **Goal:** Deliver the final Home hero that answers "How am I today?" through `Readiness`.
 

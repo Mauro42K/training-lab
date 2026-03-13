@@ -5,7 +5,16 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.1 — CLOSED** (2026-03-13 America/New_York)
+- **Phase 5.1.1 — CLOSED** (2026-03-13 America/New_York)
+
+### Phase 5.1.1 Closure Summary
+- The visible iPhone app name now resolves to `Training Lab`.
+- The target now ships with a real `AppIcon` asset set instead of the generic placeholder icon.
+- Validation passed in simulator and on real iPhone:
+  - app installs and launches successfully
+  - SpringBoard shows `Training Lab`
+  - the icon is no longer the generic white/default tile
+- This was intentionally kept as a small identity baseline only; no product or architecture changes were introduced.
 
 ### Phase 5.1 Closure Summary
 - `Capacity` is now formally implemented inside the load domain.

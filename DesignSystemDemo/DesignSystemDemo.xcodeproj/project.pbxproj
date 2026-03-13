@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01BC7B7228AF959B48D961CB /* AppRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F285DCEC30A1C2818F5048 /* AppRadius.swift */; };
+		08C1A11B22C34D44E55F6677 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08C1A11B22C34D44E55F6676 /* Assets.xcassets */; };
 		0A5B2C8D9E1F4A6B7C8D9E01 /* IngestionOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A2B3C4D5E6F708192A3B4 /* IngestionOrchestrator.swift */; };
 		13025129FD95684EA31D165A /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FFC3C48C53B49D2AD32DA0 /* AppSpacing.swift */; };
 		1C0F5F5BCD5464DE11F4DFD5 /* DSEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4FA03DDD18FCE69FC040FC /* DSEmptyState.swift */; };
@@ -59,6 +60,7 @@
 
 /* Begin PBXFileReference section */
 		03D46860B194AB501C6B1F3B /* DSChartCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DSChartCard.swift; path = ../DesignSystem/Components/DSChartCard.swift; sourceTree = "<group>"; };
+		08C1A11B22C34D44E55F6676 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = DesignSystemDemo/App/Assets.xcassets; sourceTree = "<group>"; };
 		2BC0FCD6236D8C26920A92BA /* DSMetricPill.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DSMetricPill.swift; path = ../DesignSystem/Components/DSMetricPill.swift; sourceTree = "<group>"; };
 		3214E0495250B71CB8973869 /* AppChartStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppChartStyle.swift; path = ../DesignSystem/Charts/AppChartStyle.swift; sourceTree = "<group>"; };
 		3B97EB7EABA1087E455E41FC /* DesignSystemDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DesignSystemDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,6 +172,7 @@
 			children = (
 				E80C4364E7278FD80F4663A5 /* DesignSystemDemoApp.swift */,
 				A0180965DDCE77D462F3806F /* GalleryRootView.swift */,
+				08C1A11B22C34D44E55F6676 /* Assets.xcassets */,
 				E1F2A3B4C5D60718293A4B5C /* DesignSystemDemo/TrainingLab */,
 			);
 			name = DesignSystemDemo;
@@ -360,6 +363,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08C1A11B22C34D44E55F6677 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

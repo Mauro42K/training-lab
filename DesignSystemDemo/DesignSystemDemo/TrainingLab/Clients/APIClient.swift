@@ -4,7 +4,7 @@ protocol APIClient: Sendable {
     func ingestWorkouts(idempotencyKey: String, payload: WorkoutIngestDTO) async throws -> IngestResponseDTO
     func fetchWorkouts(from: Date, to: Date, sport: SportType?) async throws -> [WorkoutDTO]
     func fetchDaily(from: Date, to: Date) async throws -> [DailyItemDTO]
-    func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> [TrainingLoadItemDTO]
+    func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> TrainingLoadSummaryDTO
 }
 
 enum APIClientError: Error, LocalizedError {

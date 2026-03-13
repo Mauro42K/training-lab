@@ -176,24 +176,65 @@ donde N es la ventana (42 para Fitness, 7 para Fatigue).
 **Qué es:** Métrica del dominio de carga usada para soportar el bloque Home **Load vs Capacity**. No pertenece al dominio de recovery/readiness.
 
 **Estado**
-- Phase 5.0 decidió que `Capacity` permanece dentro del contrato oficial del Trend Card.
-- Su definición detallada y su implementación se trabajan en **Phase 5.1**.
-- No debe mostrarse en UI antes de quedar formalmente definida en este catálogo.
+- Phase 5.1 formaliza `Capacity` y la implementa dentro del contrato de `GET /v1/training-load`.
+- `Capacity` ya puede mostrarse dentro del bloque `Load vs Capacity`.
+- Sigue siendo una métrica del dominio de carga, no del dominio de recovery/readiness.
 
-**Inputs esperados**
+**Inputs**
 - Serie diaria `Load_day`
 - Modelo existente de Training Load (`Fitness` / `Fatigue` / `Form`)
-- Cualquier derivado adicional del dominio de carga que se justifique explícitamente en Phase 5.1
+
+**Cálculo (Phase 5.1 / v1)**
+- `Capacity_day = Fitness_day`
+- `Fitness_day = CTL = EMA 42d de Load_day`
+
+Esto significa:
+- `Capacity` se apoya principalmente en la base crónica de carga del atleta.
+- `Capacity` no usa recovery diario ni señales del dominio `daily_recovery`.
+- No se crea un motor paralelo; se deriva sobre la misma serie diaria de carga ya existente.
+
+**Interpretación semántica del card**
+- El card `Load vs Capacity` no interpreta el último `Load_day` aislado.
+- `semantic_state` se deriva de **carga aguda suavizada vs capacidad**, es decir:
+  - `Fatigue_day = ATL = EMA 7d de Load_day`
+  - comparación = `ATL / CTL`
+
+Estados semánticos v1:
+- `Below capacity` si `ATL / CTL < 0.85`
+- `Within range` si `0.85 <= ATL / CTL <= 1.0`
+- `Near limit` si `1.0 < ATL / CTL <= 1.15`
+- `Above capacity` si `ATL / CTL > 1.15`
+
+Guardrail:
+- estos umbrales viven centralizados en backend para recalibración futura sin reescribir el flujo del card.
+
+**History / completeness states**
+- `available` = 42+ días de cobertura calendario útil
+- `partial` = 14–41 días de cobertura calendario útil
+- `insufficient_history` = 1–13 días de cobertura calendario útil
+- `missing` = 0 días
+
+Regla de cobertura útil:
+- se mide desde la primera fecha útil del dominio `daily_load` hasta `today_local`
+- usa cobertura calendario, no solo conteo de días con workouts
+- días reales de descanso dentro de una historia ya iniciada no degradan artificialmente el estado a `missing` o `insufficient_history`
+
+Regla de UI:
+- `semantic_state` puede mostrarse en `available` y `partial`
+- en `partial`, la UI debe indicar explícitamente que la señal aún se está consolidando
+- en `insufficient_history` o `missing`, no forzar una lectura semántica falsa del dominio de carga
+
+Fallback local cache legacy (implementado en iOS Phase 5.1):
+- si filas antiguas de cache no traen `history_status`, derivarlo desde la cobertura real de la historia cacheada de `Load/TRIMP`
+- si filas antiguas de cache no traen `capacity`, reconstruir `Capacity` desde la misma historia real de `Load/TRIMP` usando la base `CTL = EMA 42d`
+- no usar `0` como sustituto visual de `Capacity` cuando la historia real sí soporta reconstrucción
+- si no existe historia real cacheada, el estado sigue siendo `missing`
 
 **Guardrails**
 - `Capacity` debe derivarse del dominio de carga, no del dominio de `daily_recovery`.
 - No reutilizar `Readiness`/`Recovery` como sustituto de `Capacity`.
-- No congelar fórmula final en Phase 5.0 sin justificación técnica suficiente.
-
-**Pendiente Phase 5.1**
-- formal definition
-- exact calculation model
-- UI copy and interpretation rules for `Load vs Capacity`
+- `Capacity` pertenece al dominio de carga aunque el hero de Home sea `Readiness`.
+- `Load vs Capacity` sigue siendo un bloque comparativo de carga, no un score aislado.
 
 ---
 
@@ -394,7 +435,7 @@ Semántica Phase 4.5:
 ## 10) Pendientes para v0.2 (cuando tengamos datos)
 - Calibrar factores de TRIMP estimado con datos reales.
 - Definir/ajustar “optimal range” para Training Load.
-- Definir `Capacity` dentro del dominio de carga para soportar Home `Load vs Capacity`.
+- Recalibrar umbrales heurísticos de `Load vs Capacity` con datos reales.
 - Definir objetivos (targets) del ring Movement.
 - Refinar Readiness weights/baselines con evidencia y feedback.
 - Refinar Stress proxy thresholds.

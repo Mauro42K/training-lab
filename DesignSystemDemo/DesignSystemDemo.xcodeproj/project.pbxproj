@@ -42,6 +42,7 @@
 		F1C300000000000000000008 /* CachedSyncState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000000B /* CachedSyncState.swift */; };
 		F1C300000000000000000009 /* CachedWorkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000000C /* CachedWorkout.swift */; };
 		F1C30000000000000000000A /* DailySummaryDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000000D /* DailySummaryDTO.swift */; };
+		F1C300000000000000000017 /* TrainingLoadDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000017 /* TrainingLoadDTO.swift */; };
 		F1C30000000000000000000B /* WorkoutDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000000E /* WorkoutDTO.swift */; };
 		F1C30000000000000000000C /* WorkoutIngestDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000000F /* WorkoutIngestDTO.swift */; };
 		F1C30000000000000000000D /* SportType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000010 /* SportType.swift */; };
@@ -96,6 +97,7 @@
 		F1B20000000000000000000B /* CachedSyncState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CachedSyncState.swift; sourceTree = "<group>"; };
 		F1B20000000000000000000C /* CachedWorkout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CachedWorkout.swift; sourceTree = "<group>"; };
 		F1B20000000000000000000D /* DailySummaryDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailySummaryDTO.swift; sourceTree = "<group>"; };
+		F1B200000000000000000017 /* TrainingLoadDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadDTO.swift; sourceTree = "<group>"; };
 		F1B20000000000000000000E /* WorkoutDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutDTO.swift; sourceTree = "<group>"; };
 		F1B20000000000000000000F /* WorkoutIngestDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutIngestDTO.swift; sourceTree = "<group>"; };
 		F1B200000000000000000010 /* SportType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SportType.swift; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 			isa = PBXGroup;
 			children = (
 				F1B20000000000000000000D /* DailySummaryDTO.swift */,
+				F1B200000000000000000017 /* TrainingLoadDTO.swift */,
 				F1B20000000000000000000E /* WorkoutDTO.swift */,
 				F1B20000000000000000000F /* WorkoutIngestDTO.swift */,
 			);
@@ -406,6 +409,7 @@
 				F1C300000000000000000008 /* CachedSyncState.swift in Sources */,
 				F1C300000000000000000009 /* CachedWorkout.swift in Sources */,
 				F1C30000000000000000000A /* DailySummaryDTO.swift in Sources */,
+				F1C300000000000000000017 /* TrainingLoadDTO.swift in Sources */,
 				F1C30000000000000000000B /* WorkoutDTO.swift in Sources */,
 				F1C30000000000000000000C /* WorkoutIngestDTO.swift in Sources */,
 				F1C30000000000000000000D /* SportType.swift in Sources */,

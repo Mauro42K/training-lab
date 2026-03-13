@@ -144,7 +144,7 @@ struct URLSessionAPIClient: APIClient {
         return try decoder.decode(DailySummaryDTO.self, from: data).items
     }
 
-    func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> [TrainingLoadItemDTO] {
+    func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> TrainingLoadSummaryDTO {
         var components = URLComponents(url: try pathURL("v1/training-load"), resolvingAgainstBaseURL: false)
         components?.queryItems = [
             URLQueryItem(name: "days", value: String(days)),
@@ -158,7 +158,7 @@ struct URLSessionAPIClient: APIClient {
         let request = try makeRequest(url: url, method: "GET")
         let (data, response) = try await session.data(for: request)
         _ = try validate(response: response)
-        return try decoder.decode(TrainingLoadSummaryDTO.self, from: data).items
+        return try decoder.decode(TrainingLoadSummaryDTO.self, from: data)
     }
 
     private func makeRequest(path: String, method: String) throws -> URLRequest {

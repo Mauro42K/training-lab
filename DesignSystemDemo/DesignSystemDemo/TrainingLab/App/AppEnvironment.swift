@@ -202,7 +202,7 @@ private struct MissingAPIKeyAPIClient: APIClient {
         throw AppEnvironmentError.missingAPIKey
     }
 
-    func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> [TrainingLoadItemDTO] {
+    func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> TrainingLoadSummaryDTO {
         _ = days
         _ = sport
         throw AppEnvironmentError.missingAPIKey

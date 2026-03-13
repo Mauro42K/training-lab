@@ -4,7 +4,13 @@ struct TrainingLoadScreen: View {
     let environment: AppEnvironment
 
     @State private var selectedFilter: TrainingLoadSportFilter = .all
-    @State private var points: [TrainingLoadItemDTO] = []
+    @State private var trendSummary = TrainingLoadSummaryDTO(
+        items: [],
+        historyStatus: .missing,
+        semanticState: nil,
+        latestLoad: 0,
+        latestCapacity: 0
+    )
     @State private var selectedDay: SelectedTrainingLoadDay?
     @State private var dayWorkouts: [WorkoutDTO] = []
     @State private var isLoading = false
@@ -34,7 +40,8 @@ struct TrainingLoadScreen: View {
                 if isLoading && !hasLoadedOnce {
                     DSLoadingState()
                 } else {
-                    TrainingLoadChartCard(
+                    TrainingLoadTrendCard(
+                        summary: trendSummary,
                         points: chartPoints,
                         onSelectDay: { day in
                             Task { await selectDay(day) }
@@ -73,7 +80,7 @@ struct TrainingLoadScreen: View {
     }
 
     private var sortedPoints: [TrainingLoadItemDTO] {
-        points.sorted { $0.date < $1.date }
+        trendSummary.items.sorted { $0.date < $1.date }
     }
 
     private var chartPoints: [TrainingLoadChartPoint] {
@@ -81,7 +88,8 @@ struct TrainingLoadScreen: View {
             TrainingLoadChartPoint(
                 id: item.date,
                 date: item.date,
-                value: item.trimp,
+                load: item.load,
+                capacity: item.capacity,
                 isToday: calendar.isDateInToday(item.date),
                 isSelected: selectedDay.map { calendar.isDate($0.date, inSameDayAs: item.date) } ?? false
             )
@@ -90,15 +98,15 @@ struct TrainingLoadScreen: View {
 
     private var todayTotal: Double {
         let today = calendar.startOfDay(for: Date())
-        return sortedPoints.first { calendar.isDate($0.date, inSameDayAs: today) }?.trimp ?? 0
+        return sortedPoints.first { calendar.isDate($0.date, inSameDayAs: today) }?.load ?? 0
     }
 
     private var sevenDayTotal: Double {
-        sortedPoints.suffix(7).reduce(0) { $0 + $1.trimp }
+        sortedPoints.suffix(7).reduce(0) { $0 + $1.load }
     }
 
     private var twentyEightDayTotal: Double {
-        sortedPoints.suffix(28).reduce(0) { $0 + $1.trimp }
+        sortedPoints.suffix(28).reduce(0) { $0 + $1.load }
     }
 
     private func loadSeries() async {
@@ -106,14 +114,20 @@ struct TrainingLoadScreen: View {
         defer { isLoading = false }
 
         do {
-            points = try await environment.trainingLoadRepository.getTrainingLoad(
+            trendSummary = try await environment.trainingLoadRepository.getTrainingLoad(
                 days: 28,
                 sport: selectedFilter
             )
             hasLoadedOnce = true
             errorMessage = nil
         } catch {
-            points = []
+            trendSummary = TrainingLoadSummaryDTO(
+                items: [],
+                historyStatus: .missing,
+                semanticState: nil,
+                latestLoad: 0,
+                latestCapacity: 0
+            )
             hasLoadedOnce = true
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }

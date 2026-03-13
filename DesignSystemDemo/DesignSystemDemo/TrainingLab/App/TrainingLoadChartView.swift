@@ -3,25 +3,91 @@ import SwiftUI
 struct TrainingLoadChartPoint: Identifiable, Equatable {
     let id: Date
     let date: Date
-    let value: Double
+    let load: Double
+    let capacity: Double
     let isToday: Bool
     let isSelected: Bool
 }
 
-struct TrainingLoadChartCard: View {
+struct TrainingLoadTrendCard: View {
+    let summary: TrainingLoadSummaryDTO
     let points: [TrainingLoadChartPoint]
     let onSelectDay: (Date) -> Void
 
     var body: some View {
         DSChartCard(
-            title: "Daily TRIMP",
-            subtitle: "28-day load"
+            title: "Load vs Capacity",
+            subtitle: summary.cardSubtitle,
+            style: .emphasized,
+            legendItems: [
+                .init(title: "Load", color: AppColors.Accent.blue.opacity(0.92)),
+                .init(title: "Capacity", color: AppColors.Accent.orange),
+            ]
         ) {
-            TrainingLoadChartView(
-                points: points,
-                onSelectDay: onSelectDay
-            )
+            VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                HStack(alignment: .top, spacing: AppSpacing.x12) {
+                    VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                        Text(summary.headlineTitle)
+                            .appTextStyle(AppTypography.headingH3)
+                            .foregroundStyle(summary.headlineColor)
+
+                        Text(summary.headlineDetail)
+                            .appTextStyle(AppTypography.bodySmall)
+                            .foregroundStyle(AppColors.Text.secondary)
+                    }
+
+                    Spacer(minLength: AppSpacing.x12)
+
+                    if summary.showsPrimaryMetrics {
+                        HStack(spacing: AppSpacing.x12) {
+                            TrendMetric(title: "Load", value: summary.latestLoad, color: AppColors.Accent.blue)
+                            TrendMetric(title: "Capacity", value: summary.latestCapacity, color: AppColors.Accent.orange)
+                        }
+                    }
+                }
+
+                if summary.historyStatus == .missing {
+                    TrendCardMissingState()
+                } else {
+                    TrainingLoadChartView(
+                        points: points,
+                        onSelectDay: onSelectDay
+                    )
+                }
+            }
         }
+    }
+}
+
+private struct TrendCardMissingState: View {
+    var body: some View {
+        VStack(spacing: AppSpacing.x12) {
+            Image(systemName: "chart.line.uptrend.xyaxis")
+                .appTextStyle(AppTypography.headingH2)
+                .foregroundStyle(AppColors.Text.secondary)
+
+            Text("No load history yet")
+                .appTextStyle(AppTypography.headingH3)
+                .foregroundStyle(AppColors.Text.primary)
+                .multilineTextAlignment(.center)
+
+            Text("Complete your first training sessions to start comparing load against capacity.")
+                .appTextStyle(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: 188)
+        .padding(.horizontal, AppSpacing.x16)
+        .padding(.vertical, AppSpacing.x12)
+        .background(
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .fill(AppColors.Surface.cardMuted.opacity(0.36))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .stroke(AppColors.Stroke.subtle.opacity(0.7), lineWidth: AppStrokeWidth.hairline)
+        )
     }
 }
 
@@ -29,28 +95,23 @@ struct TrainingLoadChartView: View {
     let points: [TrainingLoadChartPoint]
     let onSelectDay: (Date) -> Void
     @State private var hoveredPointID: Date?
+
     private let minimumZeroHeight: CGFloat = 4
     private let minimumPositiveHeight: CGFloat = 7
-    private let showSecondaryGuide = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.x8) {
             GeometryReader { proxy in
-                let maxValue = max(points.map(\.value).max() ?? 0, 1)
+                let maxValue = chartMaxValue
                 let hoveredPoint = points.first(where: { $0.id == hoveredPointID })
                 let hoveredIndex = points.firstIndex(where: { $0.id == hoveredPointID })
 
                 ZStack(alignment: .bottomLeading) {
-                    if showSecondaryGuide {
-                        Rectangle()
-                            .fill(AppColors.Stroke.subtle.opacity(0.32))
-                            .frame(height: 1)
-                            .offset(y: -proxy.size.height * 0.45)
-                    }
-
                     Rectangle()
                         .fill(AppColors.Stroke.subtle.opacity(0.65))
                         .frame(height: 1)
+
+                    capacityLine(in: proxy.size, maxValue: maxValue)
 
                     HStack(alignment: .bottom, spacing: AppSpacing.x4) {
                         ForEach(points) { point in
@@ -62,7 +123,7 @@ struct TrainingLoadChartView: View {
                                 }
 
                                 RoundedRectangle(cornerRadius: AppRadius.small, style: .continuous)
-                                    .fill(color(for: point, isHovered: isHovered))
+                                    .fill(barColor(for: point, isHovered: isHovered))
                                     .overlay {
                                         if isHovered && !point.isSelected {
                                             RoundedRectangle(cornerRadius: AppRadius.small, style: .continuous)
@@ -76,7 +137,11 @@ struct TrainingLoadChartView: View {
                                     .frame(
                                         maxWidth: .infinity,
                                         minHeight: minimumZeroHeight,
-                                        maxHeight: barHeight(for: point.value, maxValue: maxValue, chartHeight: proxy.size.height)
+                                        maxHeight: barHeight(
+                                            for: point.load,
+                                            maxValue: maxValue,
+                                            chartHeight: proxy.size.height
+                                        )
                                     )
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
@@ -96,12 +161,14 @@ struct TrainingLoadChartView: View {
                     }
                     .padding(.bottom, 1)
 
+                    capacityMarkers(in: proxy.size, maxValue: maxValue)
+
                     #if os(macOS)
                     if let hoveredPoint, let hoveredIndex {
                         HoverTooltip(point: hoveredPoint)
                             .position(
                                 x: tooltipXPosition(for: hoveredIndex, count: points.count, width: proxy.size.width),
-                                y: 14
+                                y: 16
                             )
                             .allowsHitTesting(false)
                     }
@@ -117,9 +184,67 @@ struct TrainingLoadChartView: View {
         }
     }
 
-    private func color(for point: TrainingLoadChartPoint, isHovered: Bool) -> Color {
+    private var chartMaxValue: Double {
+        max(
+            max(points.map(\.load).max() ?? 0, points.map(\.capacity).max() ?? 0),
+            1
+        )
+    }
+
+    @ViewBuilder
+    private func capacityLine(in size: CGSize, maxValue: Double) -> some View {
+        Path { path in
+            guard !points.isEmpty else {
+                return
+            }
+
+            for index in points.indices {
+                let x = columnCenterX(for: index, count: points.count, width: size.width)
+                let y = capacityYPosition(
+                    for: points[index].capacity,
+                    maxValue: maxValue,
+                    chartHeight: size.height
+                )
+
+                if index == 0 {
+                    path.move(to: CGPoint(x: x, y: y))
+                } else {
+                    path.addLine(to: CGPoint(x: x, y: y))
+                }
+            }
+        }
+        .stroke(
+            AppColors.Accent.orange.opacity(0.96),
+            style: StrokeStyle(lineWidth: 2.25, lineCap: .round, lineJoin: .round)
+        )
+    }
+
+    @ViewBuilder
+    private func capacityMarkers(in size: CGSize, maxValue: Double) -> some View {
+        ForEach(Array(points.enumerated()), id: \.element.id) { index, point in
+            if point.isToday || point.isSelected || hoveredPointID == point.id {
+                Circle()
+                    .fill(AppColors.Surface.card)
+                    .overlay(
+                        Circle()
+                            .stroke(AppColors.Accent.orange, lineWidth: 2)
+                    )
+                    .frame(width: AppSpacing.x8, height: AppSpacing.x8)
+                    .position(
+                        x: columnCenterX(for: index, count: points.count, width: size.width),
+                        y: capacityYPosition(
+                            for: point.capacity,
+                            maxValue: maxValue,
+                            chartHeight: size.height
+                        )
+                    )
+            }
+        }
+    }
+
+    private func barColor(for point: TrainingLoadChartPoint, isHovered: Bool) -> Color {
         if point.isSelected {
-            return AppColors.Accent.orange
+            return AppColors.Accent.blue
         }
         if point.isToday {
             return isHovered ? AppColors.Accent.blue : AppColors.Accent.blue.opacity(0.92)
@@ -138,14 +263,42 @@ struct TrainingLoadChartView: View {
         return max(rawHeight, minimumPositiveHeight)
     }
 
-    private func tooltipXPosition(for index: Int, count: Int, width: CGFloat) -> CGFloat {
+    private func capacityYPosition(for value: Double, maxValue: Double, chartHeight: CGFloat) -> CGFloat {
+        let normalized = max(0, min(value / maxValue, 1))
+        return chartHeight - (CGFloat(normalized) * chartHeight)
+    }
+
+    private func columnCenterX(for index: Int, count: Int, width: CGFloat) -> CGFloat {
         guard count > 0 else {
             return width / 2
         }
         let columnWidth = width / CGFloat(count)
-        let raw = (CGFloat(index) + 0.5) * columnWidth
-        let inset: CGFloat = 62
+        return (CGFloat(index) + 0.5) * columnWidth
+    }
+
+    private func tooltipXPosition(for index: Int, count: Int, width: CGFloat) -> CGFloat {
+        let raw = columnCenterX(for: index, count: count, width: width)
+        let inset: CGFloat = 72
         return min(max(raw, inset), max(inset, width - inset))
+    }
+}
+
+private struct TrendMetric: View {
+    let title: String
+    let value: Double
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: AppSpacing.x4) {
+            Text(title)
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(AppColors.Text.secondary)
+
+            Text(String(Int(value.rounded())))
+                .appTextStyle(AppTypography.headingH3)
+                .foregroundStyle(color)
+                .monospacedDigit()
+        }
     }
 }
 
@@ -153,14 +306,16 @@ private struct HoverTooltip: View {
     let point: TrainingLoadChartPoint
 
     var body: some View {
-        HStack(spacing: AppSpacing.x4) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(Self.dateFormatter.string(from: point.date))
-            Text("•")
-                .foregroundStyle(AppColors.Text.secondary)
-            Text("TRIMP \(Int(point.value.rounded()))")
+                .foregroundStyle(AppColors.Text.primary)
+
+            HStack(spacing: AppSpacing.x8) {
+                tooltipLegend(color: AppColors.Accent.blue, label: "Load \(Int(point.load.rounded()))")
+                tooltipLegend(color: AppColors.Accent.orange, label: "Cap \(Int(point.capacity.rounded()))")
+            }
         }
         .appTextStyle(AppTypography.labelSmall)
-        .foregroundStyle(AppColors.Text.primary)
         .padding(.horizontal, AppSpacing.x8)
         .padding(.vertical, 4)
         .background(
@@ -172,6 +327,16 @@ private struct HoverTooltip: View {
                 .stroke(AppColors.Stroke.subtle.opacity(0.75), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.22), radius: 3, x: 0, y: 1)
+    }
+
+    private func tooltipLegend(color: Color, label: String) -> some View {
+        HStack(spacing: AppSpacing.x4) {
+            Circle()
+                .fill(color)
+                .frame(width: 6, height: 6)
+            Text(label)
+                .foregroundStyle(AppColors.Text.secondary)
+        }
     }
 
     private static let dateFormatter: DateFormatter = {
@@ -272,23 +437,155 @@ private struct TrainingLoadAxisLabels: View {
     }()
 }
 
+private extension TrainingLoadSummaryDTO {
+    var showsPrimaryMetrics: Bool {
+        switch historyStatus {
+        case .available, .partial:
+            return true
+        case .insufficientHistory, .missing:
+            return false
+        }
+    }
+
+    var cardSubtitle: String {
+        switch historyStatus {
+        case .available:
+            return "28-day comparative trend"
+        case .partial:
+            return "Trend still consolidating"
+        case .insufficientHistory:
+            return "Building a usable load baseline"
+        case .missing:
+            return "Waiting for the first load history"
+        }
+    }
+
+    var headlineTitle: String {
+        switch historyStatus {
+        case .available, .partial:
+            return semanticState?.displayTitle ?? "Tracking capacity"
+        case .insufficientHistory:
+            return "History still building"
+        case .missing:
+            return "No load history yet"
+        }
+    }
+
+    var headlineDetail: String {
+        switch historyStatus {
+        case .available:
+            return semanticState?.detailCopy ?? "Recent load is tracking your current capacity."
+        case .partial:
+            return semanticState?.partialDetailCopy ?? "Building the 42-day baseline."
+        case .insufficientHistory:
+            return "Need 14 days of load history before capacity becomes interpretable."
+        case .missing:
+            return "Complete your first training sessions to start comparing load against capacity."
+        }
+    }
+
+    var headlineColor: Color {
+        switch historyStatus {
+        case .available:
+            return semanticState?.accentColor ?? AppColors.Text.primary
+        case .partial:
+            return semanticState?.accentColor ?? AppColors.Accent.orange
+        case .insufficientHistory:
+            return AppColors.Accent.orange
+        case .missing:
+            return AppColors.Text.primary
+        }
+    }
+}
+
+private extension TrainingLoadSemanticState {
+    var displayTitle: String {
+        switch self {
+        case .belowCapacity:
+            return "Below capacity"
+        case .withinRange:
+            return "Within range"
+        case .nearLimit:
+            return "Near limit"
+        case .aboveCapacity:
+            return "Above capacity"
+        }
+    }
+
+    var detailCopy: String {
+        switch self {
+        case .belowCapacity:
+            return "Recent load is running below your current capacity."
+        case .withinRange:
+            return "Recent load is tracking your current capacity."
+        case .nearLimit:
+            return "Recent load is close to your current capacity ceiling."
+        case .aboveCapacity:
+            return "Recent load is running above your current capacity."
+        }
+    }
+
+    var partialDetailCopy: String {
+        switch self {
+        case .belowCapacity:
+            return "Below your current capacity. Baseline still building."
+        case .withinRange:
+            return "Tracking capacity. Baseline still building."
+        case .nearLimit:
+            return "Close to capacity. Baseline still building."
+        case .aboveCapacity:
+            return "Running above capacity. Baseline still building."
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .belowCapacity:
+            return AppColors.Accent.blue
+        case .withinRange:
+            return AppColors.Accent.green
+        case .nearLimit:
+            return AppColors.Accent.orange
+        case .aboveCapacity:
+            return AppColors.Accent.red
+        }
+    }
+}
+
 #Preview {
     let calendar = Calendar.current
     let today = calendar.startOfDay(for: Date())
     let points = (0..<28).map { offset -> TrainingLoadChartPoint in
         let date = calendar.date(byAdding: .day, value: -(27 - offset), to: today) ?? today
+        let load = Double((offset % 7) * 12 + 8)
+        let capacity = Double(18 + offset)
         return TrainingLoadChartPoint(
             id: date,
             date: date,
-            value: Double((offset % 7) * 12 + 8),
+            load: load,
+            capacity: capacity,
             isToday: calendar.isDateInToday(date),
             isSelected: offset == 21
         )
     }
 
+    let summary = TrainingLoadSummaryDTO(
+        items: points.map { point in
+            TrainingLoadItemDTO(
+                date: point.date,
+                load: point.load,
+                capacity: point.capacity
+            )
+        },
+        historyStatus: .available,
+        semanticState: .withinRange,
+        latestLoad: points.last?.load ?? 0,
+        latestCapacity: points.last?.capacity ?? 0
+    )
+
     ZStack {
         AppColors.Background.primary.ignoresSafeArea()
-        TrainingLoadChartCard(points: points) { _ in }
+        TrainingLoadTrendCard(summary: summary, points: points) { _ in }
             .padding()
     }
 }

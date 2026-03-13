@@ -383,7 +383,7 @@ Closure decisions carried into this phase:
 #### Handoff
 - Phase 4.4 remains ON HOLD and is not reopened by this closure.
 - The documentary alignment layer for Home is now closed as **Phase 5.0**.
-- The next executable Home block is **Phase 5.1 — Trend Card (Load vs Capacity)**.
+- The next executable Home block is now **Phase 5.2 — Hero Readiness**.
 - Deferred-by-decision, not bugs:
   - no recovery score yet
   - no readiness/battery final
@@ -407,7 +407,7 @@ Closure decisions carried into this phase:
 - Figma Home prototype is a visual reference only; it does not redefine functional meaning or metric semantics.
 - `Readiness` is the governing Home hero term. `Battery` remains only as a historical/documentary alias where legacy references still exist.
 - `Recommended Today` remains a contextual guidance block only. It does not absorb Coach scope.
-- `Trend Card` remains **Load vs Capacity**. `Capacity` belongs to the load domain and enters active definition/implementation scope in **Phase 5.1**.
+- `Trend Card` remains **Load vs Capacity**. `Capacity` belongs to the load domain and is formally defined/implemented in **Phase 5.1**.
 - Every Phase 5 subphase follows: **Definition -> Plan -> Implement -> QA**.
 
 ### Phase 5.0 — Home investigation / decisions / alignment
@@ -432,7 +432,23 @@ Closure decisions carried into this phase:
 - Documentary consistency across Roadmap, Metrics Catalog, Glossary, Context, and PRD.
 
 ### Phase 5.1 — Trend Card (Load vs Capacity)
+**Status:** CLOSED (2026-03-13 America/New_York)  
 **Goal:** Define and implement the first final Home block: `Load vs Capacity`.
+
+**Closure summary**
+- `Capacity` was formalized inside the load domain as `Fitness (CTL)` in v1.
+- `GET /v1/training-load` now returns `load`, `capacity`, `history_status`, `semantic_state`, `latest_load`, and `latest_capacity`.
+- `semantic_state` is server-derived from `ATL vs CTL`, with centralized heuristics for `Below capacity`, `Within range`, `Near limit`, and `Above capacity`.
+- Calendar coverage states are now explicit: `available`, `partial`, `insufficient_history`, `missing`.
+- A reusable `Load vs Capacity` card now exists in the current iOS load surface using the existing chart system, without reintroducing the old TRIMP hero framing.
+- The final card pattern is now stable:
+  - `load bars + capacity line`
+  - compact semantic reading
+  - polished `partial`, `insufficient_history`, and `missing` states
+- Local cache hardening is closed:
+  - SwiftData migration no longer fails on legacy cached training-load rows
+  - legacy cache fallback now reconstructs `history_status` from real cached load coverage instead of degrading to `missing`
+  - legacy cache fallback now reconstructs `Capacity` from cached load history when `capacity` was not persisted yet, avoiding false zero lines in the chart
 
 **Why this block exists**
 - It carries forward the validated load narrative from the MVP while moving Home toward its final PRD structure.
@@ -451,17 +467,21 @@ Closure decisions carried into this phase:
 
 **Deliverables**
 - `Capacity` documented in the Metrics Catalog with justified scope and formal ownership in the load domain
-- Trend Card contract and implementation plan
-- Final Trend Card delivery for Home
+- Extended `GET /v1/training-load` contract
+- Reusable iOS Trend Card delivery on top of the existing load screen as the temporary host
 
 **Definition of Done**
 - `Capacity` is explicitly documented before implementation is considered complete.
 - Trend Card semantics are stable and no longer rely on the temporary MVP hero framing.
+- API contract, history/completeness states, and iOS presentation are all validated.
+- Legacy cache migration and fallback behavior no longer create contradictory or false-zero Home load states on device.
 
 **QA focus**
 - Today alignment
 - Sparse load history
+- Calendar coverage vs real rest days
 - Visual consistency with Phase 2 charts
+- Legacy cache migration and offline fallback on real device
 
 ### Phase 5.2 — Hero Readiness
 **Goal:** Deliver the final Home hero that answers "How am I today?" through `Readiness`.
@@ -765,6 +785,6 @@ Closure decisions carried into this phase:
 ---
 
 ## Immediate next actions
-1) Open **Phase 5.1 — Trend Card (Load vs Capacity)**.
-2) Define `Capacity` in `docs/METRICS_CATALOG.md` with justified load-domain semantics before final implementation close.
-3) Reuse the existing training-load foundation and chart system without reintroducing the old TRIMP hero framing into final Home semantics.
+1) Open **Phase 5.2 — Hero Readiness**.
+2) Keep `Readiness` naming and semantics aligned with PRD, Glossary, and daily recovery contracts.
+3) Reuse the new `Load vs Capacity` block as an already-closed Home dependency without pulling readiness semantics back into the load domain.

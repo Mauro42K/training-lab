@@ -5,15 +5,41 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.0 — CLOSED** (2026-03-13 America/New_York)
+- **Phase 5.1 — CLOSED** (2026-03-13 America/New_York)
 
-### Phase 5.0 Closure Summary
+### Phase 5.1 Closure Summary
+- `Capacity` is now formally implemented inside the load domain.
+- `Capacity = Fitness (CTL)` in v1, derived on top of the existing `DailyLoad` foundation.
+- `semantic_state` is now server-derived from `ATL vs CTL`, not from the last daily load in isolation.
+- `history_status` is now exposed as:
+  - `available` = 42+ days
+  - `partial` = 14–41 days
+  - `insufficient_history` = 1–13 days
+  - `missing` = 0 days
+- `GET /v1/training-load` now returns:
+  - `items[]` with `load`, `capacity`, and temporary `trimp` alias
+  - `history_status`
+  - `semantic_state`
+  - `latest_load`
+  - `latest_capacity`
+- iOS now hosts a reusable `Load vs Capacity` card in `TrainingLoadScreen` using the design-system chart/card primitives.
+- `partial` history explicitly communicates that the signal is still consolidating.
+- The final visual polish pass is closed:
+  - `Capacity` renders as a real daily series, not a flat replicated line
+  - `partial` copy density was reduced
+  - `insufficient_history` de-emphasizes precision
+  - `missing` keeps continuity inside the same card component
+- Legacy cache hardening is closed:
+  - SwiftData migration no longer fails when old cached rows do not yet contain `capacity`
+  - legacy cache fallback reconstructs `history_status` from real cached load coverage
+  - legacy cache fallback reconstructs `Capacity` from cached load/TRIMP history instead of showing false zero capacity when history exists
+
+### Upstream Phase 5.0 Context
 - Home documentary investigation/alignment completed.
 - `Readiness` is now the governing Home hero term.
 - `Battery` remains only as a controlled historical/documentary alias.
 - `Recommended Today` is frozen as contextual guidance-only.
 - Home `Trend Card` remains **Load vs Capacity**.
-- `Capacity` is confirmed as a load-domain metric to be defined and implemented in **Phase 5.1**.
 - Official Phase 5 order is now:
   - 5.0 investigation / decisions / alignment
   - 5.1 Trend Card (Load vs Capacity)
@@ -156,11 +182,11 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 5.1 — Trend Card (Load vs Capacity)** (**Next**) 
+- **Phase 5.2 — Hero Readiness** (**Next**) 
 - Focus:
-  - define `Capacity` as a formal load-domain metric,
-  - build the Home Trend Card on top of the existing training-load foundation,
-  - preserve the MVP load narrative while moving Home to its final PRD structure.
+  - build the final Home hero around `Readiness`,
+  - keep `Battery` out of active product naming,
+  - preserve transparency, drivers, and missing-data behavior.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**

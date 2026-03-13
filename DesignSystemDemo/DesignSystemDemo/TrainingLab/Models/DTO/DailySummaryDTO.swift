@@ -19,14 +19,3 @@ struct DailyItemDTO: Codable, Equatable, Sendable {
 struct DailySummaryDTO: Codable, Equatable, Sendable {
     let items: [DailyItemDTO]
 }
-
-struct TrainingLoadItemDTO: Codable, Equatable, Sendable, Identifiable {
-    let date: Date
-    let trimp: Double
-
-    var id: Date { date }
-}
-
-struct TrainingLoadSummaryDTO: Codable, Equatable, Sendable {
-    let items: [TrainingLoadItemDTO]
-}

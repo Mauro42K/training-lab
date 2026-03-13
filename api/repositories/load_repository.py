@@ -237,3 +237,18 @@ def get_daily_load_rows(
     )
     rows = db.execute(stmt).all()
     return [(row.date, float(row.trimp_total)) for row in rows]
+
+
+def get_first_daily_load_date(
+    db: Session,
+    *,
+    user_id: UUID,
+    sport_filter: str,
+    trimp_model_version: int,
+) -> date | None:
+    stmt = select(func.min(DailyLoad.date)).where(
+        DailyLoad.user_id == user_id,
+        DailyLoad.sport_filter == sport_filter,
+        DailyLoad.trimp_model_version == trimp_model_version,
+    )
+    return db.execute(stmt).scalar_one_or_none()

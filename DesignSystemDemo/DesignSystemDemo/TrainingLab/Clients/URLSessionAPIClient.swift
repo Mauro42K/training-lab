@@ -156,9 +156,32 @@ struct URLSessionAPIClient: APIClient {
         }
 
         let request = try makeRequest(url: url, method: "GET")
-        let (data, response) = try await session.data(for: request)
-        _ = try validate(response: response)
-        return try decoder.decode(TrainingLoadSummaryDTO.self, from: data)
+        #if DEBUG
+        networkLogger.log("training_load request start url=\(url.absoluteString, privacy: .public)")
+        #endif
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            #if DEBUG
+            networkLogger.error("training_load transport_failed error=\(error.localizedDescription, privacy: .public)")
+            #endif
+            throw error
+        }
+        let statusCode = try validate(response: response, data: data)
+        #if DEBUG
+        networkLogger.log("training_load request success status=\(statusCode)")
+        #endif
+        do {
+            return try decoder.decode(TrainingLoadSummaryDTO.self, from: data)
+        } catch {
+            #if DEBUG
+            networkLogger.error(
+                "training_load decode_failed error=\(error.localizedDescription, privacy: .public) body=\(summarizedResponseBody(from: data), privacy: .public)"
+            )
+            #endif
+            throw error
+        }
     }
 
     private func makeRequest(path: String, method: String) throws -> URLRequest {

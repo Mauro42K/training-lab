@@ -5,7 +5,39 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.1.1 — CLOSED** (2026-03-13 America/New_York)
+- **Phase 5.2 — Hero Readiness** (**Next**)
+
+### Phase 5.1.3 Closure Summary
+- macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.
+- `Today` no longer attaches to the last training-load point unless that point is actually the current calendar day.
+- `Load Trend` totals now use calendar windows anchored to today instead of raw suffix slices.
+- The client now tolerates the legacy `training-load` response shape still returned by production and reconstructs missing `Capacity`, `history_status`, `latest_*`, and `semantic_state` values instead of failing decode and falling back to stale cache by accident.
+- Training-load fetch diagnostics now capture:
+  - effective `baseURL`
+  - remote fetch attempt
+  - remote failure
+  - cache fallback
+  - latest point date
+  - cache update timestamp
+- The UI now surfaces stale load data honestly instead of presenting old cache points as if they were current.
+- The confirmed diagnosis is:
+  - macOS and iPhone use the same backend/baseURL
+  - they can still show different dates because each platform owns a separate local cache
+  - remote refresh could also fail on the old payload shape before the client-side compatibility fallback was added
+  - when remote refresh fails, each platform falls back to its own cache state
+  - the previous `Today` labeling bug amplified that divergence visually
+- Final local macOS verification also required normalizing the target bundle identifier so the app could launch consistently during validation.
+
+### Phase 5.1.2 Closure Summary
+- macOS no longer crashes on launch when a legacy local SwiftData store is present.
+- `CachedSyncState.hasCompletedRealHealthKitIngest` was hardened for legacy migration by making the persisted field migration-safe and normalizing missing legacy values back to `false` at load time.
+- Review of the remaining local persistence models found no other new mandatory cache fields with the same unresolved migration risk:
+  - `CachedTrainingLoadPoint` had already been hardened during Phase 5.1.
+  - `CachedWorkout` and `CachedDailySummary` did not add equivalent new required fields.
+- Validation passed for:
+  - clean macOS local-store creation.
+  - legacy macOS store migration.
+  - iOS simulator build sanity check.
 
 ### Phase 5.1.1 Closure Summary
 - The visible iPhone app name now resolves to `Training Lab`.

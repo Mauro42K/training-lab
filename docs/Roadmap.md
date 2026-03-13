@@ -508,6 +508,70 @@ Closure decisions carried into this phase:
 - The app icon is configured through the real asset catalog path used by the target.
 - The next product phase remains **Phase 5.2 — Hero Readiness** with no roadmap ambiguity.
 
+### Phase 5.1.2 — SwiftData Legacy Migration Hardening (macOS)
+**Status:** CLOSED (2026-03-13 America/New_York)  
+**Goal:** Eliminate a real macOS startup crash caused by legacy local-store migration after recent cache/schema additions.
+
+**Closure summary**
+- `CachedSyncState.hasCompletedRealHealthKitIngest` no longer blocks legacy SwiftData/CoreData migration on macOS.
+- The field is now persisted in a migration-safe way for cache/local-store semantics and normalized back to `false` when a legacy row loads without a stored value yet.
+- Review of the other local persistence models confirmed no remaining new mandatory cache fields with the same migration profile:
+  - `CachedTrainingLoadPoint` had already been hardened in Phase 5.1
+  - `CachedWorkout` and `CachedDailySummary` did not introduce equivalent new required fields
+- Validation passed for:
+  - clean macOS store creation
+  - legacy store migration on macOS
+  - iOS simulator build regression check
+
+**Why this block exists**
+- Phase 5.1 cannot be considered operationally closed if a legacy local store still crashes the macOS app on launch.
+
+**Scope**
+- `CachedSyncState`
+- local SwiftData/CoreData migration safety
+- cross-platform build sanity check only
+
+**Definition of Done**
+- The app no longer crashes on macOS when a legacy local store is present.
+- Legacy rows missing `hasCompletedRealHealthKitIngest` are interpreted safely.
+- The next product phase remains **Phase 5.2 — Hero Readiness** with no roadmap ambiguity.
+
+### Phase 5.1.3 — Data Freshness + Today Label Correctness
+**Status:** CLOSED (2026-03-13 America/New_York)  
+**Goal:** Restore user trust in the training-load surface by fixing stale-date semantics and making cache fallback observable.
+
+**Closure summary**
+- macOS and iPhone were confirmed to use the same effective `baseURL`; divergence came from platform-specific local caches, not different backends.
+- The app no longer labels `Today` on the last chart point unless that point is actually the current calendar day.
+- `Load Trend` summary totals (`Today`, `7d`, `28d`) are now calculated against calendar windows ending today, not just the last items in the array.
+- The iOS client now accepts the legacy `training-load` payload still returned by production and reconstructs missing `Capacity`, `history_status`, `latest_*`, and `semantic_state` values client-side instead of failing decode and falling back to stale cache unnecessarily.
+- Training-load fetches now log and expose a contained freshness snapshot with:
+  - effective `baseURL`
+  - remote fetch attempt
+  - remote failure if any
+  - cache fallback usage
+  - latest point date
+  - latest cache update timestamp
+- When data is stale, the UI now says so explicitly instead of silently presenting an old last point as if it were current.
+- Diagnosis was confirmed:
+  - macOS and iPhone were not using different backends
+  - they can diverge because each platform owns its own local cache and the training-load request can fall back to cache when remote refresh fails or when the app sees an older payload shape it can no longer decode
+  - the old `Today` labeling logic made that cache divergence look worse and less trustworthy than it really was
+- Final local macOS validation also normalized the target bundle identifier so the app could launch reliably during cross-platform verification.
+
+**Why this block exists**
+- A stale but mislabeled trend card breaks trust faster than a clearly-stale but honest one.
+
+**Scope**
+- Training load refresh/cache diagnostics
+- Trend card temporal labeling
+- Training load summary temporal aggregation
+
+**Definition of Done**
+- `Today` only appears for the actual current calendar day.
+- Stale cache fallback is visible and diagnosable.
+- The next product phase remains **Phase 5.2 — Hero Readiness** with no roadmap ambiguity.
+
 ### Phase 5.2 — Hero Readiness
 **Goal:** Deliver the final Home hero that answers "How am I today?" through `Readiness`.
 

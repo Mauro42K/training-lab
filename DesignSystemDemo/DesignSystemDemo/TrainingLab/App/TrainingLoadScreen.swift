@@ -4,13 +4,7 @@ struct TrainingLoadScreen: View {
     let environment: AppEnvironment
 
     @State private var selectedFilter: TrainingLoadSportFilter = .all
-    @State private var trendSummary = TrainingLoadSummaryDTO(
-        items: [],
-        historyStatus: .missing,
-        semanticState: nil,
-        latestLoad: 0,
-        latestCapacity: 0
-    )
+    @State private var trendSnapshot = TrainingLoadFetchResult.empty(baseURL: URL(string: "https://api.training-lab.mauro42k.com")!)
     @State private var selectedDay: SelectedTrainingLoadDay?
     @State private var dayWorkouts: [WorkoutDTO] = []
     @State private var isLoading = false
@@ -40,6 +34,17 @@ struct TrainingLoadScreen: View {
                 if isLoading && !hasLoadedOnce {
                     DSLoadingState()
                 } else {
+                    if let freshnessMessage {
+                        TrendFreshnessCard(
+                            message: freshnessMessage,
+                            source: trendSnapshot.freshness.source
+                        )
+                    }
+
+                    if shouldShowDiagnostics {
+                        TrendDiagnosticsRow(freshness: trendSnapshot.freshness)
+                    }
+
                     TrainingLoadTrendCard(
                         summary: trendSummary,
                         points: chartPoints,
@@ -97,16 +102,15 @@ struct TrainingLoadScreen: View {
     }
 
     private var todayTotal: Double {
-        let today = calendar.startOfDay(for: Date())
-        return sortedPoints.first { calendar.isDate($0.date, inSameDayAs: today) }?.load ?? 0
+        trailingCalendarWindowTotal(days: 1)
     }
 
     private var sevenDayTotal: Double {
-        sortedPoints.suffix(7).reduce(0) { $0 + $1.load }
+        trailingCalendarWindowTotal(days: 7)
     }
 
     private var twentyEightDayTotal: Double {
-        sortedPoints.suffix(28).reduce(0) { $0 + $1.load }
+        trailingCalendarWindowTotal(days: 28)
     }
 
     private func loadSeries() async {
@@ -114,20 +118,14 @@ struct TrainingLoadScreen: View {
         defer { isLoading = false }
 
         do {
-            trendSummary = try await environment.trainingLoadRepository.getTrainingLoad(
+            trendSnapshot = try await environment.trainingLoadRepository.getTrainingLoad(
                 days: 28,
                 sport: selectedFilter
             )
             hasLoadedOnce = true
             errorMessage = nil
         } catch {
-            trendSummary = TrainingLoadSummaryDTO(
-                items: [],
-                historyStatus: .missing,
-                semanticState: nil,
-                latestLoad: 0,
-                latestCapacity: 0
-            )
+            trendSnapshot = .empty(baseURL: environment.apiBaseURL)
             hasLoadedOnce = true
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
@@ -160,6 +158,51 @@ struct TrainingLoadScreen: View {
         selectedDay = nil
         dayWorkouts = []
     }
+
+    private var trendSummary: TrainingLoadSummaryDTO {
+        trendSnapshot.summary
+    }
+
+    private var shouldShowDiagnostics: Bool {
+        environment.runtimeEnvironment != .production
+    }
+
+    private var freshnessMessage: String? {
+        guard let latestPointDate = trendSnapshot.freshness.latestPointDate,
+              !calendar.isDateInToday(latestPointDate) else {
+            return nil
+        }
+
+        let formattedDate = Self.longDateFormatter.string(from: latestPointDate)
+        switch trendSnapshot.freshness.source {
+        case .remote:
+            return "Latest load data is through \(formattedDate)."
+        case .cache:
+            return "Showing cached load through \(formattedDate) while refresh is unavailable."
+        }
+    }
+
+    private func trailingCalendarWindowTotal(days: Int) -> Double {
+        guard days > 0 else { return 0 }
+
+        let today = calendar.startOfDay(for: Date())
+        let windowStart = calendar.date(byAdding: .day, value: -(days - 1), to: today) ?? today
+
+        return sortedPoints.reduce(0) { partial, item in
+            let itemDay = calendar.startOfDay(for: item.date)
+            guard itemDay >= windowStart && itemDay <= today else {
+                return partial
+            }
+            return partial + item.load
+        }
+    }
+
+    private static let longDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }()
 }
 
 private struct SelectedTrainingLoadDay: Identifiable, Equatable {
@@ -182,5 +225,79 @@ private extension TrainingLoadSportFilter {
         case .walk:
             return .walk
         }
+    }
+}
+
+private struct TrendFreshnessCard: View {
+    let message: String
+    let source: TrainingLoadDataSource
+
+    var body: some View {
+        DSCard(style: .muted) {
+            HStack(alignment: .top, spacing: AppSpacing.x8) {
+                Image(systemName: source == .cache ? "clock.badge.exclamationmark" : "clock.arrow.circlepath")
+                    .foregroundStyle(AppColors.Accent.orange)
+                Text(message)
+                    .appTextStyle(AppTypography.bodySmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+            }
+        }
+    }
+}
+
+private struct TrendDiagnosticsRow: View {
+    let freshness: TrainingLoadFreshness
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.x4) {
+            Text(
+                "Source \(freshness.source.rawValue.uppercased()) | Base \(freshness.baseURL.absoluteString)"
+            )
+            Text(
+                "Latest point \(Self.debugDateString(freshness.latestPointDate)) | Cache updated \(Self.debugDateString(freshness.cacheUpdatedAt))"
+            )
+            if let remoteFailureDescription = freshness.remoteFailureDescription {
+                Text("Remote refresh failed: \(remoteFailureDescription)")
+            } else {
+                Text("Remote refresh succeeded")
+            }
+        }
+        .appTextStyle(AppTypography.labelSmall)
+        .foregroundStyle(AppColors.Text.secondary)
+    }
+
+    private static func debugDateString(_ date: Date?) -> String {
+        guard let date else { return "nil" }
+        return formatter.string(from: date)
+    }
+
+    private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter
+    }()
+}
+
+private extension TrainingLoadFetchResult {
+    static func empty(baseURL: URL) -> TrainingLoadFetchResult {
+        TrainingLoadFetchResult(
+            summary: TrainingLoadSummaryDTO(
+                items: [],
+                historyStatus: .missing,
+                semanticState: nil,
+                latestLoad: 0,
+                latestCapacity: 0
+            ),
+            freshness: TrainingLoadFreshness(
+                source: .cache,
+                baseURL: baseURL,
+                remoteAttempted: false,
+                remoteFailureDescription: nil,
+                fetchedAt: Date(),
+                latestPointDate: nil,
+                cacheUpdatedAt: nil
+            )
+        )
     }
 }

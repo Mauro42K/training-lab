@@ -17,6 +17,10 @@ final class SyncStateStore {
     func loadOrCreate() throws -> CachedSyncState {
         let descriptor = FetchDescriptor<CachedSyncState>()
         if let existing = try modelContext.fetch(descriptor).first {
+            if existing.hasCompletedRealHealthKitIngest == nil {
+                existing.hasCompletedRealHealthKitIngest = false
+                try modelContext.save()
+            }
             return existing
         }
 
@@ -60,7 +64,7 @@ final class SyncStateStore {
         state.hasCompletedRealHealthKitIngest = true
         try modelContext.save()
         #if DEBUG
-        logger.log("markRealHealthKitIngestCompleted hasCompletedRealHealthKitIngest=\(state.hasCompletedRealHealthKitIngest)")
+        logger.log("markRealHealthKitIngestCompleted hasCompletedRealHealthKitIngest=\(state.hasCompletedRealHealthKitIngest ?? false)")
         #endif
     }
 

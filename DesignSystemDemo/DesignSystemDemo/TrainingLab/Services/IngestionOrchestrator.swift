@@ -48,7 +48,7 @@ final class IngestionOrchestrator {
             }
 
             let syncState = try syncStateStore.loadOrCreate()
-            let isIncremental = syncState.hasCompletedRealHealthKitIngest
+            let isIncremental = syncState.hasCompletedRealHealthKitIngest ?? false
             let effectiveSince: Date? = isIncremental ? syncState.lastSuccessfulIngestAt : nil
             #if DEBUG
             logger.log("sync_mode=\(isIncremental ? "incremental" : "bootstrap", privacy: .public) effective_since=\(self.debugDateString(effectiveSince), privacy: .public)")

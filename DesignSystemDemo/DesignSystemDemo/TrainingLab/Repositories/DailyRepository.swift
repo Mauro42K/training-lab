@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import SwiftData
 
 @MainActor
@@ -75,6 +76,11 @@ final class DailyRepository {
 
 @MainActor
 final class TrainingLoadRepository {
+    #if DEBUG
+    private let logger = Logger(subsystem: "com.traininglab.designsystemdemo", category: "trainingload")
+    private let isoFormatter = ISO8601DateFormatter()
+    #endif
+
     private struct LoadCapacitySemanticThresholds {
         let belowCapacityUpperBound = 0.85
         let withinRangeUpperBound = 1.0
@@ -85,6 +91,11 @@ final class TrainingLoadRepository {
         let items: [TrainingLoadItemDTO]
         let latestCapacity: Double
         let latestFatigue: Double
+    }
+
+    private struct CachedTrainingLoadFetch {
+        let summary: TrainingLoadSummaryDTO
+        let latestCacheUpdatedAt: Date?
     }
 
     private static let fitnessWindowDays = 42
@@ -104,18 +115,45 @@ final class TrainingLoadRepository {
         self.cacheScope = cacheScope
     }
 
-    func getTrainingLoad(days: Int = 28, sport: TrainingLoadSportFilter) async throws -> TrainingLoadSummaryDTO {
+    func getTrainingLoad(days: Int = 28, sport: TrainingLoadSportFilter) async throws -> TrainingLoadFetchResult {
+        let requestStartedAt = Date()
+        #if DEBUG
+        debugEmit("fetch start baseURL=\(baseURLForDebug.absoluteString) sport=\(sport.rawValue) days=\(days)")
+        #endif
+
         do {
             let remote = try await apiClient.fetchTrainingLoad(days: days, sport: sport)
             do {
-                try replaceCache(for: sport, with: remote)
+                try replaceCache(for: sport, with: remote, cachedAt: requestStartedAt)
             } catch {
                 throw RepositoryError.cacheWriteFailed(underlying: error)
             }
-            return remote
+            let result = TrainingLoadFetchResult(
+                summary: remote,
+                freshness: TrainingLoadFreshness(
+                    source: .remote,
+                    baseURL: baseURLForDebug,
+                    remoteAttempted: true,
+                    remoteFailureDescription: nil,
+                    fetchedAt: requestStartedAt,
+                    latestPointDate: remote.items.last?.date,
+                    cacheUpdatedAt: requestStartedAt
+                )
+            )
+            #if DEBUG
+            debugEmit(
+                "fetch success source=remote baseURL=\(baseURLForDebug.absoluteString) latest_point=\(debugDateString(result.freshness.latestPointDate)) fetched_at=\(debugDateString(requestStartedAt))"
+            )
+            #endif
+            return result
         } catch {
+            #if DEBUG
+            debugEmit(
+                "fetch failure source=remote baseURL=\(baseURLForDebug.absoluteString) sport=\(sport.rawValue) error=\(error.localizedDescription)"
+            )
+            #endif
             let cached = try fetchCached(days: days, sport: sport)
-            if cached.items.isEmpty {
+            if cached.summary.items.isEmpty {
                 #if DEBUG
                 throw RepositoryError.networkAndNoCache(
                     underlying: TrainingLoadNetworkContextError(
@@ -128,11 +166,28 @@ final class TrainingLoadRepository {
                 throw RepositoryError.networkAndNoCache(underlying: error)
                 #endif
             }
-            return cached
+            let result = TrainingLoadFetchResult(
+                summary: cached.summary,
+                freshness: TrainingLoadFreshness(
+                    source: .cache,
+                    baseURL: baseURLForDebug,
+                    remoteAttempted: true,
+                    remoteFailureDescription: error.localizedDescription,
+                    fetchedAt: requestStartedAt,
+                    latestPointDate: cached.summary.items.last?.date,
+                    cacheUpdatedAt: cached.latestCacheUpdatedAt
+                )
+            )
+            #if DEBUG
+            debugEmit(
+                "fetch fallback source=cache baseURL=\(baseURLForDebug.absoluteString) latest_point=\(debugDateString(result.freshness.latestPointDate)) cache_updated_at=\(debugDateString(result.freshness.cacheUpdatedAt))"
+            )
+            #endif
+            return result
         }
     }
 
-    private func replaceCache(for sport: TrainingLoadSportFilter, with summary: TrainingLoadSummaryDTO) throws {
+    private func replaceCache(for sport: TrainingLoadSportFilter, with summary: TrainingLoadSummaryDTO, cachedAt: Date) throws {
         let scopedSportKey = scopedSportKey(for: sport)
         let predicate = #Predicate<CachedTrainingLoadPoint> { item in
             item.sportFilterRaw == scopedSportKey
@@ -154,7 +209,7 @@ final class TrainingLoadRepository {
                     semanticStateRaw: summary.semanticState?.rawValue,
                     latestLoad: summary.latestLoad,
                     latestCapacity: summary.latestCapacity,
-                    updatedAt: Date()
+                    updatedAt: cachedAt
                 )
             )
         }
@@ -162,7 +217,7 @@ final class TrainingLoadRepository {
         try modelContext.save()
     }
 
-    private func fetchCached(days: Int, sport: TrainingLoadSportFilter) throws -> TrainingLoadSummaryDTO {
+    private func fetchCached(days: Int, sport: TrainingLoadSportFilter) throws -> CachedTrainingLoadFetch {
         let scopedSportKey = scopedSportKey(for: sport)
         let predicate = #Predicate<CachedTrainingLoadPoint> { item in
             item.sportFilterRaw == scopedSportKey
@@ -174,12 +229,15 @@ final class TrainingLoadRepository {
         let cached = try modelContext.fetch(descriptor)
         let sliced = cached.suffix(max(days, 1))
         guard let metadataSource = sliced.first ?? cached.first else {
-            return TrainingLoadSummaryDTO(
-                items: [],
-                historyStatus: .missing,
-                semanticState: nil,
-                latestLoad: 0,
-                latestCapacity: 0
+            return CachedTrainingLoadFetch(
+                summary: TrainingLoadSummaryDTO(
+                    items: [],
+                    historyStatus: .missing,
+                    semanticState: nil,
+                    latestLoad: 0,
+                    latestCapacity: 0
+                ),
+                latestCacheUpdatedAt: nil
             )
         }
 
@@ -188,17 +246,20 @@ final class TrainingLoadRepository {
         let latestLoad = metadataSource.latestLoad ?? sliced.last?.trimp ?? 0
         let latestCapacity = metadataSource.latestCapacity ?? reconstructedSeries.latestCapacity
 
-        return TrainingLoadSummaryDTO(
-            items: reconstructedSeries.items,
-            historyStatus: historyStatus,
-            semanticState: resolvedSemanticState(
-                metadataSource: metadataSource,
+        return CachedTrainingLoadFetch(
+            summary: TrainingLoadSummaryDTO(
+                items: reconstructedSeries.items,
                 historyStatus: historyStatus,
-                latestFatigue: reconstructedSeries.latestFatigue,
+                semanticState: resolvedSemanticState(
+                    metadataSource: metadataSource,
+                    historyStatus: historyStatus,
+                    latestFatigue: reconstructedSeries.latestFatigue,
+                    latestCapacity: latestCapacity
+                ),
+                latestLoad: latestLoad,
                 latestCapacity: latestCapacity
             ),
-            latestLoad: latestLoad,
-            latestCapacity: latestCapacity
+            latestCacheUpdatedAt: cached.map(\.updatedAt).max()
         )
     }
 
@@ -328,6 +389,18 @@ final class TrainingLoadRepository {
     private func scopedSportKey(for sport: TrainingLoadSportFilter) -> String {
         "\(cacheScope)|\(sport.rawValue)"
     }
+
+    #if DEBUG
+    private func debugEmit(_ message: String) {
+        logger.log("\(message, privacy: .public)")
+        print("[TrainingLoadRepository] \(message)")
+    }
+
+    private func debugDateString(_ date: Date?) -> String {
+        guard let date else { return "nil" }
+        return isoFormatter.string(from: date)
+    }
+    #endif
 }
 
 private struct TrainingLoadNetworkContextError: LocalizedError {
@@ -338,4 +411,24 @@ private struct TrainingLoadNetworkContextError: LocalizedError {
     var errorDescription: String? {
         "\(underlying.localizedDescription) [baseURL=\(baseURL.absoluteString) sport=\(sport.rawValue)]"
     }
+}
+
+enum TrainingLoadDataSource: String, Equatable, Sendable {
+    case remote
+    case cache
+}
+
+struct TrainingLoadFreshness: Equatable, Sendable {
+    let source: TrainingLoadDataSource
+    let baseURL: URL
+    let remoteAttempted: Bool
+    let remoteFailureDescription: String?
+    let fetchedAt: Date
+    let latestPointDate: Date?
+    let cacheUpdatedAt: Date?
+}
+
+struct TrainingLoadFetchResult: Equatable, Sendable {
+    let summary: TrainingLoadSummaryDTO
+    let freshness: TrainingLoadFreshness
 }

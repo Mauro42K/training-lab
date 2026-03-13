@@ -350,6 +350,12 @@ private struct HoverTooltip: View {
 private struct TrainingLoadAxisLabels: View {
     let points: [TrainingLoadChartPoint]
 
+    private struct AxisLabel: Identifiable {
+        let id: Int
+        let text: String
+        let isToday: Bool
+    }
+
     var body: some View {
         Group {
             if points.count <= 7 {
@@ -364,24 +370,21 @@ private struct TrainingLoadAxisLabels: View {
                     }
                 }
             } else if points.count >= 28 {
-                HStack(spacing: AppSpacing.x8) {
-                    ForEach(anchorLabels, id: \.self) { label in
-                        if label == "Today" {
-                            Text(label)
-                                .appTextStyle(AppTypography.labelSmall)
-                                .foregroundStyle(AppColors.Accent.blue.opacity(0.98))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.9)
-                        } else {
-                            Text(label)
-                                .appTextStyle(AppTypography.labelSmall)
-                                .foregroundStyle(AppColors.Text.secondary.opacity(0.92))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.9)
+                GeometryReader { proxy in
+                    let width = proxy.size.width
+                    let height = proxy.size.height
+
+                    ZStack(alignment: .topLeading) {
+                        ForEach(anchorLabels) { label in
+                            axisLabel(label)
+                                .position(
+                                    x: clampedAxisXPosition(for: label, width: width),
+                                    y: height / 2
+                                )
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .frame(height: AppSpacing.x16)
             } else {
                 HStack(alignment: .center, spacing: AppSpacing.x4) {
                     ForEach(Array(points.indices), id: \.self) { index in
@@ -402,8 +405,41 @@ private struct TrainingLoadAxisLabels: View {
         }
     }
 
-    private var anchorLabels: [String] {
-        ["28d", "21d", "14d", "7d", "Today"]
+    private var anchorLabels: [AxisLabel] {
+        guard hasTodayPoint else {
+            let lastIndex = points.count - 1
+            let anchorIndexes = [0, 7, 14, 21, lastIndex]
+                .map { min($0, lastIndex) }
+            return anchorIndexes.enumerated().map { offset, index in
+                AxisLabel(
+                    id: offset,
+                    text: shortDateString(for: points[index].date),
+                    isToday: points[index].isToday
+                )
+            }
+        }
+
+        return [
+            AxisLabel(id: 0, text: "28d", isToday: false),
+            AxisLabel(id: 1, text: "21d", isToday: false),
+            AxisLabel(id: 2, text: "14d", isToday: false),
+            AxisLabel(id: 3, text: "7d", isToday: false),
+            AxisLabel(id: 4, text: "Today", isToday: true),
+        ]
+    }
+
+    @ViewBuilder
+    private func axisLabel(_ label: AxisLabel) -> some View {
+        Text(label.text)
+            .appTextStyle(AppTypography.labelSmall)
+            .foregroundStyle(
+                label.isToday
+                    ? AppColors.Accent.blue.opacity(0.98)
+                    : AppColors.Text.secondary.opacity(0.92)
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.85)
+            .fixedSize(horizontal: true, vertical: false)
     }
 
     private var labelsByIndex: [Int: String] {
@@ -418,8 +454,56 @@ private struct TrainingLoadAxisLabels: View {
                 labels[index] = Self.dayFormatter.string(from: points[index].date)
             }
         }
-        labels[points.count - 1] = "Today"
+        labels[points.count - 1] = points[points.count - 1].isToday
+            ? "Today"
+            : shortDateString(for: points[points.count - 1].date)
         return labels
+    }
+
+    private var hasTodayPoint: Bool {
+        points.contains(where: \.isToday)
+    }
+
+    private func shortDateString(for date: Date) -> String {
+        Self.shortDateFormatter.string(from: date)
+    }
+
+    private func clampedAxisXPosition(for label: AxisLabel, width: CGFloat) -> CGFloat {
+        guard !points.isEmpty else {
+            return width / 2
+        }
+
+        let rawX = columnCenterX(for: label.id == 4 && hasTodayPoint ? points.count - 1 : axisIndex(for: label), count: points.count, width: width)
+        let halfLabelWidth = estimatedHalfLabelWidth(for: label.text)
+        return min(max(rawX, halfLabelWidth), max(halfLabelWidth, width - halfLabelWidth))
+    }
+
+    private func axisIndex(for label: AxisLabel) -> Int {
+        switch label.id {
+        case 0:
+            return 0
+        case 1:
+            return min(7, points.count - 1)
+        case 2:
+            return min(14, points.count - 1)
+        case 3:
+            return min(21, points.count - 1)
+        default:
+            return points.count - 1
+        }
+    }
+
+    private func columnCenterX(for index: Int, count: Int, width: CGFloat) -> CGFloat {
+        guard count > 0 else {
+            return width / 2
+        }
+        let columnWidth = width / CGFloat(count)
+        return (CGFloat(index) + 0.5) * columnWidth
+    }
+
+    private func estimatedHalfLabelWidth(for text: String) -> CGFloat {
+        let perCharacterWidth: CGFloat = 4.4
+        return max(12, CGFloat(text.count) * perCharacterWidth)
     }
 
     private static let weekdayFormatter: DateFormatter = {
@@ -433,6 +517,13 @@ private struct TrainingLoadAxisLabels: View {
         let formatter = DateFormatter()
         formatter.locale = Locale.current
         formatter.dateFormat = "d"
+        return formatter
+    }()
+
+    private static let shortDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateFormat = "MMM d"
         return formatter
     }()
 }

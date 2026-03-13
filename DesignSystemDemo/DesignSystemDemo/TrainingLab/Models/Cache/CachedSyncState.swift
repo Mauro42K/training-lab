@@ -9,7 +9,7 @@ final class CachedSyncState {
     var lastError: String?
     var healthAuthStatusRaw: String
     var syncStatusRaw: String
-    var hasCompletedRealHealthKitIngest: Bool
+    var hasCompletedRealHealthKitIngest: Bool?
 
     init(
         lastSuccessfulIngestAt: Date? = nil,
@@ -18,7 +18,7 @@ final class CachedSyncState {
         lastError: String? = nil,
         healthAuthStatusRaw: String = "unknown",
         syncStatusRaw: String = "idle",
-        hasCompletedRealHealthKitIngest: Bool = false
+        hasCompletedRealHealthKitIngest: Bool? = false
     ) {
         self.lastSuccessfulIngestAt = lastSuccessfulIngestAt
         self.lastIngestAttemptAt = lastIngestAttemptAt

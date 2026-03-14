@@ -8,6 +8,7 @@ from api.repositories.daily_recovery_repository import get_daily_recovery_by_dat
 from api.repositories.daily_sleep_repository import get_daily_sleep_summary_by_date
 from api.repositories.user_repository import get_or_create_default_user
 from api.schemas.daily_domains import (
+    CoreMetricsSummaryItem,
     BodyMeasurementsDomainItem,
     DailyActivityDomainItem,
     DailyRecoveryDomainItem,
@@ -16,6 +17,7 @@ from api.schemas.daily_domains import (
 )
 from api.services.body_measurements_canonicalizer import BodyMeasurementsCanonicalizer
 from api.services.readiness_service import ReadinessService
+from api.services.training_load_service import TrainingLoadService
 
 
 class HomeSummaryService:
@@ -51,6 +53,11 @@ class HomeSummaryService:
             user_id=user.id,
             target_date=target_date,
             current_recovery_row=recovery_row,
+        )
+        load_snapshot = TrainingLoadService(self.db).get_training_load_snapshot(
+            days=7,
+            sport="all",
+            today_local=target_date,
         )
 
         return HomeSummaryResponse(
@@ -121,4 +128,10 @@ class HomeSummaryService:
                 else None
             ),
             readiness=readiness,
+            core_metrics=CoreMetricsSummaryItem(
+                seven_day_load=sum(item.load for item in load_snapshot.items),
+                fitness=load_snapshot.latest_capacity,
+                fatigue=load_snapshot.latest_fatigue,
+                history_status=load_snapshot.history_status,
+            ),
         )

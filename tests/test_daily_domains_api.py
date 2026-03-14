@@ -11,6 +11,7 @@ from api.db.session import get_db
 from api.dependencies.auth import require_api_key
 from api.main import app
 from api.schemas.daily_domains import (
+    CoreMetricsSummaryItem,
     DailyActivityDomainItem,
     DailyActivityDomainResponse,
     HomeSummaryResponse,
@@ -91,6 +92,12 @@ class DailyDomainsApiTests(unittest.TestCase):
                     )
                 ],
             ),
+            core_metrics=CoreMetricsSummaryItem(
+                seven_day_load=182.0,
+                fitness=36.4,
+                fatigue=41.2,
+                history_status="partial",
+            ),
         )
         with patch(
             "api.routers.v1.daily_domains.HomeSummaryService.get_summary",
@@ -104,6 +111,8 @@ class DailyDomainsApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.json()["sleep"])
         self.assertEqual(response.json()["readiness"]["label"], "Moderate")
+        self.assertEqual(response.json()["core_metrics"]["seven_day_load"], 182.0)
+        self.assertEqual(response.json()["core_metrics"]["history_status"], "partial")
         service_mock.assert_called_once()
 
 

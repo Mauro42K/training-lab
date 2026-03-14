@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.2.1 — Readiness data enablement** (**In progress**)
+- **Phase 5.3 — Core Metrics** (**Implemented / pending final closure check**)
 
 ### Phase 5.2 / 5.2.1 Current Summary
 - `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
@@ -55,12 +55,8 @@
   - iOS device build passed
   - iOS simulator build passed
   - simulator launch passed on `Codex iPhone 17`
-  - screenshot artifact captured at `docs/qa/phase5_2_readiness_hero_simulator.png`
-- Production DB audit then confirmed the current blocker is not the readiness model:
-  - the active production user has no physiological data in `recovery_signals`, `sleep_sessions`, `daily_sleep_summary`, `daily_recovery`, or `daily_activity`
-  - production `Readiness unavailable` is therefore correct today
-  - workouts/load data exists, but readiness inputs do not
-- `Phase 5.2` stays functionally open until real physiological data is available in production to validate the hero against non-empty states.
+  - visual validation of the hero completed before release closure
+- Initial production DB audit confirmed the first blocker was not the readiness model but missing physiological ingest.
 - `Phase 5.2.1` is the active subphase to enable real Apple Health ingest for:
   - sleep
   - HRV SDNN
@@ -73,6 +69,38 @@
 - Enabling ingest does not guarantee `complete` readiness immediately:
   - the first real output may be `partial` or `insufficient`
   - baselines consolidate progressively as real history accumulates
+- Subsequent real-device validation and production DB/API audit confirmed `Phase 5.2.1` succeeded:
+  - production now has real rows in `sleep_sessions`, `recovery_signals`, `daily_sleep_summary`, and `daily_recovery`
+  - `daily_activity` can still be empty without blocking Readiness v1
+  - production deploy parity for the backend was resolved after promoting the readiness/home-summary changes
+  - `/v1/home/summary` now returns real `readiness`, not `null`
+  - `/v1/training-load` now returns the current shape with `history_status`, `semantic_state`, `latest_load`, and `latest_capacity`
+- Readiness has now been validated against real production data:
+  - the active production user reached `complete` readiness input coverage on recent days
+  - a real observed day returned `score=35`, `label=Recover`, `confidence=0.93`
+  - that low score was coherent with poor sleep and very low HRV against baseline, while RHR was supportive and recent load context applied no penalty
+- `Phase 5.2` and `Phase 5.2.1` are therefore complete enough to be treated as closed inputs for `Phase 5.3 — Core Metrics`.
+
+### Phase 5.3 Current Summary
+- `GET /v1/home/summary` now extends the Home contract with `core_metrics`.
+- `core_metrics` exposes:
+  - `seven_day_load`
+  - `fitness`
+  - `fatigue`
+  - `history_status`
+- The block reuses the existing `training-load` domain:
+  - `seven_day_load` = trailing 7-day load sum
+  - `fitness` = Home UI naming for internal `Capacity / CTL`
+  - `fatigue` = existing `ATL` from the load model
+  - `history_status` = same sufficiency state already used by `training-load`
+- No load formulas were duplicated in client.
+- iOS now renders a separate compact `Core Metrics` block between:
+  - the `Readiness` hero
+  - the `Load Trend` section
+- Guardrails preserved:
+  - Core Metrics remains separate from Readiness
+  - Core Metrics remains separate from the Trend Card
+  - no Coach or Recommended Today semantics were introduced
 
 ### Phase 5.1.3 Closure Summary
 - macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.

@@ -28,6 +28,8 @@ struct TrainingLoadScreen: View {
                         errorMessage: readinessErrorMessage
                     )
 
+                    CoreMetricsSection(coreMetrics: homeSummary?.coreMetrics)
+
                     DSSectionHeader(title: "Load Trend", actionLabel: {
                         Text("Last 28 days")
                             .appTextStyle(AppTypography.labelSmall)
@@ -291,6 +293,170 @@ private struct ReadinessHeroSection: View {
         formatter.dateFormat = "EEEE, MMM d"
         return formatter
     }()
+}
+
+private struct CoreMetricsSection: View {
+    let coreMetrics: CoreMetricsSummaryDTO?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.x8) {
+            Text("Core Metrics")
+                .appTextStyle(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+
+            CoreMetricsCard(coreMetrics: coreMetrics)
+        }
+    }
+}
+
+private struct CoreMetricsCard: View {
+    let coreMetrics: CoreMetricsSummaryDTO?
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .fill(AppColors.Surface.card)
+
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppColors.Accent.blue.opacity(0.10),
+                            AppColors.Accent.blue.opacity(0.02),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                HStack(alignment: .top, spacing: AppSpacing.x12) {
+                    Text("Current load context")
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+
+                    Spacer()
+
+                    if shouldShowStatusPill {
+                        statusPill
+                    }
+                }
+
+                HStack(spacing: AppSpacing.x12) {
+                    CoreMetricValueView(
+                        title: "7-Day Load",
+                        valueText: valueText(for: coreMetrics?.sevenDayLoad),
+                        isMuted: shouldDeEmphasizeValues
+                    )
+                    divider
+                    CoreMetricValueView(
+                        title: "Fitness",
+                        valueText: valueText(for: coreMetrics?.fitness),
+                        isMuted: shouldDeEmphasizeValues
+                    )
+                    divider
+                    CoreMetricValueView(
+                        title: "Fatigue",
+                        valueText: valueText(for: coreMetrics?.fatigue),
+                        isMuted: shouldDeEmphasizeValues
+                    )
+                }
+
+                if let historyCopy {
+                    Text(historyCopy)
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+        }
+        .padding(AppSpacing.x16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColors.Surface.card)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+        )
+        .appShadow(AppShadows.modal)
+    }
+
+    private var divider: some View {
+        Rectangle()
+            .fill(AppColors.Stroke.subtle)
+            .frame(width: 1, height: 56)
+    }
+
+    private var shouldDeEmphasizeValues: Bool {
+        guard let coreMetrics else { return true }
+        return coreMetrics.historyStatus == .insufficientHistory || coreMetrics.historyStatus == .missing
+    }
+
+    private var historyCopy: String? {
+        guard let coreMetrics else {
+            return "Load history is unavailable for this block yet."
+        }
+
+        switch coreMetrics.historyStatus {
+        case .available:
+            return nil
+        case .partial:
+            return "History consolidating."
+        case .insufficientHistory:
+            return "Limited history so these metrics are still settling."
+        case .missing:
+            return "Core metrics are waiting for the server snapshot."
+        }
+    }
+
+    private var shouldShowStatusPill: Bool {
+        guard let coreMetrics else { return true }
+        return coreMetrics.historyStatus != .available
+    }
+
+    @ViewBuilder
+    private var statusPill: some View {
+        if let coreMetrics {
+            switch coreMetrics.historyStatus {
+            case .available:
+                EmptyView()
+            case .partial:
+                DSMetricPill("Partial history", iconSystemName: "chart.line.uptrend.xyaxis", variant: .info)
+            case .insufficientHistory:
+                DSMetricPill("History building", iconSystemName: "clock.arrow.circlepath", variant: .warning)
+            case .missing:
+                DSMetricPill("Unavailable", iconSystemName: "clock", variant: .warning)
+            }
+        } else {
+            DSMetricPill("Unavailable", iconSystemName: "clock", variant: .warning)
+        }
+    }
+
+    private func valueText(for value: Double?) -> String {
+        guard let value, coreMetrics?.historyStatus != .missing else {
+            return "--"
+        }
+        return String(Int(value.rounded()))
+    }
+}
+
+private struct CoreMetricValueView: View {
+    let title: String
+    let valueText: String
+    let isMuted: Bool
+
+    var body: some View {
+        VStack(alignment: .center, spacing: AppSpacing.x4) {
+            Text(title)
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(AppColors.Text.secondary)
+
+            Text(valueText)
+                .appTextStyle(AppTypography.headingH1)
+                .foregroundStyle(AppColors.Text.primary.opacity(isMuted ? 0.72 : 1))
+                .monospacedDigit()
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
 }
 
 private struct ReadinessHeroView: View {

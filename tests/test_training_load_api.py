@@ -217,6 +217,40 @@ class TrainingLoadServiceTests(unittest.TestCase):
         self.assertEqual(round(response.latest_capacity, 4), capacities[-1])
         self.assertNotEqual(capacities[-1], capacities[0])
 
+    def test_training_load_snapshot_exposes_latest_fatigue_for_home_metrics(self) -> None:
+        today = dt.date(2026, 3, 5)
+        first_useful_date = today - dt.timedelta(days=41)
+        rows = [
+            (today - dt.timedelta(days=6), 10.0),
+            (today - dt.timedelta(days=5), 20.0),
+            (today - dt.timedelta(days=4), 30.0),
+            (today - dt.timedelta(days=3), 40.0),
+            (today - dt.timedelta(days=2), 50.0),
+            (today - dt.timedelta(days=1), 60.0),
+            (today, 70.0),
+        ]
+
+        with (
+            patch("api.services.training_load_service.get_or_create_default_user", return_value=self.user),
+            patch(
+                "api.services.training_load_service.get_first_daily_load_date",
+                return_value=first_useful_date,
+            ),
+            patch("api.services.training_load_service.get_daily_load_rows", return_value=rows),
+        ):
+            snapshot = self.service.get_training_load_snapshot(
+                days=7,
+                sport="all",
+                today_local=today,
+            )
+
+        self.assertEqual(snapshot.history_status, "available")
+        self.assertEqual(len(snapshot.items), 7)
+        self.assertEqual(sum(item.load for item in snapshot.items), 280.0)
+        self.assertGreater(snapshot.latest_capacity, 0.0)
+        self.assertGreater(snapshot.latest_fatigue, 0.0)
+        self.assertGreater(snapshot.latest_fatigue, snapshot.latest_capacity)
+
 
 class TrainingLoadApiTests(unittest.TestCase):
     def setUp(self) -> None:

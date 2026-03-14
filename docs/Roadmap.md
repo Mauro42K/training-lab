@@ -697,6 +697,26 @@ Closure decisions carried into this phase:
 - First real readiness output is observable, even if initially `partial` or `insufficient`.
 
 ### Phase 5.3 — Core Metrics
+**Status:** IMPLEMENTED / PENDING FINAL VISUAL QA
+
+**Closure summary**
+- `GET /v1/home/summary` now includes a dedicated `core_metrics` block for Home.
+- The block exposes only already-approved load-domain metrics:
+  - `seven_day_load`
+  - `fitness`
+  - `fatigue`
+  - `history_status`
+- Backend reuses the existing `training-load` model instead of duplicating formulas:
+  - `seven_day_load` = trailing 7-day load sum
+  - `fitness` = Home naming for internal `Capacity / CTL`
+  - `fatigue` = existing `ATL`
+  - `history_status` = the same trust/sufficiency state already used by `training-load`
+- iOS now renders Core Metrics as a separate compact block between the Readiness Hero and the Trend Card in the temporary Home host.
+- Guardrails remained intact:
+  - no readiness semantics inside Core Metrics
+  - no Trend Card semantic changes
+  - no Coach / Recommended Today coupling
+
 **Goal:** Add the compact Home metrics block that contextualizes current training state.
 
 **Why this block exists**

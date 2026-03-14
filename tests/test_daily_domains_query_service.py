@@ -7,6 +7,8 @@ from unittest.mock import MagicMock, patch
 from api.services.daily_domains_query_service import DailyDomainsQueryService
 from api.services.home_summary_service import HomeSummaryService
 from api.schemas.daily_domains import ReadinessSummaryItem, ReadinessTraceInput
+from api.services.training_load_service import TrainingLoadSnapshot
+from api.schemas.training_load import TrainingLoadItem
 
 
 class DailyDomainsQueryServiceTests(unittest.TestCase):
@@ -133,6 +135,20 @@ class HomeSummaryServiceTests(unittest.TestCase):
                     ],
                 ),
             ),
+            patch(
+                "api.services.home_summary_service.TrainingLoadService.get_training_load_snapshot",
+                return_value=TrainingLoadSnapshot(
+                    items=[
+                        TrainingLoadItem(date=target_date - dt.timedelta(days=1), load=24.0, capacity=31.2, trimp=24.0),
+                        TrainingLoadItem(date=target_date, load=18.0, capacity=32.4, trimp=18.0),
+                    ],
+                    history_status="partial",
+                    semantic_state="near_limit",
+                    latest_load=18.0,
+                    latest_capacity=32.4,
+                    latest_fatigue=36.1,
+                ),
+            ),
         ):
             response = HomeSummaryService(self.db).get_summary(target_date=target_date)
 
@@ -143,6 +159,11 @@ class HomeSummaryServiceTests(unittest.TestCase):
         self.assertIsNone(response.body_measurements)
         self.assertIsNotNone(response.readiness)
         self.assertEqual(response.readiness.label, "Ready")
+        self.assertIsNotNone(response.core_metrics)
+        self.assertEqual(response.core_metrics.seven_day_load, 42.0)
+        self.assertEqual(response.core_metrics.fitness, 32.4)
+        self.assertEqual(response.core_metrics.fatigue, 36.1)
+        self.assertEqual(response.core_metrics.history_status, "partial")
 
 
 if __name__ == "__main__":

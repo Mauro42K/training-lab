@@ -30,6 +30,16 @@ class LoadCapacitySemanticThresholds:
 LOAD_CAPACITY_THRESHOLDS = LoadCapacitySemanticThresholds()
 
 
+@dataclass(frozen=True)
+class TrainingLoadSnapshot:
+    items: list[TrainingLoadItem]
+    history_status: TrainingLoadHistoryStatus
+    semantic_state: TrainingLoadSemanticState | None
+    latest_load: float
+    latest_capacity: float
+    latest_fatigue: float
+
+
 class TrainingLoadService:
     def __init__(self, db: Session, *, settings: Settings | None = None) -> None:
         self.db = db
@@ -42,6 +52,26 @@ class TrainingLoadService:
         sport: TrainingLoadSportFilter,
         today_local: dt.date | None = None,
     ) -> TrainingLoadResponse:
+        snapshot = self.get_training_load_snapshot(
+            days=days,
+            sport=sport,
+            today_local=today_local,
+        )
+        return TrainingLoadResponse(
+            items=snapshot.items,
+            history_status=snapshot.history_status,
+            semantic_state=snapshot.semantic_state,
+            latest_load=snapshot.latest_load,
+            latest_capacity=snapshot.latest_capacity,
+        )
+
+    def get_training_load_snapshot(
+        self,
+        *,
+        days: int,
+        sport: TrainingLoadSportFilter,
+        today_local: dt.date | None = None,
+    ) -> TrainingLoadSnapshot:
         user = get_or_create_default_user(self.db)
         if today_local is None:
             now_utc = dt.datetime.now(dt.UTC)
@@ -106,7 +136,7 @@ class TrainingLoadService:
         ]
         latest_day = series_by_date[today_local]
 
-        return TrainingLoadResponse(
+        return TrainingLoadSnapshot(
             items=items,
             history_status=history_status,
             semantic_state=self._resolve_semantic_state(
@@ -116,6 +146,7 @@ class TrainingLoadService:
             ),
             latest_load=latest_day["load"],
             latest_capacity=latest_day["capacity"],
+            latest_fatigue=latest_day["fatigue"],
         )
 
     def _resolve_history_status(

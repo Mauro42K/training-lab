@@ -85,7 +85,28 @@ struct ReadinessSummaryDTO: Codable, Equatable, Sendable {
     }
 }
 
+struct CoreMetricsSummaryDTO: Codable, Equatable, Sendable {
+    let sevenDayLoad: Double
+    let fitness: Double
+    let fatigue: Double
+    let historyStatus: TrainingLoadHistoryStatus
+
+    enum CodingKeys: String, CodingKey {
+        case sevenDayLoad = "seven_day_load"
+        case fitness
+        case fatigue
+        case historyStatus = "history_status"
+    }
+}
+
 struct HomeSummaryDTO: Codable, Equatable, Sendable {
     let date: Date
     let readiness: ReadinessSummaryDTO?
+    let coreMetrics: CoreMetricsSummaryDTO?
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case readiness
+        case coreMetrics = "core_metrics"
+    }
 }

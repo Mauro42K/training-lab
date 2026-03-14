@@ -3,6 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from api.schemas.training_load import TrainingLoadHistoryStatus
+
 CompletenessStatus = Literal["complete", "partial"]
 ReadinessCompletenessStatus = Literal["complete", "partial", "insufficient", "missing"]
 ReadinessLabel = Literal["Ready", "Moderate", "Recover"]
@@ -70,6 +72,13 @@ class ReadinessSummaryItem(BaseModel):
     trace_summary: list[ReadinessTraceInput]
 
 
+class CoreMetricsSummaryItem(BaseModel):
+    seven_day_load: float = Field(ge=0)
+    fitness: float = Field(ge=0)
+    fatigue: float = Field(ge=0)
+    history_status: TrainingLoadHistoryStatus
+
+
 class BodyMeasurementsDomainItem(BaseModel):
     date: dt.date
     weight_kg: float = Field(ge=0)
@@ -104,3 +113,4 @@ class HomeSummaryResponse(BaseModel):
     recovery: DailyRecoveryDomainItem | None = None
     body_measurements: BodyMeasurementsDomainItem | None = None
     readiness: ReadinessSummaryItem | None = None
+    core_metrics: CoreMetricsSummaryItem | None = None

@@ -228,6 +228,31 @@ Fallback local cache legacy (implementado en iOS Phase 5.1):
 - si filas antiguas de cache no traen `history_status`, derivarlo desde la cobertura real de la historia cacheada de `Load/TRIMP`
 - si filas antiguas de cache no traen `capacity`, reconstruir `Capacity` desde la misma historia real de `Load/TRIMP` usando la base `CTL = EMA 42d`
 - no usar `0` como sustituto visual de `Capacity` cuando la historia real sí soporta reconstrucción
+
+### 2.4 Home Core Metrics (Phase 5.3 / Load domain)
+**UI terms:** `7-Day Load`, `Fitness`, `Fatigue`  
+**Qué es:** Snapshot compacto de Home para contextualizar el estado actual del dominio de carga sin sustituir el Trend Card.
+
+**Estado**
+- Phase 5.3 expone este bloque dentro de `GET /v1/home/summary` como `core_metrics`.
+- No crea métricas nuevas; solo reutiliza métricas ya existentes del dominio `training-load`.
+
+**Contrato público (`GET /v1/home/summary`)**
+- `core_metrics.seven_day_load`
+- `core_metrics.fitness`
+- `core_metrics.fatigue`
+- `core_metrics.history_status`
+
+**Semántica**
+- `seven_day_load` = suma calendarizada de `Load_day` / TRIMP en los últimos `7` días para `sport=all`
+- `fitness` = nombre UI de Home para el valor interno `Capacity_day = Fitness_day = CTL`
+- `fatigue` = `Fatigue_day = ATL = EMA 7d de Load_day`
+- `history_status` = exactamente la misma clasificación del dominio `training-load`
+
+**Guardrails**
+- Este bloque pertenece al dominio de carga, no al dominio de readiness
+- No reemplaza ni reetiqueta el Trend Card `Load vs Capacity`
+- El cliente no recalcula estas métricas; Home las consume desde backend
 - si no existe historia real cacheada, el estado sigue siendo `missing`
 
 **Guardrails**

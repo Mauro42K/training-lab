@@ -5,7 +5,74 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.2 — Hero Readiness** (**Next**)
+- **Phase 5.2.1 — Readiness data enablement** (**In progress**)
+
+### Phase 5.2 / 5.2.1 Current Summary
+- `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
+- `daily_recovery` remains the canonical consolidated-input domain; it was not turned into a persisted final score.
+- The public readiness contract now exposes:
+  - `score`
+  - `label`
+  - `confidence`
+  - `completeness_status`
+  - `inputs_present`
+  - `inputs_missing`
+  - `model_version`
+  - `has_estimated_context`
+  - `trace_summary`
+- Readiness v1 uses the approved primary inputs and weights:
+  - Sleep `40%`
+  - HRV `35%`
+  - RHR `25%`
+- Baselines are resilient to sparse history:
+  - HRV `28d`
+  - RHR `28d`
+  - Sleep `7–14d`
+  - isolated missing days degrade `confidence`, not the whole model
+- recent exertion/load remains a bounded secondary context only:
+  - penalty-only
+  - capped
+  - excluded from readiness completeness math
+- iOS now fetches `/v1/home/summary` and hosts the Readiness Hero at the top of `TrainingLoadScreen` as the pragmatic temporary Home surface.
+- The hero was implemented against the approved Home Figma direction:
+  - dominant score
+  - centered premium label
+  - dark premium base surface
+  - atmospheric wash
+  - confidence visually secondary
+  - semantic theming keyed by `label`
+- Theme mapping is now stable in UI:
+  - `Ready` -> premium green
+  - `Moderate` -> premium amber
+  - `Recover` -> premium coral/red
+- Guardrails preserved:
+  - no load/capacity narrative inside the hero
+  - `Trend Card` remains `Load vs Capacity`
+  - `Recommended Today` was not absorbed
+  - no Coach semantics were introduced
+- Validation completed:
+  - backend unit/API tests passed locally
+  - iOS device build passed
+  - iOS simulator build passed
+  - simulator launch passed on `Codex iPhone 17`
+  - screenshot artifact captured at `docs/qa/phase5_2_readiness_hero_simulator.png`
+- Production DB audit then confirmed the current blocker is not the readiness model:
+  - the active production user has no physiological data in `recovery_signals`, `sleep_sessions`, `daily_sleep_summary`, `daily_recovery`, or `daily_activity`
+  - production `Readiness unavailable` is therefore correct today
+  - workouts/load data exists, but readiness inputs do not
+- `Phase 5.2` stays functionally open until real physiological data is available in production to validate the hero against non-empty states.
+- `Phase 5.2.1` is the active subphase to enable real Apple Health ingest for:
+  - sleep
+  - HRV SDNN
+  - resting HR
+- 5.2.1 scope is limited to real-data enablement:
+  - iPhone HealthKit permission flow for sleep/HRV/RHR
+  - client ingest to `/v1/ingest/sleep` and `/v1/ingest/recovery-signals`
+  - physiology-specific bootstrap/incremental sync state
+  - minimum sync observability for counts, latest dates, and bootstrap completion
+- Enabling ingest does not guarantee `complete` readiness immediately:
+  - the first real output may be `partial` or `insufficient`
+  - baselines consolidate progressively as real history accumulates
 
 ### Phase 5.1.3 Closure Summary
 - macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.

@@ -259,58 +259,136 @@ Fallback local cache legacy (implementado en iOS Phase 5.1):
 
 ## 4) Readiness / Recovery (transparente)
 
-Nota de alcance:
-- Las definiciones de score de esta sección siguen siendo referencia de producto futura.
-- Phase 4.5 no implementa todavía este score final.
-
 ### 4.1 Readiness (Score + drivers)
 **UI term:** Readiness  
 **Alias histórico/documental controlado:** Battery  
 **Qué es:** Preparación para entrenar hoy, explicada por drivers.
 
-**Drivers v1**
+**Estado**
+- Phase 5.2 implementa `Readiness v1` en `GET /v1/home/summary`.
+- `daily_recovery` se mantiene como dominio de inputs consolidados; no persiste el score final.
+- `model_version = 1`.
+
+**Drivers primarios v1**
 - Sleep
 - HRV
 - RHR
-- Exertion/Load (fatiga acumulada)
-- Movement (no-workout movement)
 
-**Inputs**
-- Sueño (duración/calidad) si existe
-- HRV (SDNN)
-- RHR
-- Exertion_7d (o Fatigue)
-- Steps + walking distance
+**Contexto secundario permitido v1**
+- recent exertion / load context
+- solo como ajuste pequeño y explícito
+- nunca redefine el dominio como `Load`
+- nunca mejora el score; solo puede aplicar una penalización acotada
 
-Nota Phase 4.5:
-- la capa `daily_recovery` no implementa todavía este score
-- condición mínima de emisión:
-  - `daily_sleep_summary` o HRV o RHR
+**Pesos aprobados v1**
+- Sleep = `40%`
+- HRV = `35%`
+- RHR = `25%`
+
+**Baselines aprobados v1**
+- HRV baseline = rolling `28d`
+- RHR baseline = rolling `28d`
+- Sleep baseline = referencia rolling `7–14d`
+
+Reglas operativas de baseline:
+- siempre excluir el día objetivo del baseline
+- usar observaciones válidas disponibles dentro de la ventana
+- no exigir ventanas completas
+- un día aislado faltante no destruye baseline ni colapsa el modelo
+
+Implementación v1:
+- Sleep usa `7d` si existen al menos `4` observaciones válidas en esa ventana
+- si no, expande a `14d`
+- HRV y RHR usan promedio válido de `28d`
+
+**Completeness tiers aprobados**
+- `complete` = sleep + HRV + RHR
+- `partial` = al menos 2 de 3
+- `insufficient` = solo 1
+- `missing` = 0
+
+**Contrato público mínimo (`GET /v1/home/summary`)**
+- `score`
+- `label`
+- `confidence`
+- `completeness_status`
+- `inputs_present`
+- `inputs_missing`
+- `model_version`
+- `has_estimated_context`
+- `trace_summary`
+
+Guardrail:
+- `inputs_present` / `inputs_missing` en Readiness v1 solo cubren:
+  - `sleep`
+  - `hrv`
+  - `rhr`
+- `recent_exertion` se reporta en `trace_summary` como contexto, no como driver primario de completitud
+
+**Cálculo (v1 implementado)**
+- Score `0–100`
+- cada driver primario se compara contra su baseline con una heurística lineal acotada
+- la paridad contra baseline usa un anchor conservador centralizado:
+  - `baseline parity score = 65`
+- si un input primario existe pero no tiene baseline suficiente:
+  - no se colapsa el score
+  - ese driver se degrada a contribución neutral alrededor del anchor
+  - baja `confidence`
+- agregación:
+  - promedio ponderado por pesos de los drivers presentes
+- `insufficient`:
+  - mantiene contrato estable
+  - el score se regresa parcialmente hacia el anchor para evitar sobrelectura con un solo input
+- ajuste secundario de carga reciente:
+  - penalty-only
+  - clamped a un máximo de `-5`
+  - no puede dominar el score
+
+**Labels aprobados para el hero**
+- `Ready`
+- `Moderate`
+- `Recover`
+
+Implementación v1:
+- los umbrales de label viven centralizados en backend
+- la UI debe themear por `label`, no por color continuo según score bruto
+
+**Confidence**
+- `confidence` se expone como valor `0.0–1.0`
+- depende de:
+  - completeness tier
+  - disponibilidad real de baselines por input presente
+  - uso de contexto estimado en la capa secundaria
+- un input faltante o una historia incompleta degradan `confidence`; no destruyen el contrato
+
+**Traceability mínima v1**
+- `trace_summary` expone, por input:
+  - nombre
+  - rol (`primary` / `context`)
+  - presencia
+  - si se pudo usar baseline
+  - efecto simplificado (`positive` / `neutral` / `negative` / `not_used`)
+
+**UI semantics v1**
 - `complete`:
-  - requiere sleep + HRV + RHR
+  - score normal
 - `partial`:
-  - row emitida con al menos uno de esos inputs, pero no todos
+  - score visible pero trust degradado
+- `insufficient`:
+  - hero degradado y label-first
 - `missing`:
-  - no se emite row derivada
+  - sin score real
 
-**Cálculo (v1 — estructura)**
-- Score 0–100 con combinación ponderada de drivers:
-  - Sleep 30%
-  - HRV 25%
-  - RHR 15%
-  - Fatigue/Exertion 20%
-  - Movement 10%
-- Cada driver aporta:
-  - valor actual
-  - baseline = rolling 28 días
-  - short-term = rolling 7 días (para comparar)
-  - delta y contribución al score
-
-**Nota v1 scoring:** Score 0–100 es combinación ponderada de subscores derivados del delta vs baseline; siempre mostrar drivers y completitud de datos.
-
-**Data completeness**
-- Mostrar `drivers_present / drivers_total`
-- Si faltan drivers críticos → degradar o “Datos insuficientes”
+**UI theming rule**
+- theming del hero sigue el `label` semántico, no el score crudo
+- mapeo v1:
+  - `Ready` -> premium green
+  - `Moderate` -> premium amber
+  - `Recover` -> premium coral/red
+- estable entre estados:
+  - dark premium base surface
+  - layout hierarchy
+  - typography structure
 
 ---
 

@@ -573,6 +573,53 @@ Closure decisions carried into this phase:
 - The next product phase remains **Phase 5.2 — Hero Readiness** with no roadmap ambiguity.
 
 ### Phase 5.2 — Hero Readiness
+**Status:** IMPLEMENTED / FUNCTIONALLY OPEN
+
+**Closure summary**
+- `Readiness v1` now ships from `GET /v1/home/summary` as a stable read-time contract on top of `daily_recovery`, `daily_sleep_summary`, and bounded load context.
+- The hero contract now exposes:
+  - `score`
+  - `label`
+  - `confidence`
+  - `completeness_status`
+  - `inputs_present`
+  - `inputs_missing`
+  - `model_version`
+  - `has_estimated_context`
+  - `trace_summary`
+- The model uses the approved primary inputs and weights:
+  - Sleep `40%`
+  - HRV `35%`
+  - RHR `25%`
+- Baselines were implemented with gap tolerance:
+  - HRV `28d`
+  - RHR `28d`
+  - Sleep `7–14d`
+  - an isolated missing day degrades confidence/completeness instead of collapsing the model
+- `recent exertion/load` remains a bounded secondary penalty-only modifier and does not redefine Readiness as Load.
+- iOS now renders the Readiness Hero at the top of the temporary `TrainingLoadScreen`, with Figma-aligned hierarchy and label-driven theming:
+  - `Ready` -> premium green
+  - `Moderate` -> premium amber
+  - `Recover` -> premium coral/red
+- Guardrails remained intact:
+  - `Trend Card` stays `Load vs Capacity`
+  - `Recommended Today` stays separate
+  - no Coach behaviors were introduced
+- Validation completed:
+  - backend unit/API tests passed locally
+  - iOS device build passed
+  - iOS simulator build passed
+  - simulator launch passed
+  - screenshot artifact captured for the hero host
+- Production functional validation remains open because the current production user has no physiological rows in:
+  - `recovery_signals`
+  - `sleep_sessions`
+  - `daily_sleep_summary`
+  - `daily_recovery`
+  - `daily_activity`
+- Current production `Readiness unavailable` is therefore correct.
+- The next subphase opens to enable real physiological ingest instead of weakening the model or inventing synthetic readiness.
+
 **Goal:** Deliver the final Home hero that answers "How am I today?" through `Readiness`.
 
 **Why this block exists**
@@ -597,11 +644,57 @@ Closure decisions carried into this phase:
 
 **Definition of Done**
 - Hero naming, semantics, and missing-data behavior are fully aligned.
+- Production receives enough real physiological data to validate the hero against non-empty `Readiness` states.
 
 **QA focus**
 - Missing HRV / RHR / sleep
 - Partial readiness inputs
 - State label clarity
+
+### Phase 5.2.1 — Readiness data enablement
+**Status:** IN PROGRESS
+
+**Goal:** Enable real Apple Health physiological ingest so production can populate `Readiness` inputs with real sleep, HRV, and RHR data.
+
+**Why this block exists**
+- The production hero is not blocked by scoring. It is blocked by missing physiological ingest.
+- `Readiness unavailable` is currently the correct output for the real production dataset.
+- Enabling real ingest does not guarantee `complete` readiness on day 1. Early real outputs may be `partial` or `insufficient` while baselines consolidate.
+
+**Scope**
+- Keep Apple Health / HealthKit as the real source of truth for:
+  - sleep
+  - HRV
+  - RHR
+- Reuse backend ingest/recompute already present:
+  - `POST /v1/ingest/sleep`
+  - `POST /v1/ingest/recovery-signals`
+  - `sleep_sessions -> daily_sleep_summary`
+  - `recovery_signals + daily_sleep_summary -> daily_recovery`
+- Enable iPhone-side HealthKit reads and transport for:
+  - `sleepAnalysis`
+  - `heartRateVariabilitySDNN`
+  - `restingHeartRate`
+- Add physiology-specific bootstrap/incremental sync state instead of reusing the workouts bootstrap flag.
+- Add minimum observability for physiology sync:
+  - bootstrap vs incremental mode
+  - counts sent
+  - latest sleep/recovery dates sent
+  - confirmation of physiology bootstrap completion
+
+**Non-goals**
+- No readiness scoring/model changes
+- No fake seed data
+- No Coach or Load domain changes
+- No provider abstraction or `open-wearables` adoption
+
+**Definition of Done**
+- The iPhone app requests HealthKit permission for sleep, HRV, and resting HR.
+- The client can send real sleep and recovery payloads with timezone IANA to production-capable ingest endpoints.
+- Physiology bootstrap can run independently of workout bootstrap.
+- Recent physiological raw rows begin appearing in the active backend environment.
+- Derived rows (`daily_sleep_summary`, `daily_recovery`) begin appearing from those raw inputs.
+- First real readiness output is observable, even if initially `partial` or `insufficient`.
 
 ### Phase 5.3 — Core Metrics
 **Goal:** Add the compact Home metrics block that contextualizes current training state.

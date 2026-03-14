@@ -4,6 +4,8 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 CompletenessStatus = Literal["complete", "partial"]
+ReadinessCompletenessStatus = Literal["complete", "partial", "insufficient", "missing"]
+ReadinessLabel = Literal["Ready", "Moderate", "Recover"]
 
 
 class DailySleepDomainItem(BaseModel):
@@ -48,6 +50,26 @@ class DailyRecoveryDomainItem(BaseModel):
     primary_device_name: str | None = None
 
 
+class ReadinessTraceInput(BaseModel):
+    name: str
+    role: Literal["primary", "context"]
+    present: bool
+    baseline_used: bool
+    effect: Literal["positive", "neutral", "negative", "not_used"]
+
+
+class ReadinessSummaryItem(BaseModel):
+    score: int | None = Field(default=None, ge=0, le=100)
+    label: ReadinessLabel | None = None
+    confidence: float = Field(ge=0, le=1)
+    completeness_status: ReadinessCompletenessStatus
+    inputs_present: list[str]
+    inputs_missing: list[str]
+    model_version: int = Field(ge=1)
+    has_estimated_context: bool
+    trace_summary: list[ReadinessTraceInput]
+
+
 class BodyMeasurementsDomainItem(BaseModel):
     date: dt.date
     weight_kg: float = Field(ge=0)
@@ -81,3 +103,4 @@ class HomeSummaryResponse(BaseModel):
     activity: DailyActivityDomainItem | None = None
     recovery: DailyRecoveryDomainItem | None = None
     body_measurements: BodyMeasurementsDomainItem | None = None
+    readiness: ReadinessSummaryItem | None = None

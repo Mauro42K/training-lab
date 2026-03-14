@@ -14,6 +14,8 @@ from api.schemas.daily_domains import (
     DailyActivityDomainItem,
     DailyActivityDomainResponse,
     HomeSummaryResponse,
+    ReadinessSummaryItem,
+    ReadinessTraceInput,
 )
 
 
@@ -70,6 +72,25 @@ class DailyDomainsApiTests(unittest.TestCase):
             activity=None,
             recovery=None,
             body_measurements=None,
+            readiness=ReadinessSummaryItem(
+                score=64,
+                label="Moderate",
+                confidence=0.68,
+                completeness_status="partial",
+                inputs_present=["sleep", "hrv"],
+                inputs_missing=["rhr"],
+                model_version=1,
+                has_estimated_context=False,
+                trace_summary=[
+                    ReadinessTraceInput(
+                        name="sleep",
+                        role="primary",
+                        present=True,
+                        baseline_used=True,
+                        effect="neutral",
+                    )
+                ],
+            ),
         )
         with patch(
             "api.routers.v1.daily_domains.HomeSummaryService.get_summary",
@@ -82,6 +103,7 @@ class DailyDomainsApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.json()["sleep"])
+        self.assertEqual(response.json()["readiness"]["label"], "Moderate")
         service_mock.assert_called_once()
 
 

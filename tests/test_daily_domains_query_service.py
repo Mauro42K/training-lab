@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from api.services.daily_domains_query_service import DailyDomainsQueryService
 from api.services.home_summary_service import HomeSummaryService
+from api.schemas.daily_domains import ReadinessSummaryItem, ReadinessTraceInput
 
 
 class DailyDomainsQueryServiceTests(unittest.TestCase):
@@ -110,6 +111,28 @@ class HomeSummaryServiceTests(unittest.TestCase):
                 "api.services.home_summary_service.get_body_measurements_for_dates",
                 return_value=[],
             ),
+            patch(
+                "api.services.home_summary_service.ReadinessService.get_readiness",
+                return_value=ReadinessSummaryItem(
+                    score=78,
+                    label="Ready",
+                    confidence=0.91,
+                    completeness_status="complete",
+                    inputs_present=["sleep", "hrv", "rhr"],
+                    inputs_missing=[],
+                    model_version=1,
+                    has_estimated_context=False,
+                    trace_summary=[
+                        ReadinessTraceInput(
+                            name="sleep",
+                            role="primary",
+                            present=True,
+                            baseline_used=True,
+                            effect="positive",
+                        )
+                    ],
+                ),
+            ),
         ):
             response = HomeSummaryService(self.db).get_summary(target_date=target_date)
 
@@ -118,6 +141,8 @@ class HomeSummaryServiceTests(unittest.TestCase):
         self.assertIsNone(response.activity)
         self.assertIsNone(response.recovery)
         self.assertIsNone(response.body_measurements)
+        self.assertIsNotNone(response.readiness)
+        self.assertEqual(response.readiness.label, "Ready")
 
 
 if __name__ == "__main__":

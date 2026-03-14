@@ -15,6 +15,7 @@ from api.schemas.daily_domains import (
     HomeSummaryResponse,
 )
 from api.services.body_measurements_canonicalizer import BodyMeasurementsCanonicalizer
+from api.services.readiness_service import ReadinessService
 
 
 class HomeSummaryService:
@@ -46,6 +47,11 @@ class HomeSummaryService:
             )
         )
         body_day = body_days[0] if body_days else None
+        readiness = ReadinessService(self.db).get_readiness(
+            user_id=user.id,
+            target_date=target_date,
+            current_recovery_row=recovery_row,
+        )
 
         return HomeSummaryResponse(
             date=target_date,
@@ -114,4 +120,5 @@ class HomeSummaryService:
                 if body_day is not None
                 else None
             ),
+            readiness=readiness,
         )

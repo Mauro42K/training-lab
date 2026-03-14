@@ -148,7 +148,7 @@ class HomeSummaryServiceTests(unittest.TestCase):
                     latest_capacity=32.4,
                     latest_fatigue=36.1,
                 ),
-            ),
+            ) as load_snapshot_mock,
         ):
             response = HomeSummaryService(self.db).get_summary(target_date=target_date)
 
@@ -164,6 +164,7 @@ class HomeSummaryServiceTests(unittest.TestCase):
         self.assertEqual(response.core_metrics.fitness, 32.4)
         self.assertEqual(response.core_metrics.fatigue, 36.1)
         self.assertEqual(response.core_metrics.history_status, "partial")
+        load_snapshot_mock.assert_called_once_with(days=28, sport="all", today_local=target_date)
 
 
 if __name__ == "__main__":

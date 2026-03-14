@@ -19,6 +19,9 @@ from api.services.body_measurements_canonicalizer import BodyMeasurementsCanonic
 from api.services.readiness_service import ReadinessService
 from api.services.training_load_service import TrainingLoadService
 
+HOME_CORE_METRICS_SNAPSHOT_DAYS = 28
+HOME_CORE_METRICS_LOAD_WINDOW_DAYS = 7
+
 
 class HomeSummaryService:
     def __init__(self, db: Session) -> None:
@@ -55,7 +58,7 @@ class HomeSummaryService:
             current_recovery_row=recovery_row,
         )
         load_snapshot = TrainingLoadService(self.db).get_training_load_snapshot(
-            days=7,
+            days=HOME_CORE_METRICS_SNAPSHOT_DAYS,
             sport="all",
             today_local=target_date,
         )
@@ -129,7 +132,9 @@ class HomeSummaryService:
             ),
             readiness=readiness,
             core_metrics=CoreMetricsSummaryItem(
-                seven_day_load=sum(item.load for item in load_snapshot.items),
+                seven_day_load=sum(
+                    item.load for item in load_snapshot.items[-HOME_CORE_METRICS_LOAD_WINDOW_DAYS:]
+                ),
                 fitness=load_snapshot.latest_capacity,
                 fatigue=load_snapshot.latest_fatigue,
                 history_status=load_snapshot.history_status,

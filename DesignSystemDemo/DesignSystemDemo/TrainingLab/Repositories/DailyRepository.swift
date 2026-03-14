@@ -75,6 +75,19 @@ final class DailyRepository {
 }
 
 @MainActor
+final class HomeSummaryRepository {
+    private let apiClient: any APIClient
+
+    init(apiClient: any APIClient) {
+        self.apiClient = apiClient
+    }
+
+    func getHomeSummary(date: Date) async throws -> HomeSummaryDTO {
+        try await apiClient.fetchHomeSummary(date: date)
+    }
+}
+
+@MainActor
 final class TrainingLoadRepository {
     #if DEBUG
     private let logger = Logger(subsystem: "com.traininglab.designsystemdemo", category: "trainingload")

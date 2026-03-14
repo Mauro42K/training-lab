@@ -2,8 +2,11 @@ import Foundation
 
 protocol APIClient: Sendable {
     func ingestWorkouts(idempotencyKey: String, payload: WorkoutIngestDTO) async throws -> IngestResponseDTO
+    func ingestSleepSessions(idempotencyKey: String, payload: SleepSessionsIngestDTO) async throws -> IngestResponseDTO
+    func ingestRecoverySignals(idempotencyKey: String, payload: RecoverySignalsIngestDTO) async throws -> IngestResponseDTO
     func fetchWorkouts(from: Date, to: Date, sport: SportType?) async throws -> [WorkoutDTO]
     func fetchDaily(from: Date, to: Date) async throws -> [DailyItemDTO]
+    func fetchHomeSummary(date: Date) async throws -> HomeSummaryDTO
     func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> TrainingLoadSummaryDTO
 }
 

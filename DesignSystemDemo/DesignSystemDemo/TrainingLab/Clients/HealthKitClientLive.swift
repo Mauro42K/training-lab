@@ -18,14 +18,25 @@ struct HealthKitClientLive: HealthKitClient {
             throw HealthKitClientError.unsupported
         }
 
-        let workoutType = HKObjectType.workoutType()
-        var readTypes: Set<HKObjectType> = [workoutType]
+        var readTypes: Set<HKObjectType> = [HKObjectType.workoutType()]
         if let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate) {
             readTypes.insert(heartRateType)
         }
+        if let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) {
+            readTypes.insert(sleepType)
+        }
+        if let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) {
+            readTypes.insert(hrvType)
+        }
+        if let restingHeartRateType = HKObjectType.quantityType(forIdentifier: .restingHeartRate) {
+            readTypes.insert(restingHeartRateType)
+        }
 
         #if DEBUG
-        logger.log("requestAuthorization start read_types=\(readTypes.count)")
+        let requestStatus = try? await authorizationRequestStatus(readTypes: readTypes)
+        logger.log(
+            "requestAuthorization start read_types=\(readTypes.count) request_status=\(requestStatus ?? "unknown", privacy: .public)"
+        )
         #endif
         return try await withCheckedThrowingContinuation { continuation in
             healthStore.requestAuthorization(toShare: [], read: readTypes) { success, error in
@@ -45,8 +56,11 @@ struct HealthKitClientLive: HealthKitClient {
     }
 
     func fetchWorkouts(since: Date?) async throws -> [WorkoutDTO] {
+        let queryUpperBound = Date()
         #if DEBUG
-        logger.log("fetchWorkouts start since=\(debugDateString(since), privacy: .public)")
+        logger.log(
+            "fetchWorkouts start since=\(debugDateString(since), privacy: .public) until=\(debugDateString(queryUpperBound), privacy: .public)"
+        )
         #endif
         let workouts = try await queryWorkouts(since: since)
         var mapped: [WorkoutDTO] = []
@@ -80,7 +94,6 @@ struct HealthKitClientLive: HealthKitClient {
             )
         }
 
-        // Keep payload deterministic to guarantee stable idempotency keys.
         let sorted = mapped.sorted {
             if $0.start == $1.start {
                 return $0.uuid < $1.uuid
@@ -91,6 +104,61 @@ struct HealthKitClientLive: HealthKitClient {
         logFetchSummary(workouts: sorted)
         #endif
         return sorted
+    }
+
+    func fetchSleepSessions(since: Date?) async throws -> [HealthKitSleepSessionDTO] {
+        let queryUpperBound = Date()
+        #if DEBUG
+        logger.log(
+            "fetchSleepSessions start since=\(debugDateString(since), privacy: .public) until=\(debugDateString(queryUpperBound), privacy: .public)"
+        )
+        #endif
+        do {
+            let samples = try await querySleepSamples(since: since)
+            let sessions = normalizedSleepSessionsForIngest(samples.map(mapSleepSample))
+            #if DEBUG
+            logger.log(
+                "fetchSleepSessions finish count=\(sessions.count) latest_end=\(debugDateString(sessions.last?.end), privacy: .public)"
+            )
+            #endif
+            return sessions
+        } catch {
+            #if DEBUG
+            logger.error("fetchSleepSessions fallback_empty error=\(error.localizedDescription, privacy: .public)")
+            #endif
+            return []
+        }
+    }
+
+    func fetchRecoverySignals(since: Date?) async throws -> [HealthKitRecoverySignalDTO] {
+        let queryUpperBound = Date()
+        #if DEBUG
+        logger.log(
+            "fetchRecoverySignals start since=\(debugDateString(since), privacy: .public) until=\(debugDateString(queryUpperBound), privacy: .public)"
+        )
+        #endif
+        async let hrvSignals = fetchRecoverySignalsIfAvailable(
+            identifier: .heartRateVariabilitySDNN,
+            signalType: .hrvSDNN,
+            unit: HKUnit.secondUnit(with: .milli),
+            since: since
+        )
+        async let restingHeartRateSignals = fetchRecoverySignalsIfAvailable(
+            identifier: .restingHeartRate,
+            signalType: .restingHR,
+            unit: HKUnit.count().unitDivided(by: .minute()),
+            since: since
+        )
+
+        let hrv = try await hrvSignals
+        let resting = try await restingHeartRateSignals
+        let combined = normalizedRecoverySignalsForIngest(hrv + resting)
+        #if DEBUG
+        logger.log(
+            "fetchRecoverySignals finish hrv_count=\(hrv.count) resting_hr_count=\(resting.count) total_count=\(combined.count) latest_measured_at=\(debugDateString(combined.last?.measuredAt), privacy: .public)"
+        )
+        #endif
+        return combined
     }
 
     private func queryWorkouts(since: Date?) async throws -> [HKWorkout] {
@@ -136,6 +204,120 @@ struct HealthKitClientLive: HealthKitClient {
         }
     }
 
+    private func querySleepSamples(since: Date?) async throws -> [HKCategorySample] {
+        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+            return []
+        }
+
+        let predicate: NSPredicate?
+        if let since {
+            predicate = HKQuery.predicateForSamples(
+                withStart: since,
+                end: nil,
+                options: [.strictEndDate]
+            )
+        } else {
+            predicate = nil
+        }
+
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: sleepType,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sort]
+            ) { _, samples, error in
+                if let error {
+                    if isNoDataError(error) {
+                        continuation.resume(returning: [])
+                        return
+                    }
+                    continuation.resume(throwing: error)
+                    return
+                }
+                continuation.resume(returning: (samples as? [HKCategorySample]) ?? [])
+            }
+            healthStore.execute(query)
+        }
+    }
+
+    private func fetchRecoverySignalsIfAvailable(
+        identifier: HKQuantityTypeIdentifier,
+        signalType: RecoverySignalTypeDTO,
+        unit: HKUnit,
+        since: Date?
+    ) async throws -> [HealthKitRecoverySignalDTO] {
+        do {
+            let samples = try await queryRecoveryQuantitySamples(identifier: identifier, since: since)
+            return samples.compactMap { sample in
+                let value = sample.quantity.doubleValue(for: unit)
+                guard value.isFinite else {
+                    return nil
+                }
+                return HealthKitRecoverySignalDTO(
+                    uuid: sample.uuid.uuidString.lowercased(),
+                    signalType: signalType,
+                    measuredAt: sample.startDate,
+                    value: value,
+                    sourceBundleId: sample.sourceRevision.source.bundleIdentifier,
+                    sourceCount: 1,
+                    hasMixedSources: false,
+                    primaryDeviceName: sample.device?.name
+                )
+            }
+        } catch {
+            #if DEBUG
+            logger.error(
+                "fetchRecoverySignals partial_fallback signal_type=\(signalType.rawValue, privacy: .public) error=\(error.localizedDescription, privacy: .public)"
+            )
+            #endif
+            return []
+        }
+    }
+
+    private func queryRecoveryQuantitySamples(
+        identifier: HKQuantityTypeIdentifier,
+        since: Date?
+    ) async throws -> [HKQuantitySample] {
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: identifier) else {
+            return []
+        }
+
+        let predicate: NSPredicate?
+        if let since {
+            predicate = HKQuery.predicateForSamples(
+                withStart: since,
+                end: nil,
+                options: [.strictStartDate]
+            )
+        } else {
+            predicate = nil
+        }
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: quantityType,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sort]
+            ) { _, samples, error in
+                if let error {
+                    if isNoDataError(error) {
+                        continuation.resume(returning: [])
+                        return
+                    }
+                    continuation.resume(throwing: error)
+                    return
+                }
+                continuation.resume(returning: (samples as? [HKQuantitySample]) ?? [])
+            }
+            healthStore.execute(query)
+        }
+    }
+
     private func mapSportType(_ activityType: HKWorkoutActivityType) -> SportType {
         switch activityType {
         case .running:
@@ -148,6 +330,60 @@ struct HealthKitClientLive: HealthKitClient {
             return .walk
         default:
             return .other
+        }
+    }
+
+    private func mapSleepSample(_ sample: HKCategorySample) -> HealthKitSleepSessionDTO {
+        HealthKitSleepSessionDTO(
+            uuid: sample.uuid.uuidString.lowercased(),
+            start: sample.startDate,
+            end: sample.endDate,
+            categoryValue: String(sample.value),
+            sourceBundleId: sample.sourceRevision.source.bundleIdentifier,
+            sourceCount: 1,
+            hasMixedSources: false,
+            primaryDeviceName: sample.device?.name
+        )
+    }
+
+    private func normalizedSleepSessionsForIngest(_ sessions: [HealthKitSleepSessionDTO]) -> [HealthKitSleepSessionDTO] {
+        var byUUID: [String: HealthKitSleepSessionDTO] = [:]
+        byUUID.reserveCapacity(sessions.count)
+
+        for session in sessions {
+            guard session.end >= session.start else {
+                continue
+            }
+            if let existing = byUUID[session.uuid], existing.end >= session.end {
+                continue
+            }
+            byUUID[session.uuid] = session
+        }
+
+        return byUUID.values.sorted {
+            if $0.start == $1.start {
+                return $0.uuid < $1.uuid
+            }
+            return $0.start < $1.start
+        }
+    }
+
+    private func normalizedRecoverySignalsForIngest(_ signals: [HealthKitRecoverySignalDTO]) -> [HealthKitRecoverySignalDTO] {
+        var byUUID: [String: HealthKitRecoverySignalDTO] = [:]
+        byUUID.reserveCapacity(signals.count)
+
+        for signal in signals {
+            if let existing = byUUID[signal.uuid], existing.measuredAt >= signal.measuredAt {
+                continue
+            }
+            byUUID[signal.uuid] = signal
+        }
+
+        return byUUID.values.sorted {
+            if $0.measuredAt == $1.measuredAt {
+                return $0.uuid < $1.uuid
+            }
+            return $0.measuredAt < $1.measuredAt
         }
     }
 
@@ -267,6 +503,30 @@ struct HealthKitClientLive: HealthKitClient {
         return nsError.domain == HKError.errorDomain
             && nsError.code == HKError.Code.errorNoData.rawValue
     }
+
+    private func authorizationRequestStatus(readTypes: Set<HKObjectType>) async throws -> String {
+        try await withCheckedThrowingContinuation { continuation in
+            healthStore.getRequestStatusForAuthorization(toShare: [], read: readTypes) { status, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                let rawValue: String
+                switch status {
+                case .unknown:
+                    rawValue = "unknown"
+                case .shouldRequest:
+                    rawValue = "should_request"
+                case .unnecessary:
+                    rawValue = "unnecessary"
+                @unknown default:
+                    rawValue = "unknown_default"
+                }
+                continuation.resume(returning: rawValue)
+            }
+        }
+    }
 }
 #else
 struct HealthKitClientLive: HealthKitClient {
@@ -275,6 +535,16 @@ struct HealthKitClientLive: HealthKitClient {
     }
 
     func fetchWorkouts(since: Date?) async throws -> [WorkoutDTO] {
+        _ = since
+        throw HealthKitClientError.unsupported
+    }
+
+    func fetchSleepSessions(since: Date?) async throws -> [HealthKitSleepSessionDTO] {
+        _ = since
+        throw HealthKitClientError.unsupported
+    }
+
+    func fetchRecoverySignals(since: Date?) async throws -> [HealthKitRecoverySignalDTO] {
         _ = since
         throw HealthKitClientError.unsupported
     }

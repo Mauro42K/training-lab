@@ -9,4 +9,14 @@ struct HealthKitClientUnsupported: HealthKitClient {
         _ = since
         throw HealthKitClientError.unsupported
     }
+
+    func fetchSleepSessions(since: Date?) async throws -> [HealthKitSleepSessionDTO] {
+        _ = since
+        throw HealthKitClientError.unsupported
+    }
+
+    func fetchRecoverySignals(since: Date?) async throws -> [HealthKitRecoverySignalDTO] {
+        _ = since
+        throw HealthKitClientError.unsupported
+    }
 }

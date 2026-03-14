@@ -31,7 +31,9 @@ enum AppColors {
     enum Accent {
         static let blue = Color.dynamic(darkHex: 0x3A7BFF, lightHex: 0x2F6DE8)
         static let green = Color.dynamic(darkHex: 0x3DDC84, lightHex: 0x2FC46E)
+        static let amber = Color.dynamic(darkHex: 0xF4C542, lightHex: 0xD6A11F)
         static let orange = Color.dynamic(darkHex: 0xFF8A3D, lightHex: 0xE9782F)
+        static let coral = Color.dynamic(darkHex: 0xFF6B62, lightHex: 0xE1574D)
         static let red = Color.dynamic(darkHex: 0xFF5C5C, lightHex: 0xE14949)
         static let purple = Color.dynamic(darkHex: 0x8B7CFF, lightHex: 0x7666E8)
     }

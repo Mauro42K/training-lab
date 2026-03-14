@@ -5,35 +5,43 @@ struct TrainingLoadScreen: View {
 
     @State private var selectedFilter: TrainingLoadSportFilter = .all
     @State private var trendSnapshot = TrainingLoadFetchResult.empty(baseURL: URL(string: "https://api.training-lab.mauro42k.com")!)
+    @State private var homeSummary: HomeSummaryDTO?
     @State private var selectedDay: SelectedTrainingLoadDay?
     @State private var dayWorkouts: [WorkoutDTO] = []
     @State private var isLoading = false
     @State private var isLoadingDay = false
     @State private var hasLoadedOnce = false
     @State private var errorMessage: String?
+    @State private var readinessErrorMessage: String?
 
     private let calendar = Calendar.current
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.x16) {
-                DSSectionHeader(title: "Load Trend", actionLabel: {
-                    Text("Last 28 days")
-                        .appTextStyle(AppTypography.labelSmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                })
-
-                TrainingLoadSummaryRow(
-                    today: todayTotal,
-                    sevenDays: sevenDayTotal,
-                    twentyEightDays: twentyEightDayTotal
-                )
-
-                TrainingLoadFilterControl(selection: $selectedFilter)
-
                 if isLoading && !hasLoadedOnce {
                     DSLoadingState()
                 } else {
+                    ReadinessHeroSection(
+                        date: homeSummary?.date ?? Date(),
+                        readiness: homeSummary?.readiness,
+                        errorMessage: readinessErrorMessage
+                    )
+
+                    DSSectionHeader(title: "Load Trend", actionLabel: {
+                        Text("Last 28 days")
+                            .appTextStyle(AppTypography.labelSmall)
+                            .foregroundStyle(AppColors.Text.secondary)
+                    })
+
+                    TrainingLoadSummaryRow(
+                        today: todayTotal,
+                        sevenDays: sevenDayTotal,
+                        twentyEightDays: twentyEightDayTotal
+                    )
+
+                    TrainingLoadFilterControl(selection: $selectedFilter)
+
                     if let freshnessMessage {
                         TrendFreshnessCard(
                             message: freshnessMessage,
@@ -71,7 +79,7 @@ struct TrainingLoadScreen: View {
             .padding(AppSpacing.x16)
         }
         .background(AppColors.Background.primary.ignoresSafeArea())
-        .navigationTitle("Training Load")
+        .navigationTitle("Home")
         .task(id: selectedFilter) {
             await loadSeries()
         }
@@ -117,18 +125,35 @@ struct TrainingLoadScreen: View {
         isLoading = true
         defer { isLoading = false }
 
-        do {
-            trendSnapshot = try await environment.trainingLoadRepository.getTrainingLoad(
+        async let trendResult = Self.capture {
+            try await environment.trainingLoadRepository.getTrainingLoad(
                 days: 28,
                 sport: selectedFilter
             )
-            hasLoadedOnce = true
+        }
+        async let homeSummaryResult = Self.capture {
+            try await environment.homeSummaryRepository.getHomeSummary(date: Date())
+        }
+
+        switch await trendResult {
+        case let .success(snapshot):
+            trendSnapshot = snapshot
             errorMessage = nil
-        } catch {
+        case let .failure(error):
             trendSnapshot = .empty(baseURL: environment.apiBaseURL)
-            hasLoadedOnce = true
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
+
+        switch await homeSummaryResult {
+        case let .success(summary):
+            homeSummary = summary
+            readinessErrorMessage = nil
+        case let .failure(error):
+            homeSummary = nil
+            readinessErrorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
+
+        hasLoadedOnce = true
     }
 
     private func selectDay(_ day: Date) async {
@@ -203,6 +228,16 @@ struct TrainingLoadScreen: View {
         formatter.dateFormat = "MMM d"
         return formatter
     }()
+
+    private static func capture<T>(
+        _ operation: @escaping () async throws -> T
+    ) async -> Result<T, Error> {
+        do {
+            return .success(try await operation())
+        } catch {
+            return .failure(error)
+        }
+    }
 }
 
 private struct SelectedTrainingLoadDay: Identifiable, Equatable {
@@ -225,6 +260,420 @@ private extension TrainingLoadSportFilter {
         case .walk:
             return .walk
         }
+    }
+}
+
+private struct ReadinessHeroSection: View {
+    let date: Date
+    let readiness: ReadinessSummaryDTO?
+    let errorMessage: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.x12) {
+            Text(Self.dateFormatter.string(from: date))
+                .appTextStyle(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+
+            Text("Today's Readiness")
+                .appTextStyle(AppTypography.headingH2)
+                .foregroundStyle(AppColors.Text.primary)
+
+            ReadinessHeroView(
+                readiness: readiness,
+                errorMessage: errorMessage
+            )
+        }
+    }
+
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateFormat = "EEEE, MMM d"
+        return formatter
+    }()
+}
+
+private struct ReadinessHeroView: View {
+    let readiness: ReadinessSummaryDTO?
+    let errorMessage: String?
+
+    private static let heroSurface = Color(
+        .sRGB,
+        red: 22.0 / 255.0,
+        green: 22.0 / 255.0,
+        blue: 24.0 / 255.0,
+        opacity: 1
+    )
+    private static let heroPrimaryText = Color.white
+    private static let heroSecondaryText = Color.white.opacity(0.64)
+    private static let heroTertiaryText = Color.white.opacity(0.5)
+
+    private var theme: ReadinessHeroTheme {
+        ReadinessHeroTheme(label: readiness?.label)
+    }
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Self.heroSurface)
+
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [theme.wash.opacity(0.24), theme.wash.opacity(0.04)],
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                )
+
+            Circle()
+                .fill(theme.glow.opacity(0.36))
+                .frame(width: 240, height: 240)
+                .blur(radius: 72)
+                .offset(y: 84)
+
+            WaveBandShape()
+                .fill(
+                    LinearGradient(
+                        colors: [theme.wave.opacity(0.28), theme.wave.opacity(0.08)],
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                )
+                .frame(height: 118)
+                .overlay(alignment: .top) {
+                    WaveStrokeShape()
+                        .stroke(theme.wave.opacity(0.42), lineWidth: 1)
+                        .frame(height: 40)
+                        .offset(y: 1)
+                }
+                .opacity(0.92)
+
+            content
+                .padding(.horizontal, AppSpacing.x24)
+                .padding(.top, 36)
+                .padding(.bottom, 30)
+        }
+        .frame(maxWidth: .infinity, minHeight: 280, alignment: .top)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+        )
+        .appShadow(AppShadows.modal)
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let readiness, readiness.completenessStatus != .missing {
+            if readiness.completenessStatus == .insufficient {
+                insufficientContent(readiness)
+            } else {
+                standardContent(readiness)
+            }
+        } else {
+            missingContent
+        }
+    }
+
+    private func standardContent(_ readiness: ReadinessSummaryDTO) -> some View {
+        VStack(spacing: AppSpacing.x8) {
+            Spacer(minLength: 0)
+
+            HStack(spacing: 0) {
+                Text(scoreText(for: readiness.score))
+                    .font(.system(size: 82, weight: .bold))
+                    .monospacedDigit()
+                    .foregroundStyle(theme.primary)
+
+                Text("%")
+                    .font(.system(size: 36, weight: .bold))
+                    .foregroundStyle(theme.primary)
+                    .offset(y: -16)
+            }
+
+            Text(labelText(for: readiness))
+                .appTextStyle(AppTypography.bodyLarge)
+                .foregroundStyle(theme.labelAccent)
+                .multilineTextAlignment(.center)
+
+            Text(metadataLine(for: readiness))
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(Self.heroTertiaryText)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: AppSpacing.x8) {
+                if readiness.completenessStatus == .partial {
+                    ReadinessStateBadge(
+                        title: "Partial signal",
+                        tint: theme.primary
+                    )
+                }
+                if readiness.hasEstimatedContext {
+                    ReadinessStateBadge(
+                        title: "Estimated context",
+                        tint: theme.primary
+                    )
+                }
+            }
+
+            Text(confidenceLine(for: readiness.confidence))
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(Self.heroSecondaryText)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func insufficientContent(_ readiness: ReadinessSummaryDTO) -> some View {
+        VStack(spacing: AppSpacing.x8) {
+            Spacer(minLength: 0)
+
+            Text(labelText(for: readiness))
+                .font(.system(size: 34, weight: .semibold))
+                .foregroundStyle(theme.labelAccent)
+                .multilineTextAlignment(.center)
+
+            if let score = readiness.score {
+                Text("Estimated score \(score)%")
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(theme.primary.opacity(0.56))
+            }
+
+            Text(metadataLine(for: readiness))
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(Self.heroTertiaryText)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: AppSpacing.x8) {
+                ReadinessStateBadge(
+                    title: "Limited signal",
+                    tint: theme.primary
+                )
+                if readiness.hasEstimatedContext {
+                    ReadinessStateBadge(
+                        title: "Estimated context",
+                        tint: theme.primary
+                    )
+                }
+            }
+
+            Text(confidenceLine(for: readiness.confidence))
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(Self.heroSecondaryText)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var missingContent: some View {
+        VStack(spacing: AppSpacing.x8) {
+            Spacer(minLength: 0)
+
+            Text(errorMessage == nil ? "Readiness unavailable" : "Couldn't refresh readiness")
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundStyle(Self.heroPrimaryText)
+                .multilineTextAlignment(.center)
+
+            Text(
+                errorMessage
+                ?? "Readiness needs Sleep, HRV, and RHR before a score can be shown."
+            )
+            .appTextStyle(AppTypography.labelSmall)
+            .foregroundStyle(Self.heroSecondaryText)
+            .multilineTextAlignment(.center)
+
+            Text("No score is shown until today's signal is available.")
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(Self.heroTertiaryText)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func scoreText(for score: Int?) -> String {
+        guard let score else { return "--" }
+        return String(score)
+    }
+
+    private func labelText(for readiness: ReadinessSummaryDTO) -> String {
+        switch readiness.label {
+        case .ready:
+            return "Ready to Train"
+        case .moderate:
+            return "Moderate Readiness"
+        case .recover:
+            return "Recover First"
+        case .none:
+            return "Readiness"
+        }
+    }
+
+    private func supportingLine(for readiness: ReadinessSummaryDTO) -> String {
+        let present = localizedInputs(readiness.inputsPresent)
+        let missing = localizedInputs(readiness.inputsMissing)
+
+        switch readiness.completenessStatus {
+        case .complete:
+            return "Using \(present)."
+        case .partial:
+            return missing.isEmpty
+                ? "Using \(present)."
+                : "Using \(present). Missing \(missing)."
+        case .insufficient:
+            return "Limited signal today. Using \(present)."
+        case .missing:
+            return "Readiness needs Sleep, HRV, and RHR."
+        }
+    }
+
+    private func metadataLine(for readiness: ReadinessSummaryDTO) -> String {
+        let supporting = supportingLine(for: readiness)
+        guard readiness.completenessStatus != .complete else {
+            return localizedInputs(readiness.inputsPresent)
+        }
+        return supporting
+    }
+
+    private func confidenceLine(for confidence: Double) -> String {
+        "Confidence \(confidenceText(for: confidence))"
+    }
+
+    private func localizedInputs(_ inputs: [String]) -> String {
+        let labels = inputs.map { input in
+            switch input {
+            case "sleep":
+                return "Sleep"
+            case "hrv":
+                return "HRV"
+            case "rhr":
+                return "RHR"
+            default:
+                return input.capitalized
+            }
+        }
+        switch labels.count {
+        case 0:
+            return "today's signal"
+        case 1:
+            return labels[0]
+        case 2:
+            return "\(labels[0]) and \(labels[1])"
+        default:
+            let head = labels.dropLast().joined(separator: ", ")
+            return "\(head), and \(labels.last ?? "")"
+        }
+    }
+
+    private func confidenceText(for confidence: Double) -> String {
+        "\(Int((confidence * 100).rounded()))%"
+    }
+}
+
+private struct ReadinessStateBadge: View {
+    let title: String
+    let tint: Color
+
+    var body: some View {
+        Text(title)
+            .appTextStyle(AppTypography.labelSmall)
+            .foregroundStyle(Color.white)
+            .padding(.horizontal, AppSpacing.x8)
+            .padding(.vertical, 6)
+            .background(tint.opacity(0.18), in: Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(tint.opacity(0.24), lineWidth: AppStrokeWidth.hairline)
+            )
+    }
+}
+
+private struct ReadinessHeroTheme {
+    let primary: Color
+    let glow: Color
+    let wash: Color
+    let wave: Color
+    let labelAccent: Color
+
+    init(label: ReadinessLabelDTO?) {
+        switch label {
+        case .moderate:
+            primary = AppColors.Accent.amber
+            glow = AppColors.Accent.orange
+            wash = AppColors.Accent.amber
+            wave = AppColors.Accent.orange
+            labelAccent = Color.white
+        case .recover:
+            primary = AppColors.Accent.coral
+            glow = AppColors.Accent.red
+            wash = AppColors.Accent.coral
+            wave = AppColors.Accent.red
+            labelAccent = Color.white
+        case .ready:
+            primary = AppColors.Accent.green
+            glow = AppColors.Accent.green
+            wash = AppColors.Accent.green
+            wave = AppColors.Accent.green
+            labelAccent = Color.white
+        case .none:
+            primary = Color.white.opacity(0.82)
+            glow = Color.white.opacity(0.18)
+            wash = Color.white.opacity(0.1)
+            wave = Color.white.opacity(0.18)
+            labelAccent = Color.white
+        }
+    }
+}
+
+private struct WaveBandShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.height * 0.52))
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.4, y: rect.height * 0.72),
+            control1: CGPoint(x: rect.width * 0.12, y: rect.height * 0.46),
+            control2: CGPoint(x: rect.width * 0.26, y: rect.height * 0.9)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.7, y: rect.height * 0.44),
+            control1: CGPoint(x: rect.width * 0.5, y: rect.height * 0.5),
+            control2: CGPoint(x: rect.width * 0.58, y: rect.height * 0.2)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.maxX, y: rect.height * 0.3),
+            control1: CGPoint(x: rect.width * 0.84, y: rect.height * 0.72),
+            control2: CGPoint(x: rect.width * 0.92, y: rect.height * 0.12)
+        )
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+private struct WaveStrokeShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.height * 0.58))
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.4, y: rect.height * 0.72),
+            control1: CGPoint(x: rect.width * 0.12, y: rect.height * 0.5),
+            control2: CGPoint(x: rect.width * 0.28, y: rect.height * 0.88)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.7, y: rect.height * 0.38),
+            control1: CGPoint(x: rect.width * 0.52, y: rect.height * 0.52),
+            control2: CGPoint(x: rect.width * 0.58, y: rect.height * 0.16)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.maxX, y: rect.height * 0.18),
+            control1: CGPoint(x: rect.width * 0.82, y: rect.height * 0.66),
+            control2: CGPoint(x: rect.width * 0.92, y: rect.height * 0.02)
+        )
+        return path
     }
 }
 

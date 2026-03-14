@@ -60,6 +60,7 @@ struct AppEnvironment {
     let syncStateStore: SyncStateStore
     let workoutsRepository: WorkoutsRepository
     let dailyRepository: DailyRepository
+    let homeSummaryRepository: HomeSummaryRepository
     let trainingLoadRepository: TrainingLoadRepository
     let ingestionOrchestrator: IngestionOrchestrator
 
@@ -110,6 +111,7 @@ struct AppEnvironment {
         let syncStateStore = SyncStateStore(modelContext: modelContext)
         let workoutsRepository = WorkoutsRepository(apiClient: apiClient, modelContext: modelContext)
         let dailyRepository = DailyRepository(apiClient: apiClient, modelContext: modelContext)
+        let homeSummaryRepository = HomeSummaryRepository(apiClient: apiClient)
         let trainingLoadRepository = TrainingLoadRepository(
             apiClient: apiClient,
             modelContext: modelContext,
@@ -135,6 +137,7 @@ struct AppEnvironment {
             syncStateStore: syncStateStore,
             workoutsRepository: workoutsRepository,
             dailyRepository: dailyRepository,
+            homeSummaryRepository: homeSummaryRepository,
             trainingLoadRepository: trainingLoadRepository,
             ingestionOrchestrator: ingestionOrchestrator
         )
@@ -189,6 +192,18 @@ private struct MissingAPIKeyAPIClient: APIClient {
         throw AppEnvironmentError.missingAPIKey
     }
 
+    func ingestSleepSessions(idempotencyKey: String, payload: SleepSessionsIngestDTO) async throws -> IngestResponseDTO {
+        _ = idempotencyKey
+        _ = payload
+        throw AppEnvironmentError.missingAPIKey
+    }
+
+    func ingestRecoverySignals(idempotencyKey: String, payload: RecoverySignalsIngestDTO) async throws -> IngestResponseDTO {
+        _ = idempotencyKey
+        _ = payload
+        throw AppEnvironmentError.missingAPIKey
+    }
+
     func fetchWorkouts(from: Date, to: Date, sport: SportType?) async throws -> [WorkoutDTO] {
         _ = from
         _ = to
@@ -199,6 +214,11 @@ private struct MissingAPIKeyAPIClient: APIClient {
     func fetchDaily(from: Date, to: Date) async throws -> [DailyItemDTO] {
         _ = from
         _ = to
+        throw AppEnvironmentError.missingAPIKey
+    }
+
+    func fetchHomeSummary(date: Date) async throws -> HomeSummaryDTO {
+        _ = date
         throw AppEnvironmentError.missingAPIKey
     }
 

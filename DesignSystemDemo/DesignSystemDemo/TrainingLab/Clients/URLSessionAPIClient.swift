@@ -58,7 +58,43 @@ struct URLSessionAPIClient: APIClient {
     }
 
     func ingestWorkouts(idempotencyKey: String, payload: WorkoutIngestDTO) async throws -> IngestResponseDTO {
-        var request = try makeRequest(path: "v1/ingest/workouts", method: "POST")
+        try await ingestPayload(
+            path: "v1/ingest/workouts",
+            idempotencyKey: idempotencyKey,
+            payload: payload,
+            logLabel: "ingest_workouts",
+            itemCount: payload.workouts.count
+        )
+    }
+
+    func ingestSleepSessions(idempotencyKey: String, payload: SleepSessionsIngestDTO) async throws -> IngestResponseDTO {
+        try await ingestPayload(
+            path: "v1/ingest/sleep",
+            idempotencyKey: idempotencyKey,
+            payload: payload,
+            logLabel: "ingest_sleep",
+            itemCount: payload.sleepSessions.count
+        )
+    }
+
+    func ingestRecoverySignals(idempotencyKey: String, payload: RecoverySignalsIngestDTO) async throws -> IngestResponseDTO {
+        try await ingestPayload(
+            path: "v1/ingest/recovery-signals",
+            idempotencyKey: idempotencyKey,
+            payload: payload,
+            logLabel: "ingest_recovery",
+            itemCount: payload.recoverySignals.count
+        )
+    }
+
+    private func ingestPayload<Payload: Encodable>(
+        path: String,
+        idempotencyKey: String,
+        payload: Payload,
+        logLabel: String,
+        itemCount: Int
+    ) async throws -> IngestResponseDTO {
+        var request = try makeRequest(path: path, method: "POST")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(idempotencyKey, forHTTPHeaderField: "X-Idempotency-Key")
 
@@ -69,20 +105,20 @@ struct URLSessionAPIClient: APIClient {
         }
 
         #if DEBUG
-        networkLogger.log("ingest request start url=\(request.url?.absoluteString ?? "nil", privacy: .public) workouts=\(payload.workouts.count)")
+        networkLogger.log("\(logLabel, privacy: .public) request start url=\(request.url?.absoluteString ?? "nil", privacy: .public) items=\(itemCount)")
         #endif
         let (data, response): (Data, URLResponse)
         do {
             (data, response) = try await session.data(for: request)
         } catch {
             #if DEBUG
-            networkLogger.error("ingest transport_failed error=\(error.localizedDescription, privacy: .public)")
+            networkLogger.error("\(logLabel, privacy: .public) transport_failed error=\(error.localizedDescription, privacy: .public)")
             #endif
             throw error
         }
         let statusCode = try validate(response: response, data: data)
         #if DEBUG
-        networkLogger.log("ingest request success status=\(statusCode)")
+        networkLogger.log("\(logLabel, privacy: .public) request success status=\(statusCode)")
         #endif
 
         guard statusCode == 200 else {
@@ -94,7 +130,7 @@ struct URLSessionAPIClient: APIClient {
         } catch {
             #if DEBUG
             networkLogger.error(
-                "ingest decode_failed error=\(error.localizedDescription, privacy: .public) body=\(summarizedResponseBody(from: data), privacy: .public)"
+                "\(logLabel, privacy: .public) decode_failed error=\(error.localizedDescription, privacy: .public) body=\(summarizedResponseBody(from: data), privacy: .public)"
             )
             #endif
             throw error
@@ -142,6 +178,45 @@ struct URLSessionAPIClient: APIClient {
         _ = try validate(response: response)
 
         return try decoder.decode(DailySummaryDTO.self, from: data).items
+    }
+
+    func fetchHomeSummary(date: Date) async throws -> HomeSummaryDTO {
+        var components = URLComponents(url: try pathURL("v1/home/summary"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            URLQueryItem(name: "date", value: dateOnlyString(date))
+        ]
+
+        guard let url = components?.url else {
+            throw APIClientError.invalidURL
+        }
+
+        let request = try makeRequest(url: url, method: "GET")
+        #if DEBUG
+        networkLogger.log("home_summary request start url=\(url.absoluteString, privacy: .public)")
+        #endif
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            #if DEBUG
+            networkLogger.error("home_summary transport_failed error=\(error.localizedDescription, privacy: .public)")
+            #endif
+            throw error
+        }
+        let statusCode = try validate(response: response, data: data)
+        #if DEBUG
+        networkLogger.log("home_summary request success status=\(statusCode)")
+        #endif
+        do {
+            return try decoder.decode(HomeSummaryDTO.self, from: data)
+        } catch {
+            #if DEBUG
+            networkLogger.error(
+                "home_summary decode_failed error=\(error.localizedDescription, privacy: .public) body=\(summarizedResponseBody(from: data), privacy: .public)"
+            )
+            #endif
+            throw error
+        }
     }
 
     func fetchTrainingLoad(days: Int, sport: TrainingLoadSportFilter) async throws -> TrainingLoadSummaryDTO {

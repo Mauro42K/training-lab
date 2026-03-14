@@ -21,7 +21,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Training Lab reads your workouts to compute training load.</string>
+	<string>Training Lab reads your workouts, sleep, heart rate variability, and resting heart rate to compute training load and readiness.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Training Lab may write workout-related data when sync features are enabled.</string>
 	<key>TrainingLabAPIBaseURL</key>

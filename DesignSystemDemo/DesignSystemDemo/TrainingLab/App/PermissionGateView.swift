@@ -12,7 +12,6 @@ struct PermissionGateView: View {
     let openGallery: () -> Void
 
     @State private var state: GateState = .loading
-
     var body: some View {
         Group {
             if shouldShowTrainingLoad {
@@ -141,6 +140,7 @@ struct PermissionGateView: View {
             state = .error(error.localizedDescription)
         }
     }
+
 }
 
 #Preview {

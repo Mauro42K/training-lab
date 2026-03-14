@@ -70,6 +70,29 @@ Defined in `AppTypography`.
 - Card-to-card spacing in section groups: `AppSpacing.x16`
 - Tight element spacing within cards: `AppSpacing.x8` or `AppSpacing.x12`
 
+## Home Language
+
+### Readiness Hero
+- Home keeps a premium/editorial direction anchored in Figma, with the hero as the dominant surface.
+- `Readiness` uses semantic theming by label, not a continuous score gradient:
+  - `Ready` -> premium green
+  - `Moderate` -> premium amber
+  - `Recover` -> premium coral/red
+  - `missing` -> neutral dark treatment without positive signaling
+- Hero hierarchy is stable:
+  - score first
+  - label second
+  - confidence and trust states as secondary support only
+
+### Supporting Home Blocks
+- Supporting blocks such as `Core Metrics` should stay in the same Home language without copying the hero treatment.
+- Prefer shared primitives first:
+  - `DSSectionHeader` for section hierarchy
+  - `DSMetricSnapshotCard` for compact supporting metric groups
+  - `DSCard` for supporting surfaces that do not need grouped metric tiles
+  - `DSMetricPill` only for secondary trust/history signals
+- Avoid introducing ad-hoc gradients, custom surface recipes, or bespoke shadows when an existing design-system primitive already matches the role.
+
 ## Navigation Patterns
 
 ### iPhone
@@ -83,6 +106,7 @@ Defined in `AppTypography`.
 ## Component Library
 Implemented primitives:
 - `DSCard`
+- `DSMetricSnapshotCard`
 - `DSMetricPill`
 - `DSSectionHeader`
 - `DSSegmentedControl`

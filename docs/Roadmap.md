@@ -697,7 +697,7 @@ Closure decisions carried into this phase:
 - First real readiness output is observable, even if initially `partial` or `insufficient`.
 
 ### Phase 5.3 — Core Metrics
-**Status:** IMPLEMENTED / PENDING FINAL VISUAL QA
+**Status:** CLOSED
 
 **Closure summary**
 - `GET /v1/home/summary` now includes a dedicated `core_metrics` block for Home.
@@ -712,10 +712,23 @@ Closure decisions carried into this phase:
   - `fatigue` = existing `ATL`
   - `history_status` = the same trust/sufficiency state already used by `training-load`
 - iOS now renders Core Metrics as a separate compact block between the Readiness Hero and the Trend Card in the temporary Home host.
+- The final visual pass aligned the block to shared Design System primitives instead of a bespoke surface:
+  - `DSSectionHeader`
+  - `DSMetricSnapshotCard`
+  - `DSCard` as the base supporting surface primitive
+  - `DSMetricPill` only for secondary trust/history states
+- The supporting snapshot pattern now lives in the Design System Gallery so Home no longer improvises a one-off multi-metric card.
+- Core Metrics now uses a stable Home load snapshot so `Fitness` and `Fatigue` stay aligned with the same load-domain state exposed by `training-load`.
 - Guardrails remained intact:
   - no readiness semantics inside Core Metrics
   - no Trend Card semantic changes
+  - Hero, Core Metrics, and Trend Card remain visually distinct supporting layers inside Home
   - no Coach / Recommended Today coupling
+- Final validation passed:
+  - backend/API QA
+  - iOS build
+  - macOS build
+  - macOS visual QA of `Readiness Hero + Core Metrics + Load Trend`
 
 **Goal:** Add the compact Home metrics block that contextualizes current training state.
 

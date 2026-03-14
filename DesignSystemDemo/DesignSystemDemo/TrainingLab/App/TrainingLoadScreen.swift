@@ -300,9 +300,7 @@ private struct CoreMetricsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.x8) {
-            Text("Core Metrics")
-                .appTextStyle(AppTypography.bodySmall)
-                .foregroundStyle(AppColors.Text.secondary)
+            DSSectionHeader(title: "Core Metrics")
 
             CoreMetricsCard(coreMetrics: coreMetrics)
         }
@@ -313,77 +311,12 @@ private struct CoreMetricsCard: View {
     let coreMetrics: CoreMetricsSummaryDTO?
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
-                .fill(AppColors.Surface.card)
-
-            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            AppColors.Accent.blue.opacity(0.10),
-                            AppColors.Accent.blue.opacity(0.02),
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-
-            VStack(alignment: .leading, spacing: AppSpacing.x16) {
-                HStack(alignment: .top, spacing: AppSpacing.x12) {
-                    Text("Current load context")
-                        .appTextStyle(AppTypography.labelSmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-
-                    Spacer()
-
-                    if shouldShowStatusPill {
-                        statusPill
-                    }
-                }
-
-                HStack(spacing: AppSpacing.x12) {
-                    CoreMetricValueView(
-                        title: "7-Day Load",
-                        valueText: valueText(for: coreMetrics?.sevenDayLoad),
-                        isMuted: shouldDeEmphasizeValues
-                    )
-                    divider
-                    CoreMetricValueView(
-                        title: "Fitness",
-                        valueText: valueText(for: coreMetrics?.fitness),
-                        isMuted: shouldDeEmphasizeValues
-                    )
-                    divider
-                    CoreMetricValueView(
-                        title: "Fatigue",
-                        valueText: valueText(for: coreMetrics?.fatigue),
-                        isMuted: shouldDeEmphasizeValues
-                    )
-                }
-
-                if let historyCopy {
-                    Text(historyCopy)
-                        .appTextStyle(AppTypography.labelSmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                }
-            }
-        }
-        .padding(AppSpacing.x16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColors.Surface.card)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
-                .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+        DSMetricSnapshotCard(
+            eyebrow: "Load snapshot",
+            items: snapshotItems,
+            footerText: historyCopy,
+            accessory: shouldShowStatusPill ? AnyView(statusPill) : nil
         )
-        .appShadow(AppShadows.modal)
-    }
-
-    private var divider: some View {
-        Rectangle()
-            .fill(AppColors.Stroke.subtle)
-            .frame(width: 1, height: 56)
     }
 
     private var shouldDeEmphasizeValues: Bool {
@@ -413,6 +346,40 @@ private struct CoreMetricsCard: View {
         return coreMetrics.historyStatus != .available
     }
 
+    private var snapshotItems: [DSMetricSnapshotCard.Item] {
+        [
+            .init(
+                title: "7-Day Load",
+                value: valueText(for: coreMetrics?.sevenDayLoad),
+                detail: "Weekly total",
+                emphasis: metricEmphasis,
+                tint: metricTint
+            ),
+            .init(
+                title: "Fitness",
+                value: valueText(for: coreMetrics?.fitness),
+                detail: "Base form",
+                emphasis: metricEmphasis,
+                tint: metricTint
+            ),
+            .init(
+                title: "Fatigue",
+                value: valueText(for: coreMetrics?.fatigue),
+                detail: "Recent strain",
+                emphasis: metricEmphasis,
+                tint: metricTint
+            )
+        ]
+    }
+
+    private var metricEmphasis: DSMetricSnapshotCard.Item.Emphasis {
+        shouldDeEmphasizeValues ? .subdued : .primary
+    }
+
+    private var metricTint: Color {
+        AppColors.Text.primary.opacity(shouldDeEmphasizeValues ? 0.72 : 1)
+    }
+
     @ViewBuilder
     private var statusPill: some View {
         if let coreMetrics {
@@ -436,26 +403,6 @@ private struct CoreMetricsCard: View {
             return "--"
         }
         return String(Int(value.rounded()))
-    }
-}
-
-private struct CoreMetricValueView: View {
-    let title: String
-    let valueText: String
-    let isMuted: Bool
-
-    var body: some View {
-        VStack(alignment: .center, spacing: AppSpacing.x4) {
-            Text(title)
-                .appTextStyle(AppTypography.labelSmall)
-                .foregroundStyle(AppColors.Text.secondary)
-
-            Text(valueText)
-                .appTextStyle(AppTypography.headingH1)
-                .foregroundStyle(AppColors.Text.primary.opacity(isMuted ? 0.72 : 1))
-                .monospacedDigit()
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 

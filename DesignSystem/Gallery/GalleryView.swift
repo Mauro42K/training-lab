@@ -250,6 +250,25 @@ struct GalleryView: View {
 
             DSCard {
                 VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                    tokenSubheader("DSMetricSnapshotCard")
+
+                    DSMetricSnapshotCard(
+                        eyebrow: "Load snapshot",
+                        items: [
+                            .init(title: "7-Day Load", value: "175", detail: "Weekly total"),
+                            .init(title: "Fitness", value: "35", detail: "Base form"),
+                            .init(title: "Fatigue", value: "38", detail: "Recent strain")
+                        ],
+                        footerText: "History is still consolidating.",
+                        accessory: AnyView(
+                            DSMetricPill("Partial history", iconSystemName: "chart.line.uptrend.xyaxis", variant: .info)
+                        )
+                    )
+                }
+            }
+
+            DSCard {
+                VStack(alignment: .leading, spacing: AppSpacing.x16) {
                     tokenSubheader("DSSectionHeader")
                     DSSectionHeader(title: "Recent Workouts", action: {}) {
                         Text("See all")
@@ -306,22 +325,18 @@ struct GalleryView: View {
         VStack(alignment: .leading, spacing: AppSpacing.x16) {
             DSSectionHeader(title: "Compositions (Sandbox)")
 
-            DSCard {
-                VStack(alignment: .leading, spacing: AppSpacing.x12) {
-                    Text("Example Metric Card")
-                        .appTextStyle(AppTypography.headingH3)
-                        .foregroundStyle(AppColors.Text.primary)
-
-                    HStack(spacing: AppSpacing.x8) {
-                        DSMetricPill("Load +8%", iconSystemName: "arrow.up", variant: .info)
-                        DSMetricPill("Recovered", iconSystemName: "heart.fill", variant: .success)
-                    }
-
-                    Text("Weekly training load stays within target range.")
-                        .appTextStyle(AppTypography.bodySmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-                }
-            }
+            DSMetricSnapshotCard(
+                eyebrow: "Home supporting snapshot",
+                items: [
+                    .init(title: "7-Day Load", value: "175", detail: "Weekly total"),
+                    .init(title: "Fitness", value: "35", detail: "Base form"),
+                    .init(title: "Fatigue", value: "38", detail: "Recent strain")
+                ],
+                footerText: "Use this pattern for compact supporting metric blocks before composing a custom card.",
+                accessory: AnyView(
+                    DSMetricPill("System pattern", iconSystemName: "square.grid.2x2", variant: .success)
+                )
+            )
 
             DSChartCard(
                 title: "Example Workout Card",

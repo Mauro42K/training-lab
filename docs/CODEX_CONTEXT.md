@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.3 — Core Metrics** (**Implemented / pending final closure check**)
+- **Phase 5.3 — Core Metrics** (**Closed / ready for 5.4 planning**)
 
 ### Phase 5.2 / 5.2.1 Current Summary
 - `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
@@ -97,10 +97,26 @@
 - iOS now renders a separate compact `Core Metrics` block between:
   - the `Readiness` hero
   - the `Load Trend` section
+- The final visual pass aligned the block back to the shared design-system primitives:
+  - `DSSectionHeader` for section hierarchy
+  - `DSMetricSnapshotCard` for the compact multi-metric snapshot
+  - `DSCard` as the base supporting surface primitive
+  - `DSMetricPill` only for secondary history/trust states
+- The Gallery now exposes the supporting snapshot pattern directly so Home does not need to improvise multi-metric supporting cards ad hoc.
+- The block now stays visually coherent with the Home hero/trend language without relying on ad-hoc custom surface recipes.
+- Core Metrics now reuses a stable Home load snapshot so:
+  - `7-Day Load` matches the trailing 7-day sum
+  - `Fitness` aligns with the current load-domain `Capacity / CTL`
+  - `Fatigue` aligns with the current load-domain `ATL`
 - Guardrails preserved:
   - Core Metrics remains separate from Readiness
   - Core Metrics remains separate from the Trend Card
   - no Coach or Recommended Today semantics were introduced
+- Validation closed:
+  - backend/API tests passed locally
+  - iOS and macOS builds passed locally
+  - production now returns real `core_metrics`
+  - macOS visual QA confirmed `Readiness Hero + Core Metrics + Load Trend` together in the Home host
 
 ### Phase 5.1.3 Closure Summary
 - macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.

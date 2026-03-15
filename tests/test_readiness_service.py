@@ -73,6 +73,15 @@ class ReadinessServiceTests(unittest.TestCase):
         self.assertGreater(readiness.confidence, 0.8)
         self.assertEqual(readiness.inputs_present, ["sleep", "hrv", "rhr"])
         self.assertEqual(readiness.inputs_missing, [])
+        self.assertIsNotNone(readiness.explainability)
+        assert readiness.explainability is not None
+        self.assertEqual(len(readiness.explainability.items), 4)
+        self.assertEqual(
+            [item.role for item in readiness.explainability.items],
+            ["primary_driver", "primary_driver", "primary_driver", "secondary_context"],
+        )
+        self.assertEqual(readiness.explainability.items[0].status, "measured")
+        self.assertEqual(readiness.explainability.items[0].short_reason, "Sleep ran above usual.")
 
     def test_partial_readiness_degrades_confidence_without_changing_contract(self) -> None:
         recovery_history = [
@@ -107,6 +116,11 @@ class ReadinessServiceTests(unittest.TestCase):
         self.assertLess(readiness.confidence, 0.8)
         self.assertEqual(readiness.inputs_present, ["sleep", "hrv"])
         self.assertEqual(readiness.inputs_missing, ["rhr"])
+        assert readiness.explainability is not None
+        explainability_by_key = {item.key: item for item in readiness.explainability.items}
+        self.assertEqual(explainability_by_key["rhr"].status, "missing")
+        self.assertEqual(explainability_by_key["rhr"].role, "primary_driver")
+        self.assertEqual(explainability_by_key["rhr"].short_reason, "RHR missing today.")
 
     def test_insufficient_readiness_returns_guarded_low_trust_score(self) -> None:
         sleep_history = [
@@ -130,6 +144,13 @@ class ReadinessServiceTests(unittest.TestCase):
         self.assertIsNotNone(readiness.score)
         self.assertIsNotNone(readiness.label)
         self.assertLess(readiness.confidence, 0.5)
+        assert readiness.explainability is not None
+        explainability_by_key = {item.key: item for item in readiness.explainability.items}
+        self.assertTrue(explainability_by_key["sleep"].is_baseline_sufficient)
+        self.assertEqual(
+            explainability_by_key["sleep"].short_reason,
+            "Sleep ran below usual.",
+        )
 
     def test_missing_readiness_returns_no_real_score(self) -> None:
         readiness = self.service.build_readiness(
@@ -146,6 +167,8 @@ class ReadinessServiceTests(unittest.TestCase):
         self.assertIsNone(readiness.label)
         self.assertEqual(readiness.inputs_present, [])
         self.assertEqual(readiness.inputs_missing, ["sleep", "hrv", "rhr"])
+        assert readiness.explainability is not None
+        self.assertTrue(all(item.status == "missing" for item in readiness.explainability.items))
 
     def test_isolated_missing_day_does_not_destroy_baselines(self) -> None:
         missing_gap_date = self.target_date - dt.timedelta(days=3)
@@ -241,6 +264,106 @@ class ReadinessServiceTests(unittest.TestCase):
         self.assertTrue(with_penalty.has_estimated_context)
         self.assertEqual(with_penalty.trace_summary[-1].name, "recent_exertion")
         self.assertEqual(with_penalty.trace_summary[-1].effect, "negative")
+        assert with_penalty.explainability is not None
+        exertion_item = with_penalty.explainability.items[-1]
+        self.assertEqual(exertion_item.key, "recent_exertion")
+        self.assertEqual(exertion_item.role, "secondary_context")
+        self.assertEqual(exertion_item.status, "estimated")
+        self.assertEqual(exertion_item.effect, "negative")
+        self.assertTrue(exertion_item.is_baseline_sufficient)
+        self.assertEqual(exertion_item.short_reason, "Exertion stayed elevated.")
+
+    def test_recent_exertion_missing_when_no_recent_context_exists(self) -> None:
+        readiness = self.service.build_readiness(
+            target_date=self.target_date,
+            current_recovery_row=self._recovery_row(
+                local_date=self.target_date,
+                sleep_total_sec=8 * 3600,
+                hrv_sdnn_ms=60.0,
+                resting_hr_bpm=48.0,
+            ),
+            recovery_history_rows=[],
+            sleep_history_rows=[],
+            load_rows=[],
+            load_context_by_date={},
+        )
+
+        assert readiness.explainability is not None
+        exertion_item = readiness.explainability.items[-1]
+        self.assertEqual(exertion_item.key, "recent_exertion")
+        self.assertEqual(exertion_item.status, "missing")
+        self.assertEqual(exertion_item.short_reason, "Exertion unavailable.")
+        self.assertFalse(exertion_item.is_baseline_sufficient)
+
+    def test_recent_exertion_measured_when_recent_context_uses_real_inputs(self) -> None:
+        recovery_history = [
+            self._recovery_row(
+                local_date=current_date,
+                hrv_sdnn_ms=52.0,
+                resting_hr_bpm=51.0,
+            )
+            for current_date in self._history_dates(days=28)
+        ]
+        sleep_history = [
+            self._sleep_row(local_date=current_date, total_sleep_sec=7 * 3600 + 1200)
+            for current_date in self._history_dates(days=14)
+        ]
+        load_rows = [(current_date, 42.0) for current_date in self._history_dates(days=28)]
+
+        readiness = self.service.build_readiness(
+            target_date=self.target_date,
+            current_recovery_row=self._recovery_row(
+                local_date=self.target_date,
+                sleep_total_sec=7 * 3600 + 1800,
+                hrv_sdnn_ms=56.0,
+                resting_hr_bpm=49.0,
+            ),
+            recovery_history_rows=recovery_history,
+            sleep_history_rows=sleep_history,
+            load_rows=load_rows,
+            load_context_by_date={
+                self.target_date - dt.timedelta(days=1): DailyLoadContext(
+                    local_date=self.target_date - dt.timedelta(days=1),
+                    load_present=True,
+                    has_estimated_inputs=False,
+                )
+            },
+        )
+
+        assert readiness.explainability is not None
+        exertion_item = readiness.explainability.items[-1]
+        self.assertEqual(exertion_item.key, "recent_exertion")
+        self.assertEqual(exertion_item.role, "secondary_context")
+        self.assertEqual(exertion_item.status, "measured")
+        self.assertEqual(exertion_item.effect, "neutral")
+        self.assertEqual(exertion_item.short_reason, "Exertion stayed in range.")
+
+    def test_trace_summary_stays_aligned_with_explainability_items(self) -> None:
+        sleep_history = [
+            self._sleep_row(local_date=current_date, total_sleep_sec=7 * 3600)
+            for current_date in self._history_dates(days=7)
+        ]
+
+        readiness = self.service.build_readiness(
+            target_date=self.target_date,
+            current_recovery_row=self._recovery_row(
+                local_date=self.target_date,
+                sleep_total_sec=7 * 3600 + 900,
+            ),
+            recovery_history_rows=[],
+            sleep_history_rows=sleep_history,
+            load_rows=[],
+            load_context_by_date={},
+        )
+
+        assert readiness.explainability is not None
+        trace_by_name = {item.name: item for item in readiness.trace_summary}
+        explainability_by_key = {item.key: item for item in readiness.explainability.items}
+        for key, explainability in explainability_by_key.items():
+            trace = trace_by_name[key]
+            self.assertEqual(trace.present, explainability.status != "missing")
+            self.assertEqual(trace.baseline_used, explainability.is_baseline_sufficient)
+            self.assertEqual(trace.effect, explainability.effect)
 
 
 if __name__ == "__main__":

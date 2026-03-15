@@ -269,6 +269,52 @@ struct GalleryView: View {
 
             DSCard {
                 VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                    tokenSubheader("DSExplainabilityCard")
+
+                    DSExplainabilityCard(
+                        primaryItems: [
+                            .init(
+                                title: "Sleep",
+                                value: "7h 38m",
+                                baselineHint: "Usual 7h 12m",
+                                reason: "Sleep ran above usual.",
+                                tint: AppColors.Accent.green
+                            ),
+                            .init(
+                                title: "HRV",
+                                value: "61",
+                                unit: "ms",
+                                baselineHint: "Usual 56 ms",
+                                reason: "HRV rose above usual.",
+                                tint: AppColors.Accent.green
+                            ),
+                            .init(
+                                title: "RHR",
+                                value: "49",
+                                unit: "bpm",
+                                baselineHint: "Usual 52 bpm",
+                                reason: "RHR stayed below usual.",
+                                tint: AppColors.Accent.green
+                            )
+                        ],
+                        secondaryItems: [
+                            .init(
+                                title: "Exertion",
+                                value: "182",
+                                unit: "load",
+                                reason: "Exertion stayed elevated.",
+                                status: .estimated,
+                                emphasis: .secondary,
+                                tint: AppColors.Accent.orange
+                            )
+                        ],
+                        footerText: "Sleep, HRV, and RHR drive the score. Exertion stays contextual."
+                    )
+                }
+            }
+
+            DSCard {
+                VStack(alignment: .leading, spacing: AppSpacing.x16) {
                     tokenSubheader("DSSectionHeader")
                     DSSectionHeader(title: "Recent Workouts", action: {}) {
                         Text("See all")
@@ -336,6 +382,42 @@ struct GalleryView: View {
                 accessory: AnyView(
                     DSMetricPill("System pattern", iconSystemName: "square.grid.2x2", variant: .success)
                 )
+            )
+
+            DSExplainabilityCard(
+                primaryItems: [
+                    .init(
+                        title: "Sleep",
+                        value: "6h 48m",
+                        baselineHint: "Usual 7h 20m",
+                        reason: "Sleep ran below usual.",
+                        tint: AppColors.Accent.coral
+                    ),
+                    .init(
+                        title: "HRV",
+                        value: "58",
+                        unit: "ms",
+                        baselineHint: "Usual 60 ms",
+                        reason: "HRV held near baseline."
+                    ),
+                    .init(
+                        title: "RHR",
+                        value: "--",
+                        unit: "bpm",
+                        reason: "RHR missing today.",
+                        status: .missing
+                    )
+                ],
+                secondaryItems: [
+                    .init(
+                        title: "Exertion",
+                        value: "164",
+                        unit: "load",
+                        reason: "Exertion stayed in range.",
+                        emphasis: .secondary
+                    )
+                ],
+                footerText: "Use this pattern when Home needs premium explainability without turning the block into a lab readout."
             )
 
             DSChartCard(

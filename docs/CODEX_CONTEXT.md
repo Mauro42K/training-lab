@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.3 — Core Metrics** (**Closed / ready for 5.4 planning**)
+- **Phase 5.4 — Drivers / Explainability** (**Closed / ready for 5.5 planning**)
 
 ### Phase 5.2 / 5.2.1 Current Summary
 - `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
@@ -20,6 +20,7 @@
   - `model_version`
   - `has_estimated_context`
   - `trace_summary`
+  - `explainability`
 - Readiness v1 uses the approved primary inputs and weights:
   - Sleep `40%`
   - HRV `35%`
@@ -117,6 +118,62 @@
   - iOS and macOS builds passed locally
   - production now returns real `core_metrics`
   - macOS visual QA confirmed `Readiness Hero + Core Metrics + Load Trend` together in the Home host
+
+### Phase 5.4 Current Summary
+- `GET /v1/home/summary` now extends `readiness` with a nested `explainability` block instead of pushing explainability logic into the client.
+- `readiness.explainability` exposes:
+  - `completeness_status`
+  - `confidence`
+  - `model_version`
+  - `items[]`
+- Every visible explainability item now carries:
+  - `key`
+  - `role`
+  - `status`
+  - `effect`
+  - `display_value`
+  - `display_unit`
+  - `baseline_value`
+  - `baseline_unit`
+  - `is_baseline_sufficient`
+  - `short_reason`
+- Visible v1 scope is constrained to the approved taxonomy:
+  - primary drivers:
+    - `sleep`
+    - `hrv`
+    - `rhr`
+  - secondary context:
+    - `recent_exertion`
+- Public visible roles are now only:
+  - `primary_driver`
+  - `secondary_context`
+- Public statuses are now:
+  - `measured`
+  - `estimated`
+  - `proxy`
+  - `missing`
+- Guardrails preserved:
+  - `recent_exertion` remains secondary context only
+  - `Exertion` is the UI label, but backend key remains `recent_exertion`
+  - `Movement` and secondary strength context stay out of the v1 Home surface
+  - score math and readiness weighting were not changed
+- `trace_summary` remains in the readiness contract for compatibility, but is now derived from the same explainability evaluation path so score/trace/explainability cannot drift.
+- iOS Home now renders a distinct `Drivers` block between:
+  - the `Readiness` hero
+  - `Core Metrics`
+- The drivers block reuses a governed Design System primitive instead of a bespoke Home card:
+  - `DSExplainabilityCard`
+  - Gallery preview added for the pattern
+- Visual hierarchy is now explicit in Home:
+  - Hero remains dominant
+  - `Sleep`, `HRV`, and `RHR` carry the main explainability weight
+  - `Exertion` remains visually quieter as context
+  - `Core Metrics` and `Trend Card` stay separate from explainability
+- Validation completed locally:
+  - backend unit/API tests passed
+  - iOS simulator build passed
+  - macOS build passed
+  - visual QA completed on iPhone simulator and macOS host using a local mock of the approved Home contract to verify the new block before backend rollout
 
 ### Phase 5.1.3 Closure Summary
 - macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.

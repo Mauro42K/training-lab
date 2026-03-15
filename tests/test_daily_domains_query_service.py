@@ -6,7 +6,12 @@ from unittest.mock import MagicMock, patch
 
 from api.services.daily_domains_query_service import DailyDomainsQueryService
 from api.services.home_summary_service import HomeSummaryService
-from api.schemas.daily_domains import ReadinessSummaryItem, ReadinessTraceInput
+from api.schemas.daily_domains import (
+    ReadinessExplainability,
+    ReadinessExplainabilityItem,
+    ReadinessSummaryItem,
+    ReadinessTraceInput,
+)
 from api.services.training_load_service import TrainingLoadSnapshot
 from api.schemas.training_load import TrainingLoadItem
 
@@ -133,6 +138,61 @@ class HomeSummaryServiceTests(unittest.TestCase):
                             effect="positive",
                         )
                     ],
+                    explainability=ReadinessExplainability(
+                        completeness_status="complete",
+                        confidence=0.91,
+                        model_version=1,
+                        items=[
+                            ReadinessExplainabilityItem(
+                                key="sleep",
+                                role="primary_driver",
+                                status="measured",
+                                effect="positive",
+                                display_value="8h",
+                                display_unit=None,
+                                baseline_value="7h 30m",
+                                baseline_unit=None,
+                                is_baseline_sufficient=True,
+                                short_reason="Sleep ran above usual.",
+                            ),
+                            ReadinessExplainabilityItem(
+                                key="hrv",
+                                role="primary_driver",
+                                status="measured",
+                                effect="positive",
+                                display_value="62",
+                                display_unit="ms",
+                                baseline_value="55",
+                                baseline_unit="ms",
+                                is_baseline_sufficient=True,
+                                short_reason="HRV rose above usual.",
+                            ),
+                            ReadinessExplainabilityItem(
+                                key="rhr",
+                                role="primary_driver",
+                                status="measured",
+                                effect="positive",
+                                display_value="48",
+                                display_unit="bpm",
+                                baseline_value="52",
+                                baseline_unit="bpm",
+                                is_baseline_sufficient=True,
+                                short_reason="RHR stayed below usual.",
+                            ),
+                            ReadinessExplainabilityItem(
+                                key="recent_exertion",
+                                role="secondary_context",
+                                status="measured",
+                                effect="neutral",
+                                display_value="42",
+                                display_unit="load",
+                                baseline_value="50",
+                                baseline_unit="load",
+                                is_baseline_sufficient=True,
+                                short_reason="Exertion stayed in range.",
+                            ),
+                        ],
+                    ),
                 ),
             ),
             patch(

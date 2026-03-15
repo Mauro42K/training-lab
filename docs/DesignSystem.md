@@ -89,9 +89,14 @@ Defined in `AppTypography`.
 - Prefer shared primitives first:
   - `DSSectionHeader` for section hierarchy
   - `DSMetricSnapshotCard` for compact supporting metric groups
+  - `DSExplainabilityCard` for readiness-style primary drivers plus quieter secondary context
   - `DSCard` for supporting surfaces that do not need grouped metric tiles
   - `DSMetricPill` only for secondary trust/history signals
 - Avoid introducing ad-hoc gradients, custom surface recipes, or bespoke shadows when an existing design-system primitive already matches the role.
+- Explainability-specific rule:
+  - primary drivers keep the visual weight
+  - secondary context stays visually quieter inside the same card system
+  - `estimated`, `proxy`, and `missing` states use lightweight status treatment and must never read as fully measured signals
 
 ## Navigation Patterns
 
@@ -107,6 +112,7 @@ Defined in `AppTypography`.
 Implemented primitives:
 - `DSCard`
 - `DSMetricSnapshotCard`
+- `DSExplainabilityCard`
 - `DSMetricPill`
 - `DSSectionHeader`
 - `DSSegmentedControl`

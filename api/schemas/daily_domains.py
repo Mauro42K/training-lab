@@ -8,6 +8,9 @@ from api.schemas.training_load import TrainingLoadHistoryStatus
 CompletenessStatus = Literal["complete", "partial"]
 ReadinessCompletenessStatus = Literal["complete", "partial", "insufficient", "missing"]
 ReadinessLabel = Literal["Ready", "Moderate", "Recover"]
+ReadinessExplainabilityRole = Literal["primary_driver", "secondary_context"]
+ReadinessExplainabilityStatus = Literal["measured", "estimated", "proxy", "missing"]
+ReadinessExplainabilityEffect = Literal["positive", "neutral", "negative", "not_used"]
 
 
 class DailySleepDomainItem(BaseModel):
@@ -60,6 +63,26 @@ class ReadinessTraceInput(BaseModel):
     effect: Literal["positive", "neutral", "negative", "not_used"]
 
 
+class ReadinessExplainabilityItem(BaseModel):
+    key: str
+    role: ReadinessExplainabilityRole
+    status: ReadinessExplainabilityStatus
+    effect: ReadinessExplainabilityEffect
+    display_value: str | None = None
+    display_unit: str | None = None
+    baseline_value: str | None = None
+    baseline_unit: str | None = None
+    is_baseline_sufficient: bool
+    short_reason: str
+
+
+class ReadinessExplainability(BaseModel):
+    completeness_status: ReadinessCompletenessStatus
+    confidence: float = Field(ge=0, le=1)
+    model_version: int = Field(ge=1)
+    items: list[ReadinessExplainabilityItem]
+
+
 class ReadinessSummaryItem(BaseModel):
     score: int | None = Field(default=None, ge=0, le=100)
     label: ReadinessLabel | None = None
@@ -70,6 +93,7 @@ class ReadinessSummaryItem(BaseModel):
     model_version: int = Field(ge=1)
     has_estimated_context: bool
     trace_summary: list[ReadinessTraceInput]
+    explainability: ReadinessExplainability | None = None
 
 
 class CoreMetricsSummaryItem(BaseModel):

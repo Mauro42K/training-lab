@@ -28,6 +28,8 @@ struct TrainingLoadScreen: View {
                         errorMessage: readinessErrorMessage
                     )
 
+                    ReadinessDriversSection(readiness: homeSummary?.readiness)
+
                     CoreMetricsSection(coreMetrics: homeSummary?.coreMetrics)
 
                     DSSectionHeader(title: "Load Trend", actionLabel: {
@@ -303,6 +305,136 @@ private struct CoreMetricsSection: View {
             DSSectionHeader(title: "Core Metrics")
 
             CoreMetricsCard(coreMetrics: coreMetrics)
+        }
+    }
+}
+
+private struct ReadinessDriversSection: View {
+    let readiness: ReadinessSummaryDTO?
+
+    @ViewBuilder
+    var body: some View {
+        if let readiness, let explainability = readiness.explainability {
+            VStack(alignment: .leading, spacing: AppSpacing.x8) {
+                DSSectionHeader(title: "Drivers")
+
+                ReadinessDriversCard(
+                    readiness: readiness,
+                    explainability: explainability
+                )
+            }
+        }
+    }
+}
+
+private struct ReadinessDriversCard: View {
+    let readiness: ReadinessSummaryDTO
+    let explainability: ReadinessExplainabilityDTO
+
+    var body: some View {
+        DSExplainabilityCard(
+            primaryItems: primaryItems,
+            secondaryItems: secondaryItems,
+            footerText: footerText
+        )
+    }
+
+    private var primaryItems: [DSExplainabilityCard.Item] {
+        explainability.items
+            .filter { $0.role == .primaryDriver }
+            .map { item in
+                DSExplainabilityCard.Item(
+                    title: title(for: item.key),
+                    value: item.displayValue ?? "--",
+                    unit: item.displayUnit,
+                    baselineHint: baselineHint(for: item),
+                    reason: item.shortReason,
+                    status: status(for: item.status),
+                    emphasis: .primary,
+                    tint: tint(for: item)
+                )
+            }
+    }
+
+    private var secondaryItems: [DSExplainabilityCard.Item] {
+        explainability.items
+            .filter { $0.role == .secondaryContext }
+            .map { item in
+                DSExplainabilityCard.Item(
+                    title: title(for: item.key),
+                    value: item.displayValue ?? "--",
+                    unit: item.displayUnit,
+                    reason: item.shortReason,
+                    status: status(for: item.status),
+                    emphasis: .secondary,
+                    tint: tint(for: item)
+                )
+            }
+    }
+
+    private var footerText: String {
+        if readiness.completenessStatus == .missing {
+            return "Sleep, HRV, and RHR drive the score once today's signal is available. Exertion stays contextual."
+        }
+        return "Sleep, HRV, and RHR drive the score. Exertion stays contextual."
+    }
+
+    private func title(for key: String) -> String {
+        switch key {
+        case "sleep":
+            return "Sleep"
+        case "hrv":
+            return "HRV"
+        case "rhr":
+            return "RHR"
+        case "recent_exertion":
+            return "Exertion"
+        default:
+            return key.replacingOccurrences(of: "_", with: " ").capitalized
+        }
+    }
+
+    private func status(for status: ReadinessExplainabilityStatusDTO) -> DSExplainabilityCard.Item.Status {
+        switch status {
+        case .measured:
+            return .measured
+        case .estimated:
+            return .estimated
+        case .proxy:
+            return .proxy
+        case .missing:
+            return .missing
+        }
+    }
+
+    private func baselineHint(for item: ReadinessExplainabilityItemDTO) -> String? {
+        guard item.role == .primaryDriver,
+              item.status == .measured,
+              item.isBaselineSufficient,
+              let baselineValue = item.baselineValue else {
+            return nil
+        }
+
+        if let baselineUnit = item.baselineUnit, !baselineUnit.isEmpty {
+            return "Usual \(baselineValue) \(baselineUnit)"
+        }
+        return "Usual \(baselineValue)"
+    }
+
+    private func tint(for item: ReadinessExplainabilityItemDTO) -> Color {
+        if item.status != .measured {
+            return AppColors.Text.secondary
+        }
+
+        switch item.effect {
+        case .positive:
+            return AppColors.Accent.green
+        case .negative:
+            return item.role == .secondaryContext ? AppColors.Accent.orange : AppColors.Accent.coral
+        case .neutral:
+            return AppColors.Text.primary
+        case .notUsed:
+            return AppColors.Text.secondary
         }
     }
 }

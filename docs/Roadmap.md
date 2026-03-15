@@ -761,14 +761,76 @@ Closure decisions carried into this phase:
 - Multi-sport recent load
 
 ### Phase 5.4 — Drivers / Explainability
+**Status:** CLOSED
+
+**Closure summary**
+- `Readiness` now exposes a nested explainability contract in `GET /v1/home/summary` under `readiness.explainability`.
+- The public explainability block exposes:
+  - `completeness_status`
+  - `confidence`
+  - `model_version`
+  - `items[]`
+- Every visible item now carries:
+  - `key`
+  - `role`
+  - `status`
+  - `effect`
+  - `display_value`
+  - `display_unit`
+  - `baseline_value`
+  - `baseline_unit`
+  - `is_baseline_sufficient`
+  - `short_reason`
+- Visible v1 scope is now locked to the approved set:
+  - primary drivers:
+    - `sleep`
+    - `hrv`
+    - `rhr`
+  - secondary context:
+    - `recent_exertion`
+- Public visible `role` values are only:
+  - `primary_driver`
+  - `secondary_context`
+- Public visible `status` values are:
+  - `measured`
+  - `estimated`
+  - `proxy`
+  - `missing`
+- Guardrails remained intact:
+  - `recent_exertion` stays context only and is presented in UI as `Exertion`
+  - `Movement` and secondary strength context stay out of the v1 Home surface
+  - score math and label semantics were not changed
+  - `trace_summary` remains for compatibility but is derived from the same evaluation path
+- iOS Home now renders a separate `Drivers` block between the hero and Core Metrics, using governed Design System primitives instead of a bespoke card:
+  - `DSExplainabilityCard`
+  - `DSSectionHeader`
+  - `DSMetricPill` only for lightweight non-measured states
+- Visual separation is now explicit:
+  - Hero remains dominant
+  - Drivers explain readiness
+  - Core Metrics remains load snapshot
+  - Trend Card remains load trajectory
+- Validation completed locally:
+  - backend unit/API tests passed
+  - iOS simulator build passed
+  - macOS build passed
+  - visual QA passed on iPhone simulator and macOS host using a local mock of the approved contract
+
 **Goal:** Make `Readiness` transparent through an explicit driver layer.
 
 **Why this block exists**
 - `Readiness` is only acceptable if the user can see why it moved.
 
 **Scope**
-- Implement the driver breakdown for documented inputs such as Sleep, HRV, RHR, Load/Exertion, Movement, and explicit secondary strength context when applicable.
-- Use proxy/estimated labels only where the Metrics Catalog already allows them.
+- Implement the driver breakdown for the approved v1 items only:
+  - primary drivers:
+    - Sleep
+    - HRV
+    - RHR
+  - secondary context:
+    - Load / Exertion
+- Use proxy/estimated labels only through approved `status`, not by inventing visible driver roles.
+- Keep `Movement` and secondary strength context out of the visible v1 Home surface.
 
 **Main dependencies**
 - Phase 5.2 hero contract
@@ -781,12 +843,12 @@ Closure decisions carried into this phase:
 - Driver surfaces aligned with Design System rules
 
 **Definition of Done**
-- Every displayed driver maps to a documented input or metric.
+- Every displayed driver/context item maps to a documented input or metric and preserves the approved primary-vs-context separation.
 
 **QA focus**
 - Missing drivers
-- Proxy labels
-- Secondary strength narrative
+- Measured vs estimated context treatment
+- Separation from Core Metrics and Trend Card
 
 ### Phase 5.5 — Recommended Today
 **Goal:** Add the contextual recommendation block without expanding into Coach.

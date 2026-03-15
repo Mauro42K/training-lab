@@ -342,6 +342,7 @@ Implementación v1:
 - `model_version`
 - `has_estimated_context`
 - `trace_summary`
+- `explainability`
 
 Guardrail:
 - `inputs_present` / `inputs_missing` en Readiness v1 solo cubren:
@@ -349,6 +350,65 @@ Guardrail:
   - `hrv`
   - `rhr`
 - `recent_exertion` se reporta en `trace_summary` como contexto, no como driver primario de completitud
+
+**Explainability v1 (`readiness.explainability`)**
+- Phase 5.4 agrega una capa explícita de explainability dentro del mismo contrato de `Readiness`.
+- vive anidada en `GET /v1/home/summary -> readiness.explainability`
+- no recalcula el score con otra lógica; reutiliza las mismas evaluaciones y baselines de `Readiness v1`
+
+Contrato del bloque:
+- `completeness_status`
+- `confidence`
+- `model_version`
+- `items[]`
+
+Contrato por item visible:
+- `key`
+- `role`
+- `status`
+- `effect`
+- `display_value`
+- `display_unit`
+- `baseline_value`
+- `baseline_unit`
+- `is_baseline_sufficient`
+- `short_reason`
+
+Taxonomía pública visible aprobada:
+- `role`:
+  - `primary_driver`
+  - `secondary_context`
+- `status`:
+  - `measured`
+  - `estimated`
+  - `proxy`
+  - `missing`
+
+Scope visible v1 aprobado:
+- Drivers primarios:
+  - `sleep`
+  - `hrv`
+  - `rhr`
+- Contexto secundario:
+  - `recent_exertion`
+
+Guardrails Phase 5.4:
+- `recent_exertion` mantiene backend key estable y solo se presenta como contexto secundario
+- en UI Home se etiqueta como `Exertion`
+- `Load / Exertion` nunca se presenta como driver primario del score
+- `Movement` y `secondary strength context` quedan fuera del payload visible v1
+- `not_ready_for_v1` queda como gobernanza/documentación, no como `role` visible del contrato principal
+- `short_reason` debe mantenerse corto, no técnico y visualmente liviano
+
+Reglas operativas v1:
+- `sleep`, `hrv`, `rhr`:
+  - `measured` cuando existe señal diaria usable
+  - `missing` cuando no existe señal usable
+- `recent_exertion`:
+  - `measured` cuando existe contexto de carga reciente con inputs reales
+  - `estimated` cuando el contexto de carga reciente depende de TRIMP estimado
+  - `missing` cuando no existe contexto usable
+- `proxy` queda soportado por schema para evolución futura, pero no se promueve artificialmente en los drivers/contexto aprobados de v1
 
 **Cálculo (v1 implementado)**
 - Score `0–100`
@@ -393,6 +453,11 @@ Implementación v1:
   - presencia
   - si se pudo usar baseline
   - efecto simplificado (`positive` / `neutral` / `negative` / `not_used`)
+
+Relación entre `trace_summary` y `explainability`:
+- `trace_summary` se mantiene por compatibilidad
+- debe derivarse del mismo camino de evaluación que `explainability`
+- no se permite deriva semántica entre score, trace y explainability
 
 **UI semantics v1**
 - `complete`:

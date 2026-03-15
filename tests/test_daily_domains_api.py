@@ -15,6 +15,8 @@ from api.schemas.daily_domains import (
     DailyActivityDomainItem,
     DailyActivityDomainResponse,
     HomeSummaryResponse,
+    ReadinessExplainability,
+    ReadinessExplainabilityItem,
     ReadinessSummaryItem,
     ReadinessTraceInput,
 )
@@ -91,6 +93,37 @@ class DailyDomainsApiTests(unittest.TestCase):
                         effect="neutral",
                     )
                 ],
+                explainability=ReadinessExplainability(
+                    completeness_status="partial",
+                    confidence=0.68,
+                    model_version=1,
+                    items=[
+                        ReadinessExplainabilityItem(
+                            key="sleep",
+                            role="primary_driver",
+                            status="measured",
+                            effect="neutral",
+                            display_value="7h 30m",
+                            display_unit=None,
+                            baseline_value="7h",
+                            baseline_unit=None,
+                            is_baseline_sufficient=True,
+                            short_reason="Sleep held near usual.",
+                        ),
+                        ReadinessExplainabilityItem(
+                            key="recent_exertion",
+                            role="secondary_context",
+                            status="estimated",
+                            effect="negative",
+                            display_value="182",
+                            display_unit="load",
+                            baseline_value="140",
+                            baseline_unit="load",
+                            is_baseline_sufficient=True,
+                            short_reason="Exertion stayed elevated.",
+                        ),
+                    ],
+                ),
             ),
             core_metrics=CoreMetricsSummaryItem(
                 seven_day_load=182.0,
@@ -111,6 +144,14 @@ class DailyDomainsApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.json()["sleep"])
         self.assertEqual(response.json()["readiness"]["label"], "Moderate")
+        self.assertEqual(
+            response.json()["readiness"]["explainability"]["items"][0]["role"],
+            "primary_driver",
+        )
+        self.assertEqual(
+            response.json()["readiness"]["explainability"]["items"][1]["status"],
+            "estimated",
+        )
         self.assertEqual(response.json()["core_metrics"]["seven_day_load"], 182.0)
         self.assertEqual(response.json()["core_metrics"]["history_status"], "partial")
         service_mock.assert_called_once()

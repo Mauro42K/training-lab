@@ -15,7 +15,12 @@ from api.repositories.daily_recovery_repository import (
 )
 from api.repositories.daily_sleep_repository import get_daily_sleep_summary_range
 from api.repositories.load_repository import get_daily_load_rows
-from api.schemas.daily_domains import ReadinessSummaryItem, ReadinessTraceInput
+from api.schemas.daily_domains import (
+    ReadinessExplainability,
+    ReadinessExplainabilityItem,
+    ReadinessSummaryItem,
+    ReadinessTraceInput,
+)
 
 
 @dataclass(frozen=True)
@@ -55,12 +60,27 @@ class ReadinessModelConfig:
 
 
 @dataclass(frozen=True)
-class _DriverEvaluation:
-    name: str
+class _ExplainabilityEvaluation:
+    key: str
+    role: str
+    status: str
     present: bool
     baseline_used: bool
+    display_value: str | None
+    display_unit: str | None
+    baseline_value: str | None
+    baseline_unit: str | None
+    short_reason: str
     score: float | None
     effect: str
+
+
+@dataclass(frozen=True)
+class _RecentExertionSummary:
+    recent_total: float
+    weekly_reference: float | None
+    penalty: float
+    is_baseline_sufficient: bool
 
 
 class ReadinessService:
@@ -152,60 +172,56 @@ class ReadinessService:
         load_rows: Sequence[tuple[dt.date, float]],
         load_context_by_date: dict[dt.date, DailyLoadContext],
     ) -> ReadinessSummaryItem:
-        evaluations = self._evaluate_primary_inputs(
+        recent_exertion_summary = self._recent_exertion_summary(
+            target_date=target_date,
+            load_rows=load_rows,
+        )
+        explainability_items = self._build_explainability_items(
             target_date=target_date,
             current_recovery_row=current_recovery_row,
             recovery_history_rows=recovery_history_rows,
             sleep_history_rows=sleep_history_rows,
+            load_context_by_date=load_context_by_date,
+            recent_exertion_summary=recent_exertion_summary,
         )
-        inputs_present = [evaluation.name for evaluation in evaluations if evaluation.present]
-        inputs_missing = [evaluation.name for evaluation in evaluations if not evaluation.present]
+        primary_evaluations = [
+            evaluation for evaluation in explainability_items if evaluation.role == "primary_driver"
+        ]
+        inputs_present = [evaluation.key for evaluation in primary_evaluations if evaluation.present]
+        inputs_missing = [evaluation.key for evaluation in primary_evaluations if not evaluation.present]
         completeness_status = self._resolve_completeness_status(len(inputs_present))
         has_estimated_context = any(
             context.has_estimated_inputs for context in load_context_by_date.values()
         )
 
-        raw_score = self._aggregate_primary_score(evaluations=evaluations)
+        raw_score = self._aggregate_primary_score(evaluations=primary_evaluations)
         score = None
         label = None
-        context_penalty = 0.0
+        context_penalty = recent_exertion_summary.penalty
         if raw_score is not None:
             if completeness_status == "insufficient":
                 raw_score = self.config.score_anchor + (
                     (raw_score - self.config.score_anchor) * self.config.insufficient_score_regression
                 )
-            context_penalty = self._recent_exertion_penalty(
-                target_date=target_date,
-                load_rows=load_rows,
-            )
             score = int(round(self._clamp(raw_score - context_penalty, lower=0, upper=100)))
             label = self._resolve_label(score)
 
         confidence = self._resolve_confidence(
             completeness_status=completeness_status,
-            evaluations=evaluations,
+            evaluations=primary_evaluations,
             has_estimated_context=has_estimated_context,
         )
 
         trace_summary = [
             ReadinessTraceInput(
-                name=evaluation.name,
-                role="primary",
+                name=evaluation.key,
+                role="primary" if evaluation.role == "primary_driver" else "context",
                 present=evaluation.present,
                 baseline_used=evaluation.baseline_used,
                 effect=evaluation.effect,  # type: ignore[arg-type]
             )
-            for evaluation in evaluations
+            for evaluation in explainability_items
         ]
-        trace_summary.append(
-            ReadinessTraceInput(
-                name="recent_exertion",
-                role="context",
-                present=bool(load_rows),
-                baseline_used=bool(load_rows),
-                effect="negative" if context_penalty > 0 else ("neutral" if load_rows else "not_used"),
-            )
-        )
 
         return ReadinessSummaryItem(
             score=score,
@@ -217,16 +233,38 @@ class ReadinessService:
             model_version=self.config.model_version,
             has_estimated_context=has_estimated_context,
             trace_summary=trace_summary,
+            explainability=ReadinessExplainability(
+                completeness_status=completeness_status,
+                confidence=confidence,
+                model_version=self.config.model_version,
+                items=[
+                    ReadinessExplainabilityItem(
+                        key=evaluation.key,
+                        role=evaluation.role,  # type: ignore[arg-type]
+                        status=evaluation.status,  # type: ignore[arg-type]
+                        effect=evaluation.effect,  # type: ignore[arg-type]
+                        display_value=evaluation.display_value,
+                        display_unit=evaluation.display_unit,
+                        baseline_value=evaluation.baseline_value,
+                        baseline_unit=evaluation.baseline_unit,
+                        is_baseline_sufficient=evaluation.baseline_used,
+                        short_reason=evaluation.short_reason,
+                    )
+                    for evaluation in explainability_items
+                ],
+            ),
         )
 
-    def _evaluate_primary_inputs(
+    def _build_explainability_items(
         self,
         *,
         target_date: dt.date,
         current_recovery_row: Any | None,
         recovery_history_rows: Sequence[Any],
         sleep_history_rows: Sequence[Any],
-    ) -> list[_DriverEvaluation]:
+        load_context_by_date: dict[dt.date, DailyLoadContext],
+        recent_exertion_summary: _RecentExertionSummary,
+    ) -> list[_ExplainabilityEvaluation]:
         anchor = self.config.score_anchor
         sleep_current = getattr(current_recovery_row, "sleep_total_sec", None)
         sleep_baseline = self._sleep_baseline_seconds(
@@ -269,32 +307,83 @@ class ReadinessService:
         )
 
         return [
-            self._driver_evaluation("sleep", sleep_current, sleep_score, sleep_baseline_used, anchor),
-            self._driver_evaluation("hrv", hrv_current, hrv_score, hrv_baseline_used, anchor),
-            self._driver_evaluation("rhr", rhr_current, rhr_score, rhr_baseline_used, anchor),
+            self._primary_explainability_evaluation(
+                key="sleep",
+                current_value=sleep_current,
+                baseline_value=sleep_baseline,
+                score=sleep_score,
+                baseline_used=sleep_baseline_used,
+                anchor=anchor,
+            ),
+            self._primary_explainability_evaluation(
+                key="hrv",
+                current_value=hrv_current,
+                baseline_value=hrv_baseline,
+                score=hrv_score,
+                baseline_used=hrv_baseline_used,
+                anchor=anchor,
+            ),
+            self._primary_explainability_evaluation(
+                key="rhr",
+                current_value=rhr_current,
+                baseline_value=rhr_baseline,
+                score=rhr_score,
+                baseline_used=rhr_baseline_used,
+                anchor=anchor,
+            ),
+            self._recent_exertion_explainability_evaluation(
+                load_context_by_date=load_context_by_date,
+                recent_exertion_summary=recent_exertion_summary,
+            ),
         ]
 
-    def _driver_evaluation(
+    def _primary_explainability_evaluation(
         self,
-        name: str,
+        *,
+        key: str,
         current_value: float | int | None,
+        baseline_value: float | None,
         score: float | None,
         baseline_used: bool,
         anchor: float,
-    ) -> _DriverEvaluation:
+    ) -> _ExplainabilityEvaluation:
         if current_value is None:
-            return _DriverEvaluation(
-                name=name,
+            return _ExplainabilityEvaluation(
+                key=key,
+                role="primary_driver",
+                status="missing",
                 present=False,
                 baseline_used=False,
+                display_value=None,
+                display_unit=self._display_unit(key),
+                baseline_value=self._format_value(key, baseline_value),
+                baseline_unit=self._baseline_unit(key),
+                short_reason=self._short_reason(
+                    key=key,
+                    status="missing",
+                    effect="not_used",
+                    baseline_used=False,
+                ),
                 score=None,
                 effect="not_used",
             )
         if score is None:
-            return _DriverEvaluation(
-                name=name,
+            return _ExplainabilityEvaluation(
+                key=key,
+                role="primary_driver",
+                status="measured",
                 present=True,
                 baseline_used=False,
+                display_value=self._format_value(key, current_value),
+                display_unit=self._display_unit(key),
+                baseline_value=self._format_value(key, baseline_value),
+                baseline_unit=self._baseline_unit(key),
+                short_reason=self._short_reason(
+                    key=key,
+                    status="measured",
+                    effect="neutral",
+                    baseline_used=False,
+                ),
                 score=anchor,
                 effect="neutral",
             )
@@ -304,25 +393,98 @@ class ReadinessService:
             effect = "negative"
         else:
             effect = "neutral"
-        return _DriverEvaluation(
-            name=name,
+        return _ExplainabilityEvaluation(
+            key=key,
+            role="primary_driver",
+            status="measured",
             present=True,
             baseline_used=baseline_used,
+            display_value=self._format_value(key, current_value),
+            display_unit=self._display_unit(key),
+            baseline_value=self._format_value(key, baseline_value),
+            baseline_unit=self._baseline_unit(key),
+            short_reason=self._short_reason(
+                key=key,
+                status="measured",
+                effect=effect,
+                baseline_used=baseline_used,
+            ),
             score=score,
+            effect=effect,
+        )
+
+    def _recent_exertion_explainability_evaluation(
+        self,
+        *,
+        load_context_by_date: dict[dt.date, DailyLoadContext],
+        recent_exertion_summary: _RecentExertionSummary,
+    ) -> _ExplainabilityEvaluation:
+        present = any(context.load_present for context in load_context_by_date.values())
+        has_estimated_inputs = any(
+            context.load_present and context.has_estimated_inputs
+            for context in load_context_by_date.values()
+        )
+        if not present:
+            return _ExplainabilityEvaluation(
+                key="recent_exertion",
+                role="secondary_context",
+                status="missing",
+                present=False,
+                baseline_used=False,
+                display_value=None,
+                display_unit="load",
+                baseline_value=None,
+                baseline_unit="load",
+                short_reason=self._short_reason(
+                    key="recent_exertion",
+                    status="missing",
+                    effect="not_used",
+                    baseline_used=False,
+                ),
+                score=None,
+                effect="not_used",
+            )
+
+        status = "estimated" if has_estimated_inputs else "measured"
+        baseline_used = recent_exertion_summary.is_baseline_sufficient
+        if recent_exertion_summary.penalty > 0:
+            effect = "negative"
+        elif baseline_used:
+            effect = "neutral"
+        else:
+            effect = "not_used"
+
+        return _ExplainabilityEvaluation(
+            key="recent_exertion",
+            role="secondary_context",
+            status=status,
+            present=True,
+            baseline_used=baseline_used,
+            display_value=self._format_value("recent_exertion", recent_exertion_summary.recent_total),
+            display_unit="load",
+            baseline_value=self._format_value("recent_exertion", recent_exertion_summary.weekly_reference),
+            baseline_unit="load",
+            short_reason=self._short_reason(
+                key="recent_exertion",
+                status=status,
+                effect=effect,
+                baseline_used=baseline_used,
+            ),
+            score=None,
             effect=effect,
         )
 
     def _aggregate_primary_score(
         self,
         *,
-        evaluations: Sequence[_DriverEvaluation],
+        evaluations: Sequence[_ExplainabilityEvaluation],
     ) -> float | None:
         weighted_total = 0.0
         weight_total = 0.0
         for evaluation in evaluations:
             if not evaluation.present or evaluation.score is None:
                 continue
-            weight = self.config.driver_weights[evaluation.name]
+            weight = self.config.driver_weights[evaluation.key]
             weighted_total += evaluation.score * weight
             weight_total += weight
         if weight_total <= 0:
@@ -333,7 +495,7 @@ class ReadinessService:
         self,
         *,
         completeness_status: str,
-        evaluations: Sequence[_DriverEvaluation],
+        evaluations: Sequence[_ExplainabilityEvaluation],
         has_estimated_context: bool,
     ) -> float:
         if completeness_status == "complete":
@@ -352,14 +514,19 @@ class ReadinessService:
             confidence -= self.config.estimated_context_penalty
         return round(self._clamp(confidence, lower=0, upper=1), 2)
 
-    def _recent_exertion_penalty(
+    def _recent_exertion_summary(
         self,
         *,
         target_date: dt.date,
         load_rows: Sequence[tuple[dt.date, float]],
-    ) -> float:
+    ) -> _RecentExertionSummary:
         if not load_rows:
-            return 0.0
+            return _RecentExertionSummary(
+                recent_total=0.0,
+                weekly_reference=None,
+                penalty=0.0,
+                is_baseline_sufficient=False,
+            )
 
         by_date = {row_date: load for row_date, load in load_rows}
         history_end = target_date - dt.timedelta(days=1)
@@ -368,15 +535,30 @@ class ReadinessService:
         recent_total = sum(by_date.get(current_date, 0.0) for current_date in recent_dates)
         reference_total = sum(by_date.get(current_date, 0.0) for current_date in reference_dates)
         if reference_total <= 0 or recent_total <= 0:
-            return 0.0
+            return _RecentExertionSummary(
+                recent_total=recent_total,
+                weekly_reference=(reference_total / 4) if reference_total > 0 else None,
+                penalty=0.0,
+                is_baseline_sufficient=False,
+            )
 
         weekly_reference = reference_total / 4
         ratio = recent_total / weekly_reference if weekly_reference > 0 else 0.0
         if ratio <= 1:
-            return 0.0
+            return _RecentExertionSummary(
+                recent_total=recent_total,
+                weekly_reference=weekly_reference,
+                penalty=0.0,
+                is_baseline_sufficient=True,
+            )
 
         penalty = (ratio - 1) * self.config.recent_exertion_penalty_scale
-        return round(min(penalty, self.config.recent_exertion_penalty_cap), 2)
+        return _RecentExertionSummary(
+            recent_total=recent_total,
+            weekly_reference=weekly_reference,
+            penalty=round(min(penalty, self.config.recent_exertion_penalty_cap), 2),
+            is_baseline_sufficient=True,
+        )
 
     def _score_against_baseline(
         self,
@@ -478,6 +660,82 @@ class ReadinessService:
         if score >= self.config.moderate_threshold:
             return "Moderate"
         return "Recover"
+
+    def _format_value(self, key: str, value: float | int | None) -> str | None:
+        if value is None:
+            return None
+        if key == "sleep":
+            total_minutes = int(round(float(value) / 60))
+            hours = total_minutes // 60
+            minutes = total_minutes % 60
+            if minutes == 0:
+                return f"{hours}h"
+            return f"{hours}h {minutes}m"
+        return str(int(round(float(value))))
+
+    def _display_unit(self, key: str) -> str | None:
+        if key == "hrv":
+            return "ms"
+        if key == "rhr":
+            return "bpm"
+        if key == "recent_exertion":
+            return "load"
+        return None
+
+    def _baseline_unit(self, key: str) -> str | None:
+        return self._display_unit(key)
+
+    def _short_reason(
+        self,
+        *,
+        key: str,
+        status: str,
+        effect: str,
+        baseline_used: bool,
+    ) -> str:
+        if status == "missing":
+            return {
+                "sleep": "Sleep missing today.",
+                "hrv": "HRV missing today.",
+                "rhr": "RHR missing today.",
+                "recent_exertion": "Exertion unavailable.",
+            }[key]
+
+        if not baseline_used:
+            return {
+                "sleep": "Sleep is still finding usual range.",
+                "hrv": "HRV baseline is still building.",
+                "rhr": "RHR baseline is still building.",
+                "recent_exertion": "Exertion context is still building.",
+            }[key]
+
+        if key == "sleep":
+            return {
+                "positive": "Sleep ran above usual.",
+                "neutral": "Sleep held near usual.",
+                "negative": "Sleep ran below usual.",
+                "not_used": "Sleep held near usual.",
+            }[effect]
+        if key == "hrv":
+            return {
+                "positive": "HRV rose above usual.",
+                "neutral": "HRV held near baseline.",
+                "negative": "HRV dipped below usual.",
+                "not_used": "HRV held near baseline.",
+            }[effect]
+        if key == "rhr":
+            return {
+                "positive": "RHR stayed below usual.",
+                "neutral": "RHR held near baseline.",
+                "negative": "RHR ran above usual.",
+                "not_used": "RHR held near baseline.",
+            }[effect]
+        return {
+            "positive": "Exertion stayed light.",
+            "neutral": "Exertion stayed in range.",
+            "negative": "Exertion stayed elevated.",
+            "not_used": "Exertion stayed in range.",
+        }[effect]
 
     def _date_window(self, *, end_date: dt.date, days: int) -> list[dt.date]:
         if days <= 0:

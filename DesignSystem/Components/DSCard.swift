@@ -135,6 +135,116 @@ struct DSMetricSnapshotCard: View {
     }
 }
 
+struct DSExplainabilityCard: View {
+    struct Item: Identifiable {
+        enum Emphasis: Equatable {
+            case primary
+            case secondary
+        }
+
+        enum Status: Equatable {
+            case measured
+            case estimated
+            case proxy
+            case missing
+        }
+
+        let id = UUID()
+        let title: String
+        let value: String
+        let unit: String?
+        let baselineHint: String?
+        let reason: String
+        let status: Status
+        let emphasis: Emphasis
+        let tint: Color
+
+        init(
+            title: String,
+            value: String,
+            unit: String? = nil,
+            baselineHint: String? = nil,
+            reason: String,
+            status: Status = .measured,
+            emphasis: Emphasis = .primary,
+            tint: Color = AppColors.Text.primary
+        ) {
+            self.title = title
+            self.value = value
+            self.unit = unit
+            self.baselineHint = baselineHint
+            self.reason = reason
+            self.status = status
+            self.emphasis = emphasis
+            self.tint = tint
+        }
+    }
+
+    private let eyebrow: String?
+    private let primaryItems: [Item]
+    private let secondaryItems: [Item]
+    private let footerText: String?
+
+    init(
+        eyebrow: String? = nil,
+        primaryItems: [Item],
+        secondaryItems: [Item] = [],
+        footerText: String? = nil
+    ) {
+        self.eyebrow = eyebrow
+        self.primaryItems = primaryItems
+        self.secondaryItems = secondaryItems
+        self.footerText = footerText
+    }
+
+    var body: some View {
+        DSCard {
+            VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                if let eyebrow {
+                    Text(eyebrow)
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: AppSpacing.x12) {
+                        ForEach(primaryItems) { item in
+                            DSExplainabilityTile(item: item)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                        ForEach(primaryItems) { item in
+                            DSExplainabilityTile(item: item)
+                        }
+                    }
+                }
+
+                if !secondaryItems.isEmpty {
+                    VStack(alignment: .leading, spacing: AppSpacing.x8) {
+                        Text("Context")
+                            .appTextStyle(AppTypography.labelSmall)
+                            .foregroundStyle(AppColors.Text.secondary)
+
+                        VStack(alignment: .leading, spacing: AppSpacing.x8) {
+                            ForEach(secondaryItems) { item in
+                                DSExplainabilityTile(item: item)
+                            }
+                        }
+                    }
+                }
+
+                if let footerText {
+                    Text(footerText)
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+        }
+    }
+}
+
 private struct DSMetricSnapshotTile: View {
     let item: DSMetricSnapshotCard.Item
 
@@ -172,6 +282,120 @@ private struct DSMetricSnapshotTile: View {
     }
 }
 
+private struct DSExplainabilityTile: View {
+    let item: DSExplainabilityCard.Item
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.x8) {
+            HStack(alignment: .top, spacing: AppSpacing.x8) {
+                Text(item.title)
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+
+                Spacer(minLength: AppSpacing.x8)
+
+                if let statusTitle {
+                    DSMetricPill(
+                        statusTitle,
+                        iconSystemName: statusIcon,
+                        variant: statusVariant
+                    )
+                }
+            }
+
+            HStack(alignment: .firstTextBaseline, spacing: AppSpacing.x4) {
+                Text(item.value)
+                    .appTextStyle(item.emphasis == .primary ? AppTypography.headingH2 : AppTypography.headingH3)
+                    .foregroundStyle(valueColor)
+                    .monospacedDigit()
+
+                if let unit = item.unit, !unit.isEmpty {
+                    Text(unit)
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+
+            if let baselineHint {
+                Text(baselineHint)
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Text(item.reason)
+                .appTextStyle(AppTypography.bodySmall)
+                .foregroundStyle(AppColors.Text.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.x12)
+        .background(backgroundColor)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+                .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+        )
+    }
+
+    private var baselineHint: String? {
+        guard item.status == .measured else { return nil }
+        return item.baselineHint
+    }
+
+    private var backgroundColor: Color {
+        item.emphasis == .primary ? AppColors.Surface.cardMuted : AppColors.Background.elevated
+    }
+
+    private var valueColor: Color {
+        switch item.status {
+        case .measured:
+            return item.tint
+        case .estimated, .proxy, .missing:
+            return AppColors.Text.secondary
+        }
+    }
+
+    private var statusTitle: String? {
+        switch item.status {
+        case .measured:
+            return nil
+        case .estimated:
+            return "Estimated"
+        case .proxy:
+            return "Proxy"
+        case .missing:
+            return "Missing"
+        }
+    }
+
+    private var statusIcon: String? {
+        switch item.status {
+        case .measured:
+            return nil
+        case .estimated:
+            return "chart.bar.xaxis"
+        case .proxy:
+            return "sparkles"
+        case .missing:
+            return "minus.circle"
+        }
+    }
+
+    private var statusVariant: DSMetricPill.Variant {
+        switch item.status {
+        case .measured:
+            return .neutral
+        case .estimated:
+            return .info
+        case .proxy:
+            return .neutral
+        case .missing:
+            return .warning
+        }
+    }
+}
+
 #Preview {
     ZStack {
         AppColors.Background.primary.ignoresSafeArea()
@@ -197,6 +421,46 @@ private struct DSMetricSnapshotTile: View {
                 accessory: AnyView(
                     DSMetricPill("Partial history", iconSystemName: "chart.line.uptrend.xyaxis", variant: .info)
                 )
+            )
+            DSExplainabilityCard(
+                eyebrow: "Readiness drivers",
+                primaryItems: [
+                    .init(
+                        title: "Sleep",
+                        value: "7h 38m",
+                        baselineHint: "Usual 7h 12m",
+                        reason: "Sleep ran above usual.",
+                        tint: AppColors.Accent.green
+                    ),
+                    .init(
+                        title: "HRV",
+                        value: "61",
+                        unit: "ms",
+                        baselineHint: "Usual 56 ms",
+                        reason: "HRV rose above usual.",
+                        tint: AppColors.Accent.green
+                    ),
+                    .init(
+                        title: "RHR",
+                        value: "49",
+                        unit: "bpm",
+                        baselineHint: "Usual 52 bpm",
+                        reason: "RHR stayed below usual.",
+                        tint: AppColors.Accent.green
+                    )
+                ],
+                secondaryItems: [
+                    .init(
+                        title: "Exertion",
+                        value: "182",
+                        unit: "load",
+                        reason: "Exertion stayed elevated.",
+                        status: .estimated,
+                        emphasis: .secondary,
+                        tint: AppColors.Accent.orange
+                    )
+                ],
+                footerText: "Sleep, HRV, and RHR drive the score. Exertion stays contextual."
             )
         }
         .padding(AppSpacing.x24)

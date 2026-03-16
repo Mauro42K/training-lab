@@ -6,6 +6,121 @@ This project follows a simple SemVer-style changelog.
 
 - Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
 
+## v0.5.4 - 2026-03-16
+
+## Phase 5.4 — Drivers / Explainability
+
+Added
+- `readiness.explainability` nested inside `GET /v1/home/summary`.
+- explainability item contract with:
+  - `key`
+  - `role`
+  - `status`
+  - `effect`
+  - `display_value`
+  - `display_unit`
+  - `baseline_value`
+  - `baseline_unit`
+  - `is_baseline_sufficient`
+  - `short_reason`
+- visible v1 explainability scope for:
+  - `Sleep`
+  - `HRV`
+  - `RHR`
+  - `Exertion` as secondary context
+- reusable Design System primitive for the drivers surface and gallery coverage for the pattern.
+
+Improved
+- readiness transparency without changing the score math.
+- consistency between score evaluation, `trace_summary`, and explainability by deriving them from the same readiness evaluation path.
+- Home hierarchy by inserting a dedicated Drivers / Explainability block between Hero and Core Metrics.
+- production validation coverage with real payloads for both complete and missing-driver days.
+
+Notes
+- `Movement` and `secondary strength context` remain out of the visible v1 explainability surface.
+- `Exertion` remains secondary context and is not treated as a primary readiness driver.
+- Phase 5.4 is formally closed.
+
+## v0.5.3 - 2026-03-15
+
+## Phase 5.3 — Core Metrics
+
+Added
+- `core_metrics` inside `GET /v1/home/summary`.
+- Home Core Metrics block with:
+  - `7-Day Load`
+  - `Fitness`
+  - `Fatigue`
+- reusable Design System support for compact supporting metric groups.
+- Gallery coverage for the Home metric snapshot pattern.
+
+Improved
+- Home context by surfacing current load-state metrics without requiring navigation to Trends.
+- alignment between Home and the load domain by reusing the existing training-load calculations instead of recalculating in client code.
+- Design System governance for Home supporting blocks.
+
+Fixed
+- deploy parity issue where production was still returning `core_metrics = null` while `training-load` was already up to date.
+- snapshot inconsistency so `Fitness` and `Fatigue` now align with the standard load-domain window used by the trend surfaces.
+
+Notes
+- `Fitness` is the Home UI name for the internal `Capacity / CTL` value.
+- Hero, Core Metrics, and Trend Card remain visually and semantically separate.
+- Phase 5.3 is formally closed.
+
+## v0.5.2 - 2026-03-14
+
+## Phase 5.2 — Readiness Hero
+
+Added
+- `Readiness v1` as a read-time layer exposed through `GET /v1/home/summary`.
+- Home Hero surface for `Readiness` with premium theming by semantic label.
+- new readiness contract fields for score, label, confidence, completeness, inputs present/missing, model version, and trace summary.
+- Apple Health ingest enablement for:
+  - sleep
+  - HRV SDNN
+  - resting HR
+- separate physiology bootstrap / incremental sync state for historical backfill and ongoing ingest.
+
+Improved
+- resilience of readiness baselines with sparse-history handling.
+- Home semantics by standardizing `Readiness` as the governing hero concept.
+- production data realism by enabling sleep and recovery-signal ingestion from iPhone HealthKit.
+
+Fixed
+- stale or misleading `Readiness unavailable` states caused by missing physiological ingest rather than readiness model failure.
+- cache migration / local-store issues tied to newly added readiness-related fields in SwiftData models.
+- deploy parity issues that prevented production from serving the readiness contract initially.
+
+Notes
+- primary readiness inputs in v1 are `Sleep`, `HRV`, and `RHR`.
+- recent load / exertion remains bounded secondary context only.
+- Phase 5.2 and 5.2.1 are operationally resolved and treated as closed inputs for subsequent Home phases.
+
+## v0.5.1 - 2026-03-13
+
+## Phase 5.1 — Trend Card (Load vs Capacity)
+
+Added
+- `Load vs Capacity` trend block for Home, backed by the load domain.
+- `Capacity` formalized from `Fitness / CTL` and exposed in the load contract.
+- `history_status`, `semantic_state`, `latest_load`, and `latest_capacity` in the training-load response.
+- app naming/icon pass for Training Lab on Apple platforms.
+
+Improved
+- trend semantics by separating current load state from readiness.
+- cache fallback logic so legacy local data can reconstruct load-history state and capacity more safely.
+- label correctness and freshness handling for `Today` in load views.
+
+Fixed
+- stale-cache inconsistencies where the trend view could show real history while the status block said `missing`.
+- capacity fallback rendering at `0` for legacy cached rows.
+- cache migration failures caused by newly added mandatory fields in local SwiftData models.
+
+Notes
+- Phase 5.1, 5.1.1, 5.1.2, and 5.1.3 are closed as the full Trend Card delivery track.
+- Trend Card remains part of the load domain and separate from Readiness.
+
 ## v0.4.4.1 - 2026-03-11
 
 ## Phase 4.4.1 — Workout History Dedup & Recompute

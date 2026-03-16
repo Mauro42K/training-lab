@@ -1,8 +1,16 @@
-# Design System — Phase 2
+# Design System
 
 ## Scope
-Phase 2 defines the shared visual language and reusable primitives used by future feature screens.
-This document is implementation-facing and maps directly to `DesignSystem/**`.
+This document defines the shared visual language, reusable primitives, and implementation rules used by Training Lab screens.
+It is implementation-facing and maps directly to `DesignSystem/**`.
+
+The Design System is the source of truth for:
+- tokens
+- semantic styles
+- reusable UI primitives
+- Home composition rules
+- chart language
+- gallery validation patterns
 
 ## Token Model
 
@@ -37,6 +45,11 @@ Defined in `AppColors` with dynamic light/dark mappings.
 - Text: `primary`, `secondary`, `inverse`
 - Stroke: `subtle`, `strong`
 - Accent: `blue`, `green`, `orange`, `red`, `purple`
+- Semantic readiness accents already approved for Home:
+  - `green` for `Ready`
+  - `amber/orange` for `Moderate`
+  - `coral/red` for `Recover`
+  - neutral dark treatment for `missing`
 
 ### Typography
 Defined in `AppTypography`.
@@ -48,8 +61,8 @@ Defined in `AppTypography`.
 - Label: `labelSmall`
 
 ### Spacing and Radius
-- Spacing scale: 0, 4, 8, 12, 16, 24, 32, 40, 48, 64
-- Radius scale: 0, 8, 12, 16, 20, 24
+- Spacing scale: `0, 4, 8, 12, 16, 24, 32, 40, 48, 64`
+- Radius scale: `0, 8, 12, 16, 20, 24`
 
 ### Shadows and Elevation
 - Shadow/Card: used for standard cards
@@ -72,6 +85,17 @@ Defined in `AppTypography`.
 
 ## Home Language
 
+### General Home Hierarchy
+Home follows a premium/editorial hierarchy.
+The order of visual importance is:
+1. `Readiness Hero`
+2. `Drivers / Explainability`
+3. `Core Metrics`
+4. `Load Trend`
+5. `Trend Card`
+
+Each block must preserve its semantic role and must not visually impersonate another block.
+
 ### Readiness Hero
 - Home keeps a premium/editorial direction anchored in Figma, with the hero as the dominant surface.
 - `Readiness` uses semantic theming by label, not a continuous score gradient:
@@ -83,33 +107,73 @@ Defined in `AppTypography`.
   - score first
   - label second
   - confidence and trust states as secondary support only
+- Hero-specific rule:
+  - the hero owns the atmospheric treatment
+  - supporting blocks must not copy the hero surface treatment
+
+### Drivers / Explainability
+- `Drivers` exist to explain **why** `Readiness` moved.
+- The visible v1 scope is intentionally limited to:
+  - primary drivers: `Sleep`, `HRV`, `RHR`
+  - secondary context: `Exertion`
+- `Movement` and `secondary strength context` are not part of the visible v1 explainability surface.
+- Drivers must preserve semantic hierarchy:
+  - primary drivers carry more visual weight
+  - secondary context is quieter and clearly subordinate
+- Explainability states:
+  - `measured` is the default and should feel trustworthy but not loud
+  - `estimated`, `proxy`, and `missing` use lightweight status treatment
+  - non-measured states must never read as if they were fully measured signals
+- Copy rule:
+  - short reasons must stay short, readable, and non-technical
+  - avoid dense paragraphs or laboratory-style phrasing
+
+### Core Metrics
+- `Core Metrics` are a compact Home context block, not a mini dashboard.
+- The visible metrics are:
+  - `7-Day Load`
+  - `Fitness`
+  - `Fatigue`
+- `Core Metrics` must feel clearly subordinate to the hero and more compact than the trend card.
+- The block should feel information-rich but visually calm.
+- Trust/history treatment must stay secondary and never compete with the values.
+
+### Trend / Load Blocks
+- `Load Trend` and `Load vs Capacity` belong to the load domain, not the readiness domain.
+- They must remain visually and semantically separate from Hero and Drivers.
+- Do not reuse trend grammar to explain readiness.
 
 ### Supporting Home Blocks
-- Supporting blocks such as `Core Metrics` should stay in the same Home language without copying the hero treatment.
+- Supporting blocks should stay in the same Home language without copying the hero treatment.
 - Prefer shared primitives first:
   - `DSSectionHeader` for section hierarchy
   - `DSMetricSnapshotCard` for compact supporting metric groups
   - `DSExplainabilityCard` for readiness-style primary drivers plus quieter secondary context
   - `DSCard` for supporting surfaces that do not need grouped metric tiles
-  - `DSMetricPill` only for secondary trust/history signals
+  - `DSMetricPill` only for secondary trust/history/status signals
 - Avoid introducing ad-hoc gradients, custom surface recipes, or bespoke shadows when an existing design-system primitive already matches the role.
-- Explainability-specific rule:
-  - primary drivers keep the visual weight
-  - secondary context stays visually quieter inside the same card system
-  - `estimated`, `proxy`, and `missing` states use lightweight status treatment and must never read as fully measured signals
+
+### Governance Rule for Home
+Before creating a new Home block or changing an existing one, implementation must answer:
+1. Which primitive already owns this pattern?
+2. Which tokens/styles govern it?
+3. Why is a new primitive necessary if one does not already exist?
+
+If a suitable primitive is missing, extend the Design System first, then implement the feature with that primitive.
+Do not build Home UI from local one-off recipes when a reusable system pattern is appropriate.
 
 ## Navigation Patterns
 
 ### iPhone
 - Primary navigation pattern: tab bar with top-level sections.
-- In Phase 2, this is documented only; no feature tab screens are implemented.
+- In current phases, Home is being hosted in the temporary validation surface while product sections continue evolving.
 
 ### Mac
 - Primary navigation pattern: split view with persistent sidebar + detail panel.
-- In Phase 2, this is documented only; no feature split-view screen is implemented.
+- macOS remains a valid visual QA surface for Home hierarchy and supporting blocks.
 
 ## Component Library
-Implemented primitives:
+Implemented primitives include:
 - `DSCard`
 - `DSMetricSnapshotCard`
 - `DSExplainabilityCard`
@@ -148,6 +212,18 @@ Defined in `DesignSystem/Charts/AppChartStyle.swift`.
 ## Gallery and Demo App
 - Gallery root: `GalleryView`
 - Executable app: `DesignSystemDemo` (single multiplatform target)
-- Supported validation platforms in Phase 2:
-  - iOS (generic + iPhone simulator)
-  - macOS (generic)
+- Gallery is not only a demo surface; it is also the visual contract for reusable primitives.
+- New reusable Home primitives should be represented in Gallery whenever they become part of the supported system language.
+
+### Supported validation platforms
+- iOS (generic + iPhone simulator)
+- macOS (generic)
+
+## Implementation Rule
+When a feature introduces a reusable pattern, the expected order is:
+1. define or extend the primitive in `DesignSystem/**`
+2. expose/validate it in Gallery if it is reusable language
+3. document the rule here in `docs/DesignSystem.md`
+4. then consume it in feature code
+
+This keeps Home and future screens governed by the system instead of drifting into custom UI per phase.

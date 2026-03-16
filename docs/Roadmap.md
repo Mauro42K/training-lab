@@ -573,7 +573,7 @@ Closure decisions carried into this phase:
 - The next product phase remains **Phase 5.2 — Hero Readiness** with no roadmap ambiguity.
 
 ### Phase 5.2 — Hero Readiness
-**Status:** IMPLEMENTED / FUNCTIONALLY OPEN
+**Status:** CLOSED
 
 **Closure summary**
 - `Readiness v1` now ships from `GET /v1/home/summary` as a stable read-time contract on top of `daily_recovery`, `daily_sleep_summary`, and bounded load context.
@@ -611,14 +611,14 @@ Closure decisions carried into this phase:
   - iOS simulator build passed
   - simulator launch passed
   - screenshot artifact captured for the hero host
-- Production functional validation remains open because the current production user has no physiological rows in:
-  - `recovery_signals`
+- Production physiological ingest was later enabled and validated with real Apple Health data.
+- Production now has real rows in:
   - `sleep_sessions`
+  - `recovery_signals`
   - `daily_sleep_summary`
   - `daily_recovery`
-  - `daily_activity`
-- Current production `Readiness unavailable` is therefore correct.
-- The next subphase opens to enable real physiological ingest instead of weakening the model or inventing synthetic readiness.
+- Readiness has now been validated against real production data and no longer remains functionally open.
+- The next subphase that was opened for enablement work (5.2.1) is now resolved.
 
 **Goal:** Deliver the final Home hero that answers "How am I today?" through `Readiness`.
 
@@ -644,7 +644,7 @@ Closure decisions carried into this phase:
 
 **Definition of Done**
 - Hero naming, semantics, and missing-data behavior are fully aligned.
-- Production receives enough real physiological data to validate the hero against non-empty `Readiness` states.
+- Production validation with real physiological data has been completed against non-empty `Readiness` states.
 
 **QA focus**
 - Missing HRV / RHR / sleep
@@ -652,7 +652,7 @@ Closure decisions carried into this phase:
 - State label clarity
 
 ### Phase 5.2.1 — Readiness data enablement
-**Status:** IN PROGRESS
+**Status:** RESOLVED
 
 **Goal:** Enable real Apple Health physiological ingest so production can populate `Readiness` inputs with real sleep, HRV, and RHR data.
 
@@ -660,6 +660,7 @@ Closure decisions carried into this phase:
 - The production hero is not blocked by scoring. It is blocked by missing physiological ingest.
 - `Readiness unavailable` is currently the correct output for the real production dataset.
 - Enabling real ingest does not guarantee `complete` readiness on day 1. Early real outputs may be `partial` or `insufficient` while baselines consolidate.
+- This phase has now been completed operationally: production ingest is active and the resulting physiological rows are present and validated.
 
 **Scope**
 - Keep Apple Health / HealthKit as the real source of truth for:
@@ -690,11 +691,11 @@ Closure decisions carried into this phase:
 
 **Definition of Done**
 - The iPhone app requests HealthKit permission for sleep, HRV, and resting HR.
-- The client can send real sleep and recovery payloads with timezone IANA to production-capable ingest endpoints.
-- Physiology bootstrap can run independently of workout bootstrap.
-- Recent physiological raw rows begin appearing in the active backend environment.
-- Derived rows (`daily_sleep_summary`, `daily_recovery`) begin appearing from those raw inputs.
-- First real readiness output is observable, even if initially `partial` or `insufficient`.
+- The client sends real sleep and recovery payloads with timezone IANA to the ingest endpoints.
+- Physiology bootstrap runs independently of workout bootstrap.
+- Recent physiological raw rows are present in the active backend environment.
+- Derived rows (`daily_sleep_summary`, `daily_recovery`) are populated from those raw inputs.
+- Real readiness outputs are now observable in production.
 
 ### Phase 5.3 — Core Metrics
 **Status:** CLOSED
@@ -810,11 +811,14 @@ Closure decisions carried into this phase:
   - Drivers explain readiness
   - Core Metrics remains load snapshot
   - Trend Card remains load trajectory
-- Validation completed locally:
+- Validation completed both locally and in production:
   - backend unit/API tests passed
   - iOS simulator build passed
   - macOS build passed
-  - visual QA passed on iPhone simulator and macOS host using a local mock of the approved contract
+  - production deploy parity was completed
+  - `GET /v1/home/summary` now serves `readiness.explainability` in production
+  - real production validation covered both complete and missing-driver days
+  - visual QA was completed against the real Home stack with Hero + Drivers + Core Metrics + Trend surfaces visible together
 
 **Goal:** Make `Readiness` transparent through an explicit driver layer.
 
@@ -851,6 +855,7 @@ Closure decisions carried into this phase:
 - Separation from Core Metrics and Trend Card
 
 ### Phase 5.5 — Recommended Today
+**Status:** NEXT / PLANNING ONLY
 **Goal:** Add the contextual recommendation block without expanding into Coach.
 
 **Why this block exists**
@@ -1062,6 +1067,11 @@ Closure decisions carried into this phase:
 ---
 
 ## Immediate next actions
-1) Open **Phase 5.2 — Hero Readiness**.
-2) Keep `Readiness` naming and semantics aligned with PRD, Glossary, and daily recovery contracts.
-3) Reuse the new `Load vs Capacity` block as an already-closed Home dependency without pulling readiness semantics back into the load domain.
+1) Open **Phase 5.5 — Recommended Today**.
+2) Keep `Recommended Today` guidance-only and clearly separate from full Coach behavior.
+3) Preserve the Home hierarchy already established in Phases 5.2–5.4:
+   - `Readiness Hero`
+   - `Drivers / Explainability`
+   - `Core Metrics`
+   - `Load Trend`
+   - `Trend Card`

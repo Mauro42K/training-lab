@@ -8,6 +8,24 @@
   - explicit query contracts for daily domains
   - `GET /v1/home/summary` as composition-only summary contract
   - QA closure on staging + production after Alembic migration `20260311_01`
+- Phase 4.4 remains on hold and must not be mixed into later active phases.
+- Phase 5.1 is closed:
+  - `Trend Card (Load vs Capacity)` shipped
+  - legacy cache migration hardening shipped
+  - training-load freshness and `Today` label correctness shipped
+- Phase 5.2 is closed:
+  - `Readiness Hero` shipped in Home
+  - `Readiness v1` uses Sleep, HRV, and RHR as primary readiness inputs
+- Phase 5.2.1 is resolved:
+  - real Apple Health ingest for sleep, HRV SDNN, and resting HR is enabled from iPhone
+  - production now has real rows in `sleep_sessions`, `recovery_signals`, `daily_sleep_summary`, and `daily_recovery`
+- Phase 5.3 is closed:
+  - Home `Core Metrics` shipped via `GET /v1/home/summary`
+  - metrics shown are `7-Day Load`, `Fitness`, and `Fatigue`
+- Phase 5.4 is closed:
+  - `Readiness Explainability` shipped
+  - visible v1 scope is `Sleep`, `HRV`, `RHR`, plus `Exertion` as secondary context
+  - explainability is delivered as `readiness.explainability` inside `GET /v1/home/summary`
 - Phase 4.4 remains on hold and must not be mixed into the next active phase.
 
 ## Environment targets
@@ -41,57 +59,92 @@ Notas:
 
 ## Ingest pipeline real
 
-Flujo actual validado en Phase 4.2:
+Flujo actual validado:
 
-HealthKit -> iOS Client -> POST /v1/ingest/workouts -> PostgreSQL -> load endpoints
+`HealthKit -> iPhone client -> ingest endpoints -> PostgreSQL -> daily domains / load domains -> Home`
 
-Nota Phase 4.5:
-- La expansión Apple-first ya quedó implementada para sueño, HRV, RHR, activity diaria y body measurements.
+Dominios reales ya activos desde iPhone:
+- workouts -> `POST /v1/ingest/workouts`
+- sleep -> `POST /v1/ingest/sleep`
+- recovery signals (`hrv_sdnn`, `resting_hr`) -> `POST /v1/ingest/recovery-signals`
+
+Derivadas backend:
+- `sleep_sessions` -> `daily_sleep_summary`
+- `recovery_signals` + `daily_sleep_summary` -> `daily_recovery`
+- workouts -> `daily_load` / `training-load` / Home metrics
+
+Notas:
 - `GET /v1/daily` permanece como contrato legacy y no debe expandirse para absorber los dominios diarios nuevos.
 - La timezone IANA del device forma parte del input operativo de los dominios diarios Apple-first.
+- La validación oficial de ingest real sigue siendo en iPhone físico, no en simulador.
 
 ## Modos de sync
 
-### Bootstrap mode
+### Workout bootstrap mode
 - Se usa cuando `hasCompletedRealHealthKitIngest == false`.
 - El cliente ignora el cursor previo y ejecuta `fetchWorkouts(since: nil)`.
-- Sirve para poblar el histórico completo en la primera ingest real.
+- Sirve para poblar el histórico completo en la primera ingest real de workouts.
 
-### Incremental mode
+### Workout incremental mode
 - Se usa cuando `hasCompletedRealHealthKitIngest == true`.
 - El cliente consulta solo workouts posteriores al cursor local.
 - El cursor principal es `lastSuccessfulIngestAt`.
 
+### Physiology bootstrap mode
+- Se usa cuando `hasCompletedPhysiologyIngest == false`.
+- El cliente hace bootstrap histórico de sueño + HRV + RHR aunque workouts ya estén completos.
+- Sirve para poblar baselines reales de `Readiness`.
+
+### Physiology incremental mode
+- Se usa cuando `hasCompletedPhysiologyIngest == true`.
+- El cliente consulta solo muestras fisiológicas posteriores al cursor propio.
+- El cursor principal es `lastSuccessfulPhysiologyIngestAt`.
+
 ## Cursor tracking
-- `lastIngestAttemptAt`: último intento iniciado.
-- `lastSuccessfulIngestAt`: último sync remoto exitoso usado para incremental.
-- `hasCompletedRealHealthKitIngest`: define si el siguiente sync corre en bootstrap o incremental.
+- `lastIngestAttemptAt`: último intento iniciado de workouts.
+- `lastSuccessfulIngestAt`: último sync remoto exitoso de workouts.
+- `hasCompletedRealHealthKitIngest`: define si workouts corren en bootstrap o incremental.
+- `lastPhysiologyIngestAttemptAt`: último intento iniciado de sueño / HRV / RHR.
+- `lastSuccessfulPhysiologyIngestAt`: último sync remoto exitoso de fisiología.
+- `hasCompletedPhysiologyIngest`: define si sueño / HRV / RHR corren en bootstrap o incremental.
 - `syncStatusRaw`: refleja transición operativa (`idle`, `syncing`, `ready`, error según corresponda).
 
-Nota Phase 4.5:
-- no se introdujeron todavía cursores dedicados por dominio,
-- pero sí quedó congelado que la timezone IANA debe viajar con el sync/ingest de dominios diarios Apple-first.
+Notas:
+- la timezone IANA viaja con los syncs Apple-first;
+- workouts y fisiología ya no comparten el mismo bootstrap operativo.
 
 ## Batch ingest strategy
 - El cliente agrupa workouts en lotes para `POST /v1/ingest/workouts`.
-- En la validación real de Phase 4.2, el histórico completo se procesó en 9 batches.
+- El cliente también agrupa sueño y recovery signals en lotes dedicados.
 - El batching reduce riesgo de timeouts y mantiene requests manejables.
+- El backend conserva recompute downstream por fechas afectadas después de cada batch relevante.
 
 ## Idempotency keys
 - Cada batch usa `X-Idempotency-Key`.
-- El pipeline backend conserva idempotencia por request y por `healthkit_workout_uuid`.
-- Replays no deben duplicar workouts ni derivadas de carga.
+- El pipeline backend conserva idempotencia por request y por identificadores HealthKit.
+- Replays no deben duplicar workouts, sleep sessions, recovery signals ni derivadas.
 
 ## Endpoints relevantes
 - `POST /v1/ingest/workouts`
+- `POST /v1/ingest/sleep`
+- `POST /v1/ingest/recovery-signals`
 - `GET /v1/workouts`
 - `GET /v1/daily`
 - `GET /v1/training-load`
+- `GET /v1/home/summary`
+
+## Home / readiness notes
+- `Readiness v1` usa como drivers primarios: `Sleep`, `HRV`, `RHR`.
+- `Exertion` aparece como contexto secundario en explainability; no es un driver primario del score.
+- `Core Metrics` en Home muestra:
+  - `7-Day Load`
+  - `Fitness`
+  - `Fatigue`
+- `Readiness Explainability` vive dentro de `readiness.explainability`.
 
 ## Notas operativas
 - Backend activo de esta fase: PostgreSQL.
 - El refresh post-ingest debe enviar fechas `YYYY-MM-DD` a `GET /v1/daily`.
-- La validación oficial de ingest real se hace en iPhone físico, no en simulador.
 - Features delicadas de reconciliación histórica o borrado deben probarse primero en staging, no en producción.
 - Para fases posteriores, la semántica nueva debe seguir reutilizando los dominios explícitos cerrados en Phase 4.5.
-- `missing` en los derivados diarios de Phase 4.5 significa ausencia de row emitida, no row vacía.
+- `missing` en los derivados diarios Apple-first significa ausencia de row emitida, no row vacía.

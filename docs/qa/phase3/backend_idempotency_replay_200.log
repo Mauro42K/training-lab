@@ -1,8 +1,0 @@
-HTTP/2 200 
-alt-svc: h3=":443"; ma=2592000
-content-type: application/json
-date: Fri, 06 Mar 2026 04:01:53 GMT
-server: uvicorn
-content-length: 70
-
-{"inserted":1,"updated":0,"total_received":1,"idempotent_replay":true}

@@ -7,7 +7,6 @@
 ## Current Phase
 - **Phase 5.4 — Drivers / Explainability** (**Closed / ready for 5.5 planning**)
 
-### Phase 5.2 / 5.2.1 Current Summary
 - `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
 - `daily_recovery` remains the canonical consolidated-input domain; it was not turned into a persisted final score.
 - The public readiness contract now exposes:
@@ -58,18 +57,15 @@
   - simulator launch passed on `Codex iPhone 17`
   - visual validation of the hero completed before release closure
 - Initial production DB audit confirmed the first blocker was not the readiness model but missing physiological ingest.
-- `Phase 5.2.1` is the active subphase to enable real Apple Health ingest for:
-  - sleep
-  - HRV SDNN
-  - resting HR
-- 5.2.1 scope is limited to real-data enablement:
-  - iPhone HealthKit permission flow for sleep/HRV/RHR
-  - client ingest to `/v1/ingest/sleep` and `/v1/ingest/recovery-signals`
-  - physiology-specific bootstrap/incremental sync state
+- Phase 5.2.1 is resolved and no longer an active subphase.
+- Its delivered scope was:
+  - iPhone HealthKit permission flow for sleep / HRV / RHR
+  - client ingest to `POST /v1/ingest/sleep` and `POST /v1/ingest/recovery-signals`
+  - physiology-specific bootstrap / incremental sync state
   - minimum sync observability for counts, latest dates, and bootstrap completion
-- Enabling ingest does not guarantee `complete` readiness immediately:
-  - the first real output may be `partial` or `insufficient`
-  - baselines consolidate progressively as real history accumulates
+- The key product note remains:
+  - enabling ingest does not guarantee `complete` readiness immediately
+  - the first real output may still be `partial` or `insufficient` while baselines consolidate
 - Subsequent real-device validation and production DB/API audit confirmed `Phase 5.2.1` succeeded:
   - production now has real rows in `sleep_sessions`, `recovery_signals`, `daily_sleep_summary`, and `daily_recovery`
   - `daily_activity` can still be empty without blocking Readiness v1
@@ -174,6 +170,19 @@
   - iOS simulator build passed
   - macOS build passed
   - visual QA completed on iPhone simulator and macOS host using a local mock of the approved Home contract to verify the new block before backend rollout
+
+- Production deploy parity for 5.4 was later completed and verified on the live API.
+- `GET /v1/home/summary` in production now serves `readiness.explainability`, not just the local/mock contract.
+- Real production validation covered both:
+  - a complete readiness day with measured primaries and populated explainability
+  - a missing-primaries day where explainability still renders coherent missing/not-used states without faking readiness
+- Visual validation was completed against real app data with the full Home stack visible together:
+  - Readiness Hero
+  - Drivers / Explainability
+  - Core Metrics
+  - Load Trend
+  - Trend Card
+- Phase 5.4 is therefore closed on both implementation and real-environment validation, not only on local mock validation.
 
 ### Phase 5.1.3 Closure Summary
 - macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.
@@ -391,11 +400,11 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 5.2 — Hero Readiness** (**Next**) 
+- **Phase 5.5 — Recommended Today** (**Next / planning only**) 
 - Focus:
-  - build the final Home hero around `Readiness`,
-  - keep `Battery` out of active product naming,
-  - preserve transparency, drivers, and missing-data behavior.
+  - define the first guidance surface that sits on top of Readiness and load context,
+  - keep it guidance-only and clearly separate from full Coach behavior,
+  - preserve the Home hierarchy already established in 5.2–5.4.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**
@@ -432,6 +441,7 @@ Closure note:
 - Keep patches scoped and explicit.
 - Never leave uncommitted changes.
 - Always update documentation before pushing a new version.
+- For any new UI block, DesignSystem + Gallery + this CODEX_CONTEXT must be treated as mandatory source material before implementation.
 
 ## Infra
 - GitHub repository: `Mauro42K/training-lab`

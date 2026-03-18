@@ -11,6 +11,7 @@ ReadinessLabel = Literal["Ready", "Moderate", "Recover"]
 ReadinessExplainabilityRole = Literal["primary_driver", "secondary_context"]
 ReadinessExplainabilityStatus = Literal["measured", "estimated", "proxy", "missing"]
 ReadinessExplainabilityEffect = Literal["positive", "neutral", "negative", "not_used"]
+RecommendedState = Literal["recuperar", "suave", "estable", "exigente", "sin_datos"]
 
 
 class DailySleepDomainItem(BaseModel):
@@ -103,6 +104,13 @@ class CoreMetricsSummaryItem(BaseModel):
     history_status: TrainingLoadHistoryStatus
 
 
+class RecommendedTodayItem(BaseModel):
+    state: RecommendedState
+    confidence: float = Field(ge=0, le=1)
+    reason_tags: list[str]
+    guidance_only: bool = True
+
+
 class BodyMeasurementsDomainItem(BaseModel):
     date: dt.date
     weight_kg: float = Field(ge=0)
@@ -138,3 +146,4 @@ class HomeSummaryResponse(BaseModel):
     body_measurements: BodyMeasurementsDomainItem | None = None
     readiness: ReadinessSummaryItem | None = None
     core_metrics: CoreMetricsSummaryItem | None = None
+    recommended_today: RecommendedTodayItem | None = None

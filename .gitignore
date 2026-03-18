@@ -31,3 +31,7 @@ DesignSystemDemo/Config/Runtime.Local.xcconfig
 
 # Build-time deploy metadata
 api/deploy_metadata.json
+
+# Local QA screenshots / artifacts
+# Keep docs/qa out of git by default; commit only if a specific artifact is intentionally needed.
+docs/qa/

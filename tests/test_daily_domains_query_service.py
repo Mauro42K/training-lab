@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 from api.services.daily_domains_query_service import DailyDomainsQueryService
 from api.services.home_summary_service import HomeSummaryService
 from api.schemas.daily_domains import (
+    RecommendedTodayItem,
     ReadinessExplainability,
     ReadinessExplainabilityItem,
     ReadinessSummaryItem,
@@ -224,6 +225,12 @@ class HomeSummaryServiceTests(unittest.TestCase):
         self.assertEqual(response.core_metrics.fitness, 32.4)
         self.assertEqual(response.core_metrics.fatigue, 36.1)
         self.assertEqual(response.core_metrics.history_status, "partial")
+        self.assertEqual(response.recommended_today, RecommendedTodayItem(
+            state="exigente",
+            confidence=0.91,
+            reason_tags=["readiness_high"],
+            guidance_only=True,
+        ))
         load_snapshot_mock.assert_called_once_with(days=28, sport="all", today_local=target_date)
 
 

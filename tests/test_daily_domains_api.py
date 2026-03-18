@@ -15,6 +15,7 @@ from api.schemas.daily_domains import (
     DailyActivityDomainItem,
     DailyActivityDomainResponse,
     HomeSummaryResponse,
+    RecommendedTodayItem,
     ReadinessExplainability,
     ReadinessExplainabilityItem,
     ReadinessSummaryItem,
@@ -131,6 +132,12 @@ class DailyDomainsApiTests(unittest.TestCase):
                 fatigue=41.2,
                 history_status="partial",
             ),
+            recommended_today=RecommendedTodayItem(
+                state="suave",
+                confidence=0.68,
+                reason_tags=["primaries_missing", "readiness_moderate"],
+                guidance_only=True,
+            ),
         )
         with patch(
             "api.routers.v1.daily_domains.HomeSummaryService.get_summary",
@@ -154,6 +161,8 @@ class DailyDomainsApiTests(unittest.TestCase):
         )
         self.assertEqual(response.json()["core_metrics"]["seven_day_load"], 182.0)
         self.assertEqual(response.json()["core_metrics"]["history_status"], "partial")
+        self.assertEqual(response.json()["recommended_today"]["state"], "suave")
+        self.assertTrue(response.json()["recommended_today"]["guidance_only"])
         service_mock.assert_called_once()
 
 

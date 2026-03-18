@@ -16,6 +16,7 @@ from api.schemas.daily_domains import (
     HomeSummaryResponse,
 )
 from api.services.body_measurements_canonicalizer import BodyMeasurementsCanonicalizer
+from api.services.recommendation import compute_recommended_today
 from api.services.readiness_service import ReadinessService
 from api.services.training_load_service import TrainingLoadService
 
@@ -61,6 +62,14 @@ class HomeSummaryService:
             days=HOME_CORE_METRICS_SNAPSHOT_DAYS,
             sport="all",
             today_local=target_date,
+        )
+        core_metrics = CoreMetricsSummaryItem(
+            seven_day_load=sum(
+                item.load for item in load_snapshot.items[-HOME_CORE_METRICS_LOAD_WINDOW_DAYS:]
+            ),
+            fitness=load_snapshot.latest_capacity,
+            fatigue=load_snapshot.latest_fatigue,
+            history_status=load_snapshot.history_status,
         )
 
         return HomeSummaryResponse(
@@ -131,12 +140,9 @@ class HomeSummaryService:
                 else None
             ),
             readiness=readiness,
-            core_metrics=CoreMetricsSummaryItem(
-                seven_day_load=sum(
-                    item.load for item in load_snapshot.items[-HOME_CORE_METRICS_LOAD_WINDOW_DAYS:]
-                ),
-                fitness=load_snapshot.latest_capacity,
-                fatigue=load_snapshot.latest_fatigue,
-                history_status=load_snapshot.history_status,
+            core_metrics=core_metrics,
+            recommended_today=compute_recommended_today(
+                readiness=readiness,
+                core_metrics=core_metrics,
             ),
         )

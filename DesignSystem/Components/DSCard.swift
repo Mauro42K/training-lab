@@ -117,7 +117,7 @@ struct DSMetricSnapshotCard: View {
 
     var body: some View {
         DSCard(style: cardStyle) {
-            VStack(alignment: .leading, spacing: AppSpacing.x12) {
+            VStack(alignment: .leading, spacing: isIntegrated ? AppSpacing.x8 : AppSpacing.x12) {
                 if eyebrow != nil || accessory != nil {
                     HStack(alignment: .center, spacing: AppSpacing.x12) {
                         if let eyebrow {
@@ -136,7 +136,7 @@ struct DSMetricSnapshotCard: View {
 
                 metricTiles
 
-                if let footerText {
+                if let footerText, !isIntegrated {
                     Text(footerText)
                         .appTextStyle(AppTypography.labelSmall)
                         .foregroundStyle(AppColors.Text.secondary)
@@ -333,7 +333,7 @@ private struct DSMetricSnapshotTile: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(embedded ? AppSpacing.x4 : AppSpacing.x12)
-        .frame(minHeight: embedded ? AppSpacing.x48 + AppSpacing.x12 : AppSpacing.x64 + AppSpacing.x12, alignment: .leading)
+        .frame(minHeight: embedded ? AppSpacing.x40 + AppSpacing.x8 : AppSpacing.x64 + AppSpacing.x12, alignment: .leading)
         .background(embedded ? Color.clear : AppColors.Surface.cardMuted)
         .clipShape(RoundedRectangle(cornerRadius: embedded ? AppRadius.small : AppRadius.medium, style: .continuous))
         .overlay(
@@ -397,6 +397,7 @@ private struct DSExplainabilityTile: View {
                 .appTextStyle(AppTypography.bodySmall)
                 .foregroundStyle(AppColors.Text.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(embedded ? 1 : nil)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(embedded ? AppSpacing.x4 : AppSpacing.x12)

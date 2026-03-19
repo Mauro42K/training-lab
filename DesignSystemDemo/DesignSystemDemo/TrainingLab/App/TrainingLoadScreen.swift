@@ -528,13 +528,13 @@ private struct RecommendedTodayCard: View {
 
     var body: some View {
         DSCard(style: .flat) {
-            VStack(alignment: .leading, spacing: AppSpacing.x12) {
-                HStack(alignment: .center, spacing: AppSpacing.x12) {
-                    HStack(spacing: AppSpacing.x8) {
+            VStack(alignment: .leading, spacing: AppSpacing.x8) {
+                HStack(alignment: .center, spacing: AppSpacing.x8) {
+                    HStack(spacing: AppSpacing.x4) {
                         Image(systemName: presentation.iconSystemName)
                             .appTextStyle(AppTypography.bodyRegular)
                             .foregroundStyle(presentation.accent)
-                            .frame(width: AppSpacing.x24, height: AppSpacing.x24)
+                            .frame(width: 20, height: 20)
                             .background(
                                 Circle()
                                     .fill(presentation.accent.opacity(0.12))
@@ -545,7 +545,7 @@ private struct RecommendedTodayCard: View {
                             .foregroundStyle(AppColors.Text.secondary)
                     }
 
-                    Spacer(minLength: AppSpacing.x8)
+                    Spacer(minLength: AppSpacing.x4)
 
                     if recommendedToday.guidanceOnly {
                         DSMetricPill("Solo guía", iconSystemName: "arrow.triangle.branch", variant: .neutral)
@@ -562,13 +562,9 @@ private struct RecommendedTodayCard: View {
                     .foregroundStyle(AppColors.Text.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                HStack(alignment: .center, spacing: AppSpacing.x12) {
-                    Text("Confianza \(confidenceText)")
-                        .appTextStyle(AppTypography.labelSmall)
-                        .foregroundStyle(AppColors.Text.secondary)
-
-                    Spacer(minLength: AppSpacing.x8)
-                }
+                Text("Confianza \(confidenceText)")
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
         .accessibilityElement(children: .combine)
@@ -937,9 +933,9 @@ private struct CoreMetricsCard: View {
         case .partial:
             return "History consolidating."
         case .insufficientHistory:
-            return "Limited history so these metrics are still settling."
+            return "Limited history."
         case .missing:
-            return "Core metrics are waiting for the server snapshot."
+            return "Waiting for snapshot."
         }
     }
 
@@ -1066,10 +1062,10 @@ private struct ReadinessHeroView: View {
 
             content
                 .padding(.horizontal, AppSpacing.x24)
-                .padding(.top, 36)
-                .padding(.bottom, 30)
+                .padding(.top, 30)
+                .padding(.bottom, 24)
         }
-        .frame(maxWidth: .infinity, minHeight: 280, alignment: .top)
+        .frame(maxWidth: .infinity, minHeight: 260, alignment: .top)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
@@ -1088,7 +1084,7 @@ private struct ReadinessHeroView: View {
     }
 
     private func standardContent(_ readiness: ReadinessSummaryDTO) -> some View {
-        VStack(spacing: AppSpacing.x8) {
+        VStack(spacing: AppSpacing.x4) {
             Spacer(minLength: 0)
 
             HStack(spacing: 0) {
@@ -1140,7 +1136,7 @@ private struct ReadinessHeroView: View {
     }
 
     private var missingContent: some View {
-        VStack(spacing: AppSpacing.x8) {
+        VStack(spacing: AppSpacing.x4) {
             Spacer(minLength: 0)
 
             Text(errorMessage == nil ? "Readiness unavailable" : "Couldn't refresh readiness")

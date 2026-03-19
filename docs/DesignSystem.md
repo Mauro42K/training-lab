@@ -154,6 +154,9 @@ Each block must preserve its semantic role and must not visually impersonate ano
   - `DSCard` for supporting surfaces that do not need grouped metric tiles
   - `DSMetricPill` only for secondary trust/history/status signals
 - Avoid introducing ad-hoc gradients, custom surface recipes, or bespoke shadows when an existing design-system primitive already matches the role.
+- When Home needs visible vertical compaction on iPhone, prefer primitive-level layout decisions over local padding tweaks:
+  - `DSExplainabilityCard(layout: .compactColumns)` for three compact primary drivers plus a quieter contextual row
+  - `DSMetricSnapshotCard(density: .compact)` for tighter supporting metric snapshots without losing numeric clarity
 
 ### Governance Rule for Home
 Before creating a new Home block or changing an existing one, implementation must answer:

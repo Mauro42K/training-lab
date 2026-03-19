@@ -21,7 +21,7 @@ struct TrainingLoadScreen: View {
             HomeCanvasBackground()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                VStack(alignment: .leading, spacing: AppSpacing.x12) {
                     if isLoading && !hasLoadedOnce {
                         DSLoadingState()
                     } else {
@@ -310,7 +310,7 @@ private struct ReadinessHeroSection: View {
     let errorMessage: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x12) {
+        VStack(alignment: .leading, spacing: AppSpacing.x8) {
             Text(Self.dateFormatter.string(from: date))
                 .appTextStyle(AppTypography.bodySmall)
                 .foregroundStyle(AppColors.Text.secondary)
@@ -415,7 +415,8 @@ private struct ReadinessDriversCard: View {
             primaryItems: primaryItems,
             secondaryItems: secondaryItems,
             footerText: footerText,
-            style: .flat
+            style: .flat,
+            layout: .compactColumns
         )
     }
 
@@ -528,13 +529,13 @@ private struct RecommendedTodayCard: View {
 
     var body: some View {
         DSCard(style: .flat) {
-            VStack(alignment: .leading, spacing: AppSpacing.x8) {
+            VStack(alignment: .leading, spacing: AppSpacing.x4) {
                 HStack(alignment: .center, spacing: AppSpacing.x8) {
                     HStack(spacing: AppSpacing.x4) {
                         Image(systemName: presentation.iconSystemName)
-                            .appTextStyle(AppTypography.bodyRegular)
+                            .appTextStyle(AppTypography.labelSmall)
                             .foregroundStyle(presentation.accent)
-                            .frame(width: 20, height: 20)
+                            .frame(width: 18, height: 18)
                             .background(
                                 Circle()
                                     .fill(presentation.accent.opacity(0.12))
@@ -547,24 +548,39 @@ private struct RecommendedTodayCard: View {
 
                     Spacer(minLength: AppSpacing.x4)
 
-                    if recommendedToday.guidanceOnly {
-                        DSMetricPill("Solo guía", iconSystemName: "arrow.triangle.branch", variant: .neutral)
+                    Text("Confianza \(confidenceText)")
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                }
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: AppSpacing.x8) {
+                        Text(presentation.headline)
+                            .appTextStyle(AppTypography.headingH3)
+                            .foregroundStyle(AppColors.Text.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        if recommendedToday.guidanceOnly {
+                            DSMetricPill("Solo guía", iconSystemName: "arrow.triangle.branch", variant: .neutral)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                        Text(presentation.headline)
+                            .appTextStyle(AppTypography.headingH3)
+                            .foregroundStyle(AppColors.Text.primary)
+
+                        if recommendedToday.guidanceOnly {
+                            DSMetricPill("Solo guía", iconSystemName: "arrow.triangle.branch", variant: .neutral)
+                        }
                     }
                 }
 
-                Text(presentation.headline)
-                    .appTextStyle(AppTypography.headingH3)
-                    .foregroundStyle(AppColors.Text.primary)
-                    .fixedSize(horizontal: false, vertical: true)
-
                 Text(presentation.body)
-                    .appTextStyle(AppTypography.bodyRegular)
+                    .appTextStyle(AppTypography.bodySmall)
                     .foregroundStyle(AppColors.Text.secondary)
+                    .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
-
-                Text("Confianza \(confidenceText)")
-                    .appTextStyle(AppTypography.labelSmall)
-                    .foregroundStyle(AppColors.Text.secondary)
             }
         }
         .accessibilityElement(children: .combine)
@@ -913,7 +929,8 @@ private struct CoreMetricsCard: View {
             items: snapshotItems,
             footerText: historyCopy,
             accessory: shouldShowStatusPill ? AnyView(statusPill) : nil,
-            style: .flat
+            style: .flat,
+            density: .compact
         )
     }
 
@@ -1062,10 +1079,10 @@ private struct ReadinessHeroView: View {
 
             content
                 .padding(.horizontal, AppSpacing.x24)
-                .padding(.top, 30)
-                .padding(.bottom, 24)
+                .padding(.top, 26)
+                .padding(.bottom, 20)
         }
-        .frame(maxWidth: .infinity, minHeight: 260, alignment: .top)
+        .frame(maxWidth: .infinity, minHeight: 244, alignment: .top)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)

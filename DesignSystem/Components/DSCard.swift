@@ -64,6 +64,11 @@ private struct DSCardChrome: ViewModifier {
 }
 
 struct DSMetricSnapshotCard: View {
+    enum Density {
+        case regular
+        case compact
+    }
+
     struct Item: Identifiable {
         enum Emphasis {
             case primary
@@ -97,6 +102,7 @@ struct DSMetricSnapshotCard: View {
     private let footerText: String?
     private let accessory: AnyView?
     private let cardStyle: DSCardStyle
+    private let density: Density
     private var isIntegrated: Bool {
         cardStyle == .flat
     }
@@ -106,18 +112,20 @@ struct DSMetricSnapshotCard: View {
         items: [Item],
         footerText: String? = nil,
         accessory: AnyView? = nil,
-        style: DSCardStyle = .standard
+        style: DSCardStyle = .standard,
+        density: Density = .regular
     ) {
         self.eyebrow = eyebrow
         self.items = items
         self.footerText = footerText
         self.accessory = accessory
         self.cardStyle = style
+        self.density = density
     }
 
     var body: some View {
         DSCard(style: cardStyle) {
-            VStack(alignment: .leading, spacing: isIntegrated ? AppSpacing.x8 : AppSpacing.x12) {
+            VStack(alignment: .leading, spacing: cardSpacing) {
                 if eyebrow != nil || accessory != nil {
                     HStack(alignment: .center, spacing: AppSpacing.x12) {
                         if let eyebrow {
@@ -145,26 +153,33 @@ struct DSMetricSnapshotCard: View {
         }
     }
 
+    private var cardSpacing: CGFloat {
+        if isIntegrated && density == .compact {
+            return AppSpacing.x4
+        }
+        return isIntegrated ? AppSpacing.x8 : AppSpacing.x12
+    }
+
     @ViewBuilder
     private var metricTiles: some View {
         if isIntegrated {
             ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: AppSpacing.x12) {
+                HStack(alignment: .top, spacing: density == .compact ? AppSpacing.x8 : AppSpacing.x12) {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                        DSMetricSnapshotTile(item: item, embedded: true)
+                        DSMetricSnapshotTile(item: item, embedded: true, density: density)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         if index < items.count - 1 {
                             Rectangle()
                                 .fill(AppColors.Stroke.subtle.opacity(0.65))
-                                .frame(width: 1, height: AppSpacing.x48 + AppSpacing.x12)
+                                .frame(width: 1, height: density == .compact ? AppSpacing.x40 : AppSpacing.x48 + AppSpacing.x12)
                         }
                     }
                 }
 
-                VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                VStack(alignment: .leading, spacing: density == .compact ? 2 : AppSpacing.x4) {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                        DSMetricSnapshotTile(item: item, embedded: true)
+                        DSMetricSnapshotTile(item: item, embedded: true, density: density)
 
                         if index < items.count - 1 {
                             Rectangle()
@@ -178,14 +193,14 @@ struct DSMetricSnapshotCard: View {
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: AppSpacing.x12) {
                     ForEach(items) { item in
-                        DSMetricSnapshotTile(item: item, embedded: false)
+                        DSMetricSnapshotTile(item: item, embedded: false, density: density)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: AppSpacing.x12) {
                     ForEach(items) { item in
-                        DSMetricSnapshotTile(item: item, embedded: false)
+                        DSMetricSnapshotTile(item: item, embedded: false, density: density)
                     }
                 }
             }
@@ -194,6 +209,11 @@ struct DSMetricSnapshotCard: View {
 }
 
 struct DSExplainabilityCard: View {
+    enum Layout {
+        case standard
+        case compactColumns
+    }
+
     struct Item: Identifiable {
         enum Emphasis: Equatable {
             case primary
@@ -243,8 +263,12 @@ struct DSExplainabilityCard: View {
     private let secondaryItems: [Item]
     private let footerText: String?
     private let cardStyle: DSCardStyle
+    private let layout: Layout
     private var isIntegrated: Bool {
         cardStyle == .flat
+    }
+    private var usesCompactColumns: Bool {
+        isIntegrated && layout == .compactColumns
     }
 
     init(
@@ -252,57 +276,98 @@ struct DSExplainabilityCard: View {
         primaryItems: [Item],
         secondaryItems: [Item] = [],
         footerText: String? = nil,
-        style: DSCardStyle = .standard
+        style: DSCardStyle = .standard,
+        layout: Layout = .standard
     ) {
         self.eyebrow = eyebrow
         self.primaryItems = primaryItems
         self.secondaryItems = secondaryItems
         self.footerText = footerText
         self.cardStyle = style
+        self.layout = layout
     }
 
     var body: some View {
         DSCard(style: cardStyle) {
-            VStack(alignment: .leading, spacing: AppSpacing.x12) {
+            VStack(alignment: .leading, spacing: usesCompactColumns ? AppSpacing.x8 : AppSpacing.x12) {
                 if let eyebrow {
                     Text(eyebrow)
                         .appTextStyle(AppTypography.labelSmall)
                         .foregroundStyle(AppColors.Text.secondary)
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .top, spacing: AppSpacing.x12) {
-                        ForEach(primaryItems) { item in
-                            DSExplainabilityTile(item: item, embedded: isIntegrated)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-
-                    VStack(alignment: .leading, spacing: AppSpacing.x12) {
-                        ForEach(primaryItems) { item in
-                            DSExplainabilityTile(item: item, embedded: isIntegrated)
-                        }
-                    }
-                }
+                primaryContent
 
                 if !secondaryItems.isEmpty {
-                    VStack(alignment: .leading, spacing: AppSpacing.x8) {
-                        Text("Context")
-                            .appTextStyle(AppTypography.labelSmall)
-                            .foregroundStyle(AppColors.Text.secondary)
-
-                        VStack(alignment: .leading, spacing: AppSpacing.x8) {
-                            ForEach(secondaryItems) { item in
-                                DSExplainabilityTile(item: item, embedded: isIntegrated)
-                            }
-                        }
-                    }
+                    secondaryContent
                 }
 
-                if let footerText {
+                if let footerText, !usesCompactColumns {
                     Text(footerText)
                         .appTextStyle(AppTypography.labelSmall)
                         .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var primaryContent: some View {
+        if usesCompactColumns {
+            HStack(alignment: .top, spacing: AppSpacing.x8) {
+                ForEach(Array(primaryItems.enumerated()), id: \.element.id) { index, item in
+                    DSExplainabilityCompactTile(item: item)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    if index < primaryItems.count - 1 {
+                        Rectangle()
+                            .fill(AppColors.Stroke.subtle.opacity(0.65))
+                            .frame(width: 1, height: AppSpacing.x64)
+                    }
+                }
+            }
+        } else {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: AppSpacing.x12) {
+                    ForEach(primaryItems) { item in
+                        DSExplainabilityTile(item: item, embedded: isIntegrated)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                    ForEach(primaryItems) { item in
+                        DSExplainabilityTile(item: item, embedded: isIntegrated)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var secondaryContent: some View {
+        if usesCompactColumns {
+            VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                Text("Context")
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+
+                VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                    ForEach(secondaryItems) { item in
+                        DSExplainabilityContextRow(item: item)
+                    }
+                }
+            }
+        } else {
+            VStack(alignment: .leading, spacing: AppSpacing.x8) {
+                Text("Context")
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+
+                VStack(alignment: .leading, spacing: AppSpacing.x8) {
+                    ForEach(secondaryItems) { item in
+                        DSExplainabilityTile(item: item, embedded: isIntegrated)
+                    }
                 }
             }
         }
@@ -312,9 +377,10 @@ struct DSExplainabilityCard: View {
 private struct DSMetricSnapshotTile: View {
     let item: DSMetricSnapshotCard.Item
     let embedded: Bool
+    let density: DSMetricSnapshotCard.Density
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x8) {
+        VStack(alignment: .leading, spacing: tileSpacing) {
             Text(item.title)
                 .appTextStyle(AppTypography.labelSmall)
                 .foregroundStyle(AppColors.Text.secondary)
@@ -329,11 +395,12 @@ private struct DSMetricSnapshotTile: View {
                     .appTextStyle(AppTypography.labelSmall)
                     .foregroundStyle(AppColors.Text.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(compactEmbedded ? 1 : nil)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(embedded ? AppSpacing.x4 : AppSpacing.x12)
-        .frame(minHeight: embedded ? AppSpacing.x40 + AppSpacing.x8 : AppSpacing.x64 + AppSpacing.x12, alignment: .leading)
+        .padding(tilePadding)
+        .frame(minHeight: tileMinHeight, alignment: .leading)
         .background(embedded ? Color.clear : AppColors.Surface.cardMuted)
         .clipShape(RoundedRectangle(cornerRadius: embedded ? AppRadius.small : AppRadius.medium, style: .continuous))
         .overlay(
@@ -348,6 +415,28 @@ private struct DSMetricSnapshotTile: View {
 
     private var detail: String? {
         item.detail
+    }
+
+    private var compactEmbedded: Bool {
+        embedded && density == .compact
+    }
+
+    private var tileSpacing: CGFloat {
+        compactEmbedded ? AppSpacing.x4 : AppSpacing.x8
+    }
+
+    private var tilePadding: CGFloat {
+        if compactEmbedded {
+            return 2
+        }
+        return embedded ? AppSpacing.x4 : AppSpacing.x12
+    }
+
+    private var tileMinHeight: CGFloat {
+        if compactEmbedded {
+            return AppSpacing.x40
+        }
+        return embedded ? AppSpacing.x40 + AppSpacing.x8 : AppSpacing.x64 + AppSpacing.x12
     }
 }
 
@@ -472,6 +561,148 @@ private struct DSExplainabilityTile: View {
     }
 }
 
+private struct DSExplainabilityCompactTile: View {
+    let item: DSExplainabilityCard.Item
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.x4) {
+            Text(item.title)
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(AppColors.Text.secondary)
+                .lineLimit(1)
+
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(item.value)
+                    .appTextStyle(item.emphasis == .primary ? AppTypography.headingH3 : AppTypography.heading4)
+                    .foregroundStyle(valueColor)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+
+                if let unit = item.unit, !unit.isEmpty {
+                    Text(unit)
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .lineLimit(1)
+                }
+            }
+
+            if let baselineHint {
+                Text(baselineHint)
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .lineLimit(1)
+            }
+
+            Text(reasonText)
+                .appTextStyle(AppTypography.bodySmall)
+                .foregroundStyle(reasonColor)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(minHeight: AppSpacing.x64, alignment: .topLeading)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var baselineHint: String? {
+        item.baselineHint
+    }
+
+    private var reasonText: String {
+        switch item.status {
+        case .measured:
+            return item.reason
+        case .estimated:
+            return "Estimated"
+        case .proxy:
+            return "Proxy"
+        case .missing:
+            return "Missing"
+        }
+    }
+
+    private var valueColor: Color {
+        switch item.status {
+        case .measured:
+            return item.tint
+        case .estimated, .proxy, .missing:
+            return AppColors.Text.secondary
+        }
+    }
+
+    private var reasonColor: Color {
+        switch item.status {
+        case .measured:
+            return AppColors.Text.secondary
+        case .estimated:
+            return AppColors.Accent.blue
+        case .proxy:
+            return AppColors.Text.secondary
+        case .missing:
+            return AppColors.Accent.orange
+        }
+    }
+}
+
+private struct DSExplainabilityContextRow: View {
+    let item: DSExplainabilityCard.Item
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: AppSpacing.x8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text(item.value)
+                        .appTextStyle(AppTypography.heading4)
+                        .foregroundStyle(valueColor)
+                        .monospacedDigit()
+
+                    if let unit = item.unit, !unit.isEmpty {
+                        Text(unit)
+                            .appTextStyle(AppTypography.labelSmall)
+                            .foregroundStyle(AppColors.Text.secondary)
+                    }
+                }
+            }
+
+            Spacer(minLength: AppSpacing.x8)
+
+            Text(contextDescriptor)
+                .appTextStyle(AppTypography.labelSmall)
+                .foregroundStyle(AppColors.Text.secondary)
+                .multilineTextAlignment(.trailing)
+                .lineLimit(2)
+        }
+        .padding(.top, 2)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var valueColor: Color {
+        switch item.status {
+        case .measured:
+            return item.tint
+        case .estimated, .proxy, .missing:
+            return AppColors.Text.secondary
+        }
+    }
+
+    private var contextDescriptor: String {
+        switch item.status {
+        case .measured:
+            return item.reason
+        case .estimated:
+            return "Estimated context"
+        case .proxy:
+            return "Proxy context"
+        case .missing:
+            return "Missing context"
+        }
+    }
+}
+
 #Preview {
     ZStack {
         AppColors.Background.primary.ignoresSafeArea()
@@ -536,7 +767,9 @@ private struct DSExplainabilityTile: View {
                         tint: AppColors.Accent.orange
                     )
                 ],
-                footerText: "Sleep, HRV, and RHR drive the score. Exertion stays contextual."
+                footerText: "Sleep, HRV, and RHR drive the score. Exertion stays contextual.",
+                style: .flat,
+                layout: .compactColumns
             )
         }
         .padding(AppSpacing.x24)

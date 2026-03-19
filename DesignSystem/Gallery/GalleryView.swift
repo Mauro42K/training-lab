@@ -267,7 +267,9 @@ struct GalleryView: View {
                         footerText: "History is still consolidating.",
                         accessory: AnyView(
                             DSMetricPill("Partial history", iconSystemName: "chart.line.uptrend.xyaxis", variant: .info)
-                        )
+                        ),
+                        style: .flat,
+                        density: .compact
                     )
                 }
             }
@@ -313,7 +315,9 @@ struct GalleryView: View {
                                 tint: AppColors.Accent.orange
                             )
                         ],
-                        footerText: "Sleep, HRV, and RHR drive the score. Exertion stays contextual."
+                        footerText: "Sleep, HRV, and RHR drive the score. Exertion stays contextual.",
+                        style: .flat,
+                        layout: .compactColumns
                     )
                 }
             }
@@ -387,7 +391,8 @@ struct GalleryView: View {
                 accessory: AnyView(
                     DSMetricPill("System pattern", iconSystemName: "square.grid.2x2", variant: .success)
                 ),
-                style: .flat
+                style: .flat,
+                density: .compact
             )
 
             DSExplainabilityCard(
@@ -424,7 +429,8 @@ struct GalleryView: View {
                     )
                 ],
                 footerText: "Use this pattern when Home needs premium explainability without turning the block into a lab readout.",
-                style: .flat
+                style: .flat,
+                layout: .compactColumns
             )
 
             DSChartCard(

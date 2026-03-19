@@ -261,6 +261,7 @@
 
 ### Phase 5.6.1 Current Summary
 - Home polish is now scoped as a pure visual iteration.
+- Supporting blocks now favor flat Home panels with embedded metric/explainability content instead of stacked nested cards.
 - Pending UX/UI targets:
   - reduce nested-card feel
   - make Drivers less dense

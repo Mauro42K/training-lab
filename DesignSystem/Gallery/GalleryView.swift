@@ -386,7 +386,8 @@ struct GalleryView: View {
                 footerText: "Use this pattern for compact supporting metric blocks before composing a custom card.",
                 accessory: AnyView(
                     DSMetricPill("System pattern", iconSystemName: "square.grid.2x2", variant: .success)
-                )
+                ),
+                style: .flat
             )
 
             DSExplainabilityCard(
@@ -422,7 +423,8 @@ struct GalleryView: View {
                         emphasis: .secondary
                     )
                 ],
-                footerText: "Use this pattern when Home needs premium explainability without turning the block into a lab readout."
+                footerText: "Use this pattern when Home needs premium explainability without turning the block into a lab readout.",
+                style: .flat
             )
 
             DSChartCard(

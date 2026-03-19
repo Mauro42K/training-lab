@@ -97,6 +97,9 @@ struct DSMetricSnapshotCard: View {
     private let footerText: String?
     private let accessory: AnyView?
     private let cardStyle: DSCardStyle
+    private var isIntegrated: Bool {
+        cardStyle == .flat
+    }
 
     init(
         eyebrow: String? = nil,
@@ -131,25 +134,59 @@ struct DSMetricSnapshotCard: View {
                     }
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .top, spacing: AppSpacing.x12) {
-                        ForEach(items) { item in
-                            DSMetricSnapshotTile(item: item)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-
-                    VStack(alignment: .leading, spacing: AppSpacing.x12) {
-                        ForEach(items) { item in
-                            DSMetricSnapshotTile(item: item)
-                        }
-                    }
-                }
+                metricTiles
 
                 if let footerText {
                     Text(footerText)
                         .appTextStyle(AppTypography.labelSmall)
                         .foregroundStyle(AppColors.Text.secondary)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var metricTiles: some View {
+        if isIntegrated {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: AppSpacing.x12) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        DSMetricSnapshotTile(item: item, embedded: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        if index < items.count - 1 {
+                            Rectangle()
+                                .fill(AppColors.Stroke.subtle.opacity(0.65))
+                                .frame(width: 1, height: AppSpacing.x48 + AppSpacing.x12)
+                        }
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        DSMetricSnapshotTile(item: item, embedded: true)
+
+                        if index < items.count - 1 {
+                            Rectangle()
+                                .fill(AppColors.Stroke.subtle.opacity(0.65))
+                                .frame(height: 1)
+                        }
+                    }
+                }
+            }
+        } else {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: AppSpacing.x12) {
+                    ForEach(items) { item in
+                        DSMetricSnapshotTile(item: item, embedded: false)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: AppSpacing.x12) {
+                    ForEach(items) { item in
+                        DSMetricSnapshotTile(item: item, embedded: false)
+                    }
                 }
             }
         }
@@ -206,6 +243,9 @@ struct DSExplainabilityCard: View {
     private let secondaryItems: [Item]
     private let footerText: String?
     private let cardStyle: DSCardStyle
+    private var isIntegrated: Bool {
+        cardStyle == .flat
+    }
 
     init(
         eyebrow: String? = nil,
@@ -233,14 +273,14 @@ struct DSExplainabilityCard: View {
                 ViewThatFits(in: .horizontal) {
                     HStack(alignment: .top, spacing: AppSpacing.x12) {
                         ForEach(primaryItems) { item in
-                            DSExplainabilityTile(item: item)
+                            DSExplainabilityTile(item: item, embedded: isIntegrated)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
 
                     VStack(alignment: .leading, spacing: AppSpacing.x12) {
                         ForEach(primaryItems) { item in
-                            DSExplainabilityTile(item: item)
+                            DSExplainabilityTile(item: item, embedded: isIntegrated)
                         }
                     }
                 }
@@ -253,7 +293,7 @@ struct DSExplainabilityCard: View {
 
                         VStack(alignment: .leading, spacing: AppSpacing.x8) {
                             ForEach(secondaryItems) { item in
-                                DSExplainabilityTile(item: item)
+                                DSExplainabilityTile(item: item, embedded: isIntegrated)
                             }
                         }
                     }
@@ -271,6 +311,7 @@ struct DSExplainabilityCard: View {
 
 private struct DSMetricSnapshotTile: View {
     let item: DSMetricSnapshotCard.Item
+    let embedded: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.x8) {
@@ -291,13 +332,17 @@ private struct DSMetricSnapshotTile: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppSpacing.x12)
-        .frame(minHeight: AppSpacing.x64 + AppSpacing.x12, alignment: .leading)
-        .background(AppColors.Surface.cardMuted)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous))
+        .padding(embedded ? AppSpacing.x4 : AppSpacing.x12)
+        .frame(minHeight: embedded ? AppSpacing.x48 + AppSpacing.x12 : AppSpacing.x64 + AppSpacing.x12, alignment: .leading)
+        .background(embedded ? Color.clear : AppColors.Surface.cardMuted)
+        .clipShape(RoundedRectangle(cornerRadius: embedded ? AppRadius.small : AppRadius.medium, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
-                .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+            Group {
+                if !embedded {
+                    RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+                        .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+                }
+            }
         )
     }
 
@@ -308,6 +353,7 @@ private struct DSMetricSnapshotTile: View {
 
 private struct DSExplainabilityTile: View {
     let item: DSExplainabilityCard.Item
+    let embedded: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.x8) {
@@ -353,12 +399,16 @@ private struct DSExplainabilityTile: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppSpacing.x12)
+        .padding(embedded ? AppSpacing.x4 : AppSpacing.x12)
         .background(backgroundColor)
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: embedded ? AppRadius.small : AppRadius.medium, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
-                .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+            Group {
+                if !embedded {
+                    RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+                        .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+                }
+            }
         )
     }
 
@@ -368,7 +418,8 @@ private struct DSExplainabilityTile: View {
     }
 
     private var backgroundColor: Color {
-        item.emphasis == .primary ? AppColors.Surface.cardMuted : AppColors.Background.elevated
+        guard !embedded else { return Color.clear }
+        return item.emphasis == .primary ? AppColors.Surface.cardMuted : AppColors.Background.elevated
     }
 
     private var valueColor: Color {

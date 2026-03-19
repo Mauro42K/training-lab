@@ -65,7 +65,8 @@ Defined in `AppTypography`.
 - Radius scale: `0, 8, 12, 16, 20, 24`
 
 ### Shadows and Elevation
-- Flat surfaces can be used for integrated Home blocks that should read as part of the canvas rather than as floating cards.
+- Flat surfaces are the default for integrated Home blocks that should read as part of the canvas rather than as floating cards.
+- In flat Home panels, internal metric and explainability clusters should prefer embedded content, subtle separators, and reduced inner chrome over nested card surfaces.
 - Shadow/Card: used for standard cards
 - Shadow/Dropdown: used for muted/dropdown surfaces
 - Shadow/Modal: used for floating/modal surfaces

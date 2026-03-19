@@ -528,36 +528,39 @@ private struct RecommendedTodayCard: View {
 
     var body: some View {
         DSCard(style: .flat) {
-            VStack(alignment: .leading, spacing: AppSpacing.x16) {
+            VStack(alignment: .leading, spacing: AppSpacing.x12) {
                 HStack(alignment: .center, spacing: AppSpacing.x12) {
-                    HStack(spacing: AppSpacing.x12) {
+                    HStack(spacing: AppSpacing.x8) {
                         Image(systemName: presentation.iconSystemName)
-                            .appTextStyle(AppTypography.bodyLarge)
+                            .appTextStyle(AppTypography.bodyRegular)
                             .foregroundStyle(presentation.accent)
-                            .frame(width: AppSpacing.x40, height: AppSpacing.x40)
+                            .frame(width: AppSpacing.x24, height: AppSpacing.x24)
                             .background(
-                                RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
-                                    .fill(presentation.accent.opacity(0.14))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
-                                    .stroke(presentation.accent.opacity(0.18), lineWidth: AppStrokeWidth.hairline)
+                                Circle()
+                                    .fill(presentation.accent.opacity(0.12))
                             )
 
-                        VStack(alignment: .leading, spacing: AppSpacing.x4) {
-                            Text(presentation.headline)
-                                .appTextStyle(AppTypography.headingH3)
-                                .foregroundStyle(AppColors.Text.primary)
-
-                            Text(presentation.body)
-                                .appTextStyle(AppTypography.bodyRegular)
-                                .foregroundStyle(AppColors.Text.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
+                        Text("Guidance")
+                            .appTextStyle(AppTypography.labelSmall)
+                            .foregroundStyle(AppColors.Text.secondary)
                     }
 
                     Spacer(minLength: AppSpacing.x8)
+
+                    if recommendedToday.guidanceOnly {
+                        DSMetricPill("Solo guía", iconSystemName: "arrow.triangle.branch", variant: .neutral)
+                    }
                 }
+
+                Text(presentation.headline)
+                    .appTextStyle(AppTypography.headingH3)
+                    .foregroundStyle(AppColors.Text.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(presentation.body)
+                    .appTextStyle(AppTypography.bodyRegular)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 HStack(alignment: .center, spacing: AppSpacing.x12) {
                     Text("Confianza \(confidenceText)")
@@ -565,10 +568,6 @@ private struct RecommendedTodayCard: View {
                         .foregroundStyle(AppColors.Text.secondary)
 
                     Spacer(minLength: AppSpacing.x8)
-
-                    if recommendedToday.guidanceOnly {
-                        DSMetricPill("Solo guía", iconSystemName: "arrow.triangle.branch", variant: .neutral)
-                    }
                 }
             }
         }

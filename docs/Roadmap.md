@@ -967,7 +967,7 @@ Closure decisions carried into this phase:
 - `primary_device_name = null`
 
 ### Phase 5.6.1 — Home UX/UI Polish
-**Status:** OPEN
+**Status:** CLOSED (2026-03-19 America/New_York)
 **Goal:** Refine Home visual cohesion on iPhone without reopening product semantics.
 
 **Why this block exists**
@@ -1003,12 +1003,24 @@ Closure decisions carried into this phase:
 
 **Definition of Done**
 - Home feels more like one cohesive dark canvas and less like independent floating cards.
+- Drivers, Recommended Today, and Core Metrics now use compact reusable primitives rather than local one-off card recipes.
+- The iPhone stack is visibly shorter and better balanced before Trend.
 
 **QA focus**
 - Nested-card reduction
 - Editorial balance of Drivers / Recommended Today / Core Metrics / Trend Card
 - iPhone-first visual cohesion
 - No semantic regression in trust/completeness behavior
+
+**Closure summary**
+- `Drivers` now uses a true compact horizontal layout for primary drivers on iPhone.
+- `Exertion` is separated as quieter contextual information below the primary drivers.
+- `Recommended Today` and `Core Metrics` are compacted to reduce vertical stack height.
+- The Home canvas reads more as one dark/premium surface and less as disconnected floating cards.
+- The reusable compact patterns are now governed in the Design System:
+  - compact explainability columns
+  - compact supporting snapshots
+- No backend, contract, trust-semantic, or Coach/planner/chat changes were introduced.
 
 ### Phase 5.7 — Deep QA / Home integration
 **Goal:** Validate Home as one coherent surface once all blocks are present.
@@ -1162,7 +1174,7 @@ Closure decisions carried into this phase:
 ---
 
 ## Immediate next actions
-1) Continue **Phase 5.6.1 — Home UX/UI Polish**.
+1) Continue **Phase 5.7 — Deep QA / Home integration**.
 2) Keep `Recommended Today` guidance-only and clearly separate from full Coach behavior.
 3) Preserve the current Home hierarchy:
    - `Readiness Hero`

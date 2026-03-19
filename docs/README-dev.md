@@ -37,10 +37,15 @@
   - Home trust/completeness is normalized through `complete`, `partial`, and `missing`
   - fallback behavior is handled in client/UI using existing semantics
   - no new transversal `home_summary` object or backend contract expansion was introduced
-- Phase 5.6.1 is open:
+- Phase 5.6.1 is closed:
   - UX/UI polish only
   - dark premium cohesion and reduced nested-card feel
+  - compact `Drivers` / `Recommended Today` / `Core Metrics` layouts shipped
   - no backend, contract, or trust-semantic changes
+- Phase 5.7 is now the active next phase:
+  - deep QA / Home integration
+  - validate the already delivered Home blocks as a single surface
+  - keep trust semantics unchanged
 - Phase 4.4 remains on hold and must not be mixed into the next active phase.
 
 ## Environment targets

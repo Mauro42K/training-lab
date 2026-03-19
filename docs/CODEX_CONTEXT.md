@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.6.1 — Home UX/UI Polish** (**Open**)
+- **Phase 5.7 — Deep QA / Home integration** (**Open**)
 
 - Phase 5.6 — Data Completeness / Confidence is closed.
 - The phase resolved Home-wide trust/completeness with minimal client-side alignment:
@@ -14,14 +14,18 @@
   - `missing` treated as fallback-only, never as a real-looking value
   - `partial` preserving useful content instead of hiding it
 - The implementation stayed on the client and did not introduce a new transversal `home_summary` object or backend contract expansion.
-- Phase 5.6.1 is an iPhone-first UX/UI polish subphase only:
+- Phase 5.6.1 is closed. It was an iPhone-first UX/UI polish subphase only:
   - dark premium cohesion
   - reduced nested cards
   - Drivers visual refinement
   - Recommended Today editorial refinement
   - Core Metrics less dashboard-like
   - Trend Card spacing, hierarchy, and balance
-- Phase 5.6.1 does not reopen backend, contracts, trust semantics, or Coach / planner / chat.
+- Phase 5.6.1 did not reopen backend, contracts, trust semantics, or Coach / planner / chat.
+- Phase 5.6.1 delivered the reusable Home compact-layout pattern:
+  - compact explainability columns for `Drivers`
+  - compact supporting snapshots for `Core Metrics`
+  - reduced vertical stack height on iPhone
 
 - `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
 - `daily_recovery` remains the canonical consolidated-input domain; it was not turned into a persisted final score.
@@ -486,12 +490,11 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 5.6.1 — Home UX/UI Polish** (**Current / active**)
+- **Phase 5.7 — Deep QA / Home integration** (**Current / active**)
 - Focus:
-  - refine Home dark/premium cohesion,
-  - reduce nested cards and dashboard-like surfaces,
-  - polish Drivers, Recommended Today, Core Metrics, and Trend Card presentation,
-  - keep trust/completeness semantics unchanged while improving iPhone-first visual hierarchy.
+  - integrate the already delivered Home blocks as a single surface,
+  - validate state transitions, missing-data days, and cross-platform presentation,
+  - keep the current Home hierarchy and trust semantics intact.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**

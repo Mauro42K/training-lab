@@ -6,6 +6,23 @@ This project follows a simple SemVer-style changelog.
 
 - Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
 
+## v0.5.6.1 - 2026-03-19
+
+## Phase 5.6.1 — Home UX/UI Polish
+
+Closed
+- Home dark/premium cohesion was tightened without reopening product semantics.
+- `Drivers` was delivered as a compact horizontal iPhone layout for the primary drivers.
+- `Exertion` was kept as quieter contextual information below the primary driver strip.
+- `Recommended Today` and `Core Metrics` were compacted to reduce the total Home stack height.
+- The compact explainability/snapshot behavior was documented as reusable Design System language.
+
+Notes
+- No backend changes were made.
+- No contract changes were made.
+- No trust/completeness semantics were changed.
+- No Coach / planner / chat behavior was introduced.
+
 ## v0.5.6 - 2026-03-19
 
 ## Phase 5.6 — Data Completeness / Confidence

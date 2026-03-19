@@ -18,7 +18,7 @@ struct TrainingLoadTrendCard: View {
         DSChartCard(
             title: "Load vs Capacity",
             subtitle: summary.cardSubtitle,
-            style: .emphasized,
+            style: .flat,
             legendItems: [
                 .init(title: "Load", color: AppColors.Accent.blue.opacity(0.92)),
                 .init(title: "Capacity", color: AppColors.Accent.orange),
@@ -530,12 +530,7 @@ private struct TrainingLoadAxisLabels: View {
 
 private extension TrainingLoadSummaryDTO {
     var showsPrimaryMetrics: Bool {
-        switch historyStatus {
-        case .available, .partial:
-            return true
-        case .insufficientHistory, .missing:
-            return false
-        }
+        historyStatus.homeTrustState != .missing
     }
 
     var cardSubtitle: String {
@@ -679,4 +674,5 @@ private extension TrainingLoadSemanticState {
         TrainingLoadTrendCard(summary: summary, points: points) { _ in }
             .padding()
     }
+    .preferredColorScheme(.dark)
 }

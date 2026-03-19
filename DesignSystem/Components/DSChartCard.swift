@@ -8,11 +8,14 @@ struct DSChartCard<ChartContent: View>: View {
     }
 
     enum Style {
+        case flat
         case standard
         case emphasized
 
         var cardStyle: DSCardStyle {
             switch self {
+            case .flat:
+                .flat
             case .standard:
                 .standard
             case .emphasized:

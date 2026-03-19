@@ -17,74 +17,78 @@ struct TrainingLoadScreen: View {
     private let calendar = Calendar.current
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: AppSpacing.x16) {
-                if isLoading && !hasLoadedOnce {
-                    DSLoadingState()
-                } else {
-                    ReadinessHeroSection(
-                        date: homeSummary?.date ?? Date(),
-                        readiness: homeSummary?.readiness,
-                        errorMessage: readinessErrorMessage
-                    )
+        ZStack {
+            HomeCanvasBackground()
 
-                    ReadinessDriversSection(readiness: homeSummary?.readiness)
-
-                    RecommendedTodaySection(recommendedToday: homeSummary?.recommendedToday)
-
-                    CoreMetricsSection(coreMetrics: homeSummary?.coreMetrics)
-
-                    DSSectionHeader(title: "Load Trend", actionLabel: {
-                        Text("Last 28 days")
-                            .appTextStyle(AppTypography.labelSmall)
-                            .foregroundStyle(AppColors.Text.secondary)
-                    })
-
-                    TrainingLoadSummaryRow(
-                        today: todayTotal,
-                        sevenDays: sevenDayTotal,
-                        twentyEightDays: twentyEightDayTotal
-                    )
-
-                    TrainingLoadFilterControl(selection: $selectedFilter)
-
-                    if let freshnessMessage {
-                        TrendFreshnessCard(
-                            message: freshnessMessage,
-                            source: trendSnapshot.freshness.source
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                    if isLoading && !hasLoadedOnce {
+                        DSLoadingState()
+                    } else {
+                        ReadinessHeroSection(
+                            date: homeSummary?.date ?? Date(),
+                            readiness: homeSummary?.readiness,
+                            errorMessage: readinessErrorMessage
                         )
-                    }
 
-                    if shouldShowDiagnostics {
-                        TrendDiagnosticsRow(freshness: trendSnapshot.freshness)
-                    }
+                        ReadinessDriversSection(readiness: homeSummary?.readiness)
 
-                    TrainingLoadTrendCard(
-                        summary: trendSummary,
-                        points: chartPoints,
-                        onSelectDay: { day in
-                            Task { await selectDay(day) }
-                        }
-                    )
-                    .opacity(isLoading ? 0.72 : 1)
-                    .animation(.easeInOut(duration: 0.2), value: isLoading)
-                }
+                        RecommendedTodaySection(recommendedToday: homeSummary?.recommendedToday)
 
-                if let errorMessage {
-                    DSCard(style: .muted) {
-                        HStack(spacing: AppSpacing.x8) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(AppColors.Accent.orange)
-                            Text(errorMessage)
-                                .appTextStyle(AppTypography.bodySmall)
+                        CoreMetricsSection(coreMetrics: homeSummary?.coreMetrics)
+
+                        DSSectionHeader(title: "Load Trend", actionLabel: {
+                            Text("Last 28 days")
+                                .appTextStyle(AppTypography.labelSmall)
                                 .foregroundStyle(AppColors.Text.secondary)
+                        })
+
+                        TrainingLoadSummaryRow(
+                            today: todayTotal,
+                            sevenDays: sevenDayTotal,
+                            twentyEightDays: twentyEightDayTotal
+                        )
+
+                        TrainingLoadFilterControl(selection: $selectedFilter)
+
+                        if let freshnessMessage {
+                            TrendFreshnessCard(
+                                message: freshnessMessage,
+                                source: trendSnapshot.freshness.source
+                            )
+                        }
+
+                        if shouldShowDiagnostics {
+                            TrendDiagnosticsRow(freshness: trendSnapshot.freshness)
+                        }
+
+                        TrainingLoadTrendCard(
+                            summary: trendSummary,
+                            points: chartPoints,
+                            onSelectDay: { day in
+                                Task { await selectDay(day) }
+                            }
+                        )
+                        .opacity(isLoading ? 0.72 : 1)
+                        .animation(.easeInOut(duration: 0.2), value: isLoading)
+                    }
+
+                    if let errorMessage {
+                        DSCard(style: .muted) {
+                            HStack(spacing: AppSpacing.x8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(AppColors.Accent.orange)
+                                Text(errorMessage)
+                                    .appTextStyle(AppTypography.bodySmall)
+                                    .foregroundStyle(AppColors.Text.secondary)
+                            }
                         }
                     }
                 }
+                .padding(AppSpacing.x16)
             }
-            .padding(AppSpacing.x16)
         }
-        .background(AppColors.Background.primary.ignoresSafeArea())
+        .preferredColorScheme(.dark)
         .navigationTitle("Home")
         .task(id: selectedFilter) {
             await loadSeries()
@@ -269,6 +273,37 @@ private extension TrainingLoadSportFilter {
     }
 }
 
+private struct HomeCanvasBackground: View {
+    var body: some View {
+        ZStack {
+            AppColors.Background.primary
+
+            LinearGradient(
+                colors: [
+                    AppColors.Background.elevated.opacity(0.92),
+                    AppColors.Background.primary.opacity(0.98),
+                    AppColors.Background.primary.opacity(0.94),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            Circle()
+                .fill(AppColors.Accent.blue.opacity(0.10))
+                .frame(width: 320, height: 320)
+                .blur(radius: 96)
+                .offset(x: 152, y: -220)
+
+            Circle()
+                .fill(AppColors.Accent.orange.opacity(0.06))
+                .frame(width: 360, height: 360)
+                .blur(radius: 120)
+                .offset(x: -168, y: 440)
+        }
+        .ignoresSafeArea()
+    }
+}
+
 private struct ReadinessHeroSection: View {
     let date: Date
     let readiness: ReadinessSummaryDTO?
@@ -316,11 +351,17 @@ private struct RecommendedTodaySection: View {
 
     @ViewBuilder
     var body: some View {
-        if let recommendedToday {
-            VStack(alignment: .leading, spacing: AppSpacing.x8) {
-                DSSectionHeader(title: "Recommended Today")
+        VStack(alignment: .leading, spacing: AppSpacing.x8) {
+            DSSectionHeader(title: "Recommended Today")
 
+            if let recommendedToday {
                 RecommendedTodayCard(recommendedToday: recommendedToday)
+            } else {
+                HomeFallbackCard(
+                    iconSystemName: "questionmark.circle.fill",
+                    title: "No strong recommendation yet",
+                    message: "A guidance block will appear once today's readiness signal has enough context."
+                )
             }
         }
     }
@@ -331,15 +372,36 @@ private struct ReadinessDriversSection: View {
 
     @ViewBuilder
     var body: some View {
-        if let readiness, let explainability = readiness.explainability {
-            VStack(alignment: .leading, spacing: AppSpacing.x8) {
-                DSSectionHeader(title: "Drivers")
+        VStack(alignment: .leading, spacing: AppSpacing.x8) {
+            DSSectionHeader(title: "Drivers")
 
+            if let readiness, let explainability = readiness.explainability {
                 ReadinessDriversCard(
                     readiness: readiness,
                     explainability: explainability
                 )
+            } else {
+                HomeFallbackCard(
+                    iconSystemName: "sparkles",
+                    title: "Drivers still consolidating",
+                    message: fallbackCopy
+                )
             }
+        }
+    }
+
+    private var fallbackCopy: String {
+        guard let readiness else {
+            return "Sleep, HRV, and RHR will appear here once today's signal is available."
+        }
+
+        switch readiness.completenessStatus.homeTrustState {
+        case .complete:
+            return "The explanation is unavailable for now, but the readiness signal itself is present."
+        case .partial:
+            return "The explanation is still consolidating while Sleep, HRV, and RHR finish arriving."
+        case .missing:
+            return "Sleep, HRV, and RHR need to be available before a solid explanation can be shown."
         }
     }
 }
@@ -352,7 +414,8 @@ private struct ReadinessDriversCard: View {
         DSExplainabilityCard(
             primaryItems: primaryItems,
             secondaryItems: secondaryItems,
-            footerText: footerText
+            footerText: footerText,
+            style: .flat
         )
     }
 
@@ -390,10 +453,14 @@ private struct ReadinessDriversCard: View {
     }
 
     private var footerText: String {
-        if readiness.completenessStatus == .missing {
+        switch readiness.completenessStatus.homeTrustState {
+        case .complete:
+            return "Sleep, HRV, and RHR drive the score. Exertion stays contextual."
+        case .partial:
+            return "Sleep, HRV, and RHR drive the score while the signal is still consolidating. Exertion stays contextual."
+        case .missing:
             return "Sleep, HRV, and RHR drive the score once today's signal is available. Exertion stays contextual."
         }
-        return "Sleep, HRV, and RHR drive the score. Exertion stays contextual."
     }
 
     private func title(for key: String) -> String {
@@ -460,7 +527,7 @@ private struct RecommendedTodayCard: View {
     let recommendedToday: RecommendedTodayDTO
 
     var body: some View {
-        DSCard {
+        DSCard(style: .flat) {
             VStack(alignment: .leading, spacing: AppSpacing.x16) {
                 HStack(alignment: .center, spacing: AppSpacing.x12) {
                     HStack(spacing: AppSpacing.x12) {
@@ -682,6 +749,16 @@ private enum RecommendedTodayCopyGenerator {
     }
 
     private static func steadyBody(context: RecommendedTodayCopyContext) -> String {
+        if context.hasMissingPrimaries {
+            return choose(
+                [
+                    "La recomendación existe, pero todavía conviene tomarla con más margen.",
+                    "La señal acompaña, aunque aún faltan piezas; mejor sostener sin empujar de más.",
+                ],
+                seed: context.seed + 27
+            )
+        }
+
         if context.hasMixedSignals {
             return choose(
                 [
@@ -712,6 +789,16 @@ private enum RecommendedTodayCopyGenerator {
     }
 
     private static func demandingBody(context: RecommendedTodayCopyContext) -> String {
+        if context.hasMissingPrimaries {
+            return choose(
+                [
+                    "Hay margen para un día más activo, pero todavía conviene no leerlo como una señal limpia.",
+                    "La señal permite empujar un poco, aunque sigue pidiendo más prudencia que confianza plena.",
+                ],
+                seed: context.seed + 41
+            )
+        }
+
         if context.confidenceBand == .high {
             return choose(
                 [
@@ -735,8 +822,8 @@ private enum RecommendedTodayCopyGenerator {
         if context.hasMissingPrimaries {
             return choose(
                 [
-                    "Faltan señales clave para orientar el día con claridad.",
-                    "Todavía faltan señales suficientes como para sugerir un enfoque con confianza.",
+                    "Todavía no hay una recomendación sólida porque faltan señales clave.",
+                    "Aún no conviene sacar una guía fuerte; faltan señales para hacerlo con confianza.",
                 ],
                 seed: context.seed + 53
             )
@@ -745,7 +832,7 @@ private enum RecommendedTodayCopyGenerator {
         if context.hasLowConfidence {
             return choose(
                 [
-                    "La lectura todavía es débil; mejor no sacar una conclusión más firme.",
+                    "La lectura todavía es débil; mejor dejar la guía en un nivel prudente.",
                     "La señal de hoy aún es demasiado corta para orientar el día con claridad.",
                 ],
                 seed: context.seed + 59
@@ -754,7 +841,7 @@ private enum RecommendedTodayCopyGenerator {
 
         return choose(
             [
-                "Todavía no hay suficiente información para sugerir un enfoque claro.",
+                "Todavía no hay suficiente información para sugerir un enfoque fuerte.",
                 "La señal disponible todavía no alcanza para orientar bien el día.",
             ],
             seed: context.seed + 61
@@ -830,13 +917,14 @@ private struct CoreMetricsCard: View {
             eyebrow: "Load snapshot",
             items: snapshotItems,
             footerText: historyCopy,
-            accessory: shouldShowStatusPill ? AnyView(statusPill) : nil
+            accessory: shouldShowStatusPill ? AnyView(statusPill) : nil,
+            style: .flat
         )
     }
 
     private var shouldDeEmphasizeValues: Bool {
         guard let coreMetrics else { return true }
-        return coreMetrics.historyStatus == .insufficientHistory || coreMetrics.historyStatus == .missing
+        return coreMetrics.historyStatus.homeTrustState != .complete
     }
 
     private var historyCopy: String? {
@@ -858,7 +946,7 @@ private struct CoreMetricsCard: View {
 
     private var shouldShowStatusPill: Bool {
         guard let coreMetrics else { return true }
-        return coreMetrics.historyStatus != .available
+        return coreMetrics.historyStatus.homeTrustState != .complete
     }
 
     private var snapshotItems: [DSMetricSnapshotCard.Item] {
@@ -914,7 +1002,7 @@ private struct CoreMetricsCard: View {
     }
 
     private func valueText(for value: Double?) -> String {
-        guard let value, coreMetrics?.historyStatus != .missing else {
+        guard let value, coreMetrics?.historyStatus.homeTrustState != .missing else {
             return "--"
         }
         return String(Int(value.rounded()))
@@ -993,12 +1081,8 @@ private struct ReadinessHeroView: View {
 
     @ViewBuilder
     private var content: some View {
-        if let readiness, readiness.completenessStatus != .missing {
-            if readiness.completenessStatus == .insufficient {
-                insufficientContent(readiness)
-            } else {
-                standardContent(readiness)
-            }
+        if let readiness, readiness.completenessStatus.homeTrustState != .missing {
+            standardContent(readiness)
         } else {
             missingContent
         }
@@ -1014,10 +1098,12 @@ private struct ReadinessHeroView: View {
                     .monospacedDigit()
                     .foregroundStyle(theme.primary)
 
-                Text("%")
-                    .font(.system(size: 36, weight: .bold))
-                    .foregroundStyle(theme.primary)
-                    .offset(y: -16)
+                if readiness.score != nil {
+                    Text("%")
+                        .font(.system(size: 36, weight: .bold))
+                        .foregroundStyle(theme.primary)
+                        .offset(y: -16)
+                }
             }
 
             Text(labelText(for: readiness))
@@ -1031,54 +1117,12 @@ private struct ReadinessHeroView: View {
                 .multilineTextAlignment(.center)
 
             HStack(spacing: AppSpacing.x8) {
-                if readiness.completenessStatus == .partial {
+                if readiness.completenessStatus.homeTrustState == .partial {
                     ReadinessStateBadge(
-                        title: "Partial signal",
+                        title: "Trust reduced",
                         tint: theme.primary
                     )
                 }
-                if readiness.hasEstimatedContext {
-                    ReadinessStateBadge(
-                        title: "Estimated context",
-                        tint: theme.primary
-                    )
-                }
-            }
-
-            Text(confidenceLine(for: readiness.confidence))
-                .appTextStyle(AppTypography.labelSmall)
-                .foregroundStyle(Self.heroSecondaryText)
-
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func insufficientContent(_ readiness: ReadinessSummaryDTO) -> some View {
-        VStack(spacing: AppSpacing.x8) {
-            Spacer(minLength: 0)
-
-            Text(labelText(for: readiness))
-                .font(.system(size: 34, weight: .semibold))
-                .foregroundStyle(theme.labelAccent)
-                .multilineTextAlignment(.center)
-
-            if let score = readiness.score {
-                Text("Estimated score \(score)%")
-                    .appTextStyle(AppTypography.labelSmall)
-                    .foregroundStyle(theme.primary.opacity(0.56))
-            }
-
-            Text(metadataLine(for: readiness))
-                .appTextStyle(AppTypography.labelSmall)
-                .foregroundStyle(Self.heroTertiaryText)
-                .multilineTextAlignment(.center)
-
-            HStack(spacing: AppSpacing.x8) {
-                ReadinessStateBadge(
-                    title: "Limited signal",
-                    tint: theme.primary
-                )
                 if readiness.hasEstimatedContext {
                     ReadinessStateBadge(
                         title: "Estimated context",
@@ -1160,7 +1204,7 @@ private struct ReadinessHeroView: View {
 
     private func metadataLine(for readiness: ReadinessSummaryDTO) -> String {
         let supporting = supportingLine(for: readiness)
-        guard readiness.completenessStatus != .complete else {
+        guard readiness.completenessStatus.homeTrustState != .complete else {
             return localizedInputs(readiness.inputsPresent)
         }
         return supporting
@@ -1215,7 +1259,39 @@ private struct ReadinessStateBadge: View {
             .overlay(
                 Capsule()
                     .stroke(tint.opacity(0.24), lineWidth: AppStrokeWidth.hairline)
-            )
+        )
+    }
+}
+
+private struct HomeFallbackCard: View {
+    let iconSystemName: String
+    let title: String
+    let message: String
+
+    var body: some View {
+        DSCard(style: .flat) {
+            HStack(alignment: .top, spacing: AppSpacing.x12) {
+                Image(systemName: iconSystemName)
+                    .appTextStyle(AppTypography.bodyRegular)
+                    .foregroundStyle(AppColors.Text.secondary)
+                    .frame(width: AppSpacing.x24, height: AppSpacing.x24)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppRadius.small, style: .continuous)
+                            .fill(AppColors.Background.elevated)
+                    )
+
+                VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                    Text(title)
+                        .appTextStyle(AppTypography.headingH3)
+                        .foregroundStyle(AppColors.Text.primary)
+
+                    Text(message)
+                        .appTextStyle(AppTypography.bodySmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
     }
 }
 
@@ -1310,7 +1386,7 @@ private struct TrendFreshnessCard: View {
     let source: TrainingLoadDataSource
 
     var body: some View {
-        DSCard(style: .muted) {
+        DSCard(style: .flat) {
             HStack(alignment: .top, spacing: AppSpacing.x8) {
                 Image(systemName: source == .cache ? "clock.badge.exclamationmark" : "clock.arrow.circlepath")
                     .foregroundStyle(AppColors.Accent.orange)
@@ -1431,6 +1507,7 @@ private extension TrainingLoadFetchResult {
         }
         .padding(AppSpacing.x16)
     }
+    .preferredColorScheme(.dark)
 }
 
 #Preview("Home Stack with Recommended Today") {
@@ -1463,6 +1540,7 @@ private extension TrainingLoadFetchResult {
         .padding(AppSpacing.x16)
     }
     .background(AppColors.Background.primary)
+    .preferredColorScheme(.dark)
 }
 
 private enum PreviewFixtures {

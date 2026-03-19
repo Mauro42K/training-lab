@@ -224,6 +224,11 @@ struct GalleryView: View {
             DSCard {
                 VStack(alignment: .leading, spacing: AppSpacing.x16) {
                     tokenSubheader("DSCard")
+                    DSCard(style: .flat) {
+                        Text("Flat Surface")
+                            .appTextStyle(AppTypography.bodyRegular)
+                            .foregroundStyle(AppColors.Text.secondary)
+                    }
                     DSCard(style: .standard) {
                         Text("Standard Card")
                             .appTextStyle(AppTypography.headingH3)

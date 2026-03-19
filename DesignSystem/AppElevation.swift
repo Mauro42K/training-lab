@@ -22,7 +22,7 @@ enum AppElevation {
     var surfaceColor: Color {
         switch self {
         case .flat:
-            AppColors.Background.primary
+            AppColors.Surface.card
         case .card:
             AppColors.Surface.card
         case .dropdown:

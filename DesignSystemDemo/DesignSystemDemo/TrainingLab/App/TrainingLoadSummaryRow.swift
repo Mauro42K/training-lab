@@ -6,7 +6,7 @@ struct TrainingLoadSummaryRow: View {
     let twentyEightDays: Double
 
     var body: some View {
-        DSCard(style: .floating) {
+        DSCard(style: .flat) {
             HStack(spacing: AppSpacing.x12) {
                 TrainingLoadSummaryMetric(title: "Today", value: today, isPrimary: true)
                 divider

@@ -1,6 +1,7 @@
 import SwiftUI
 
 enum DSCardStyle {
+    case flat
     case standard
     case muted
     case floating
@@ -21,6 +22,8 @@ struct DSCard<Content: View>: View {
 
     private var elevation: AppElevation {
         switch style {
+        case .flat:
+            .flat
         case .standard:
             .card
         case .muted:
@@ -37,11 +40,26 @@ struct DSCard<Content: View>: View {
             .frame(minHeight: minHeight, alignment: .topLeading)
             .background(elevation.surfaceColor)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
-                    .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
-            )
-            .appShadow(elevation.shadow)
+            .modifier(DSCardChrome(style: style, shadow: elevation.shadow))
+    }
+}
+
+private struct DSCardChrome: ViewModifier {
+    let style: DSCardStyle
+    let shadow: AppShadow?
+
+    func body(content: Content) -> some View {
+        switch style {
+        case .flat:
+            content
+        case .standard, .muted, .floating:
+            content
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                        .stroke(AppColors.Stroke.subtle, lineWidth: AppStrokeWidth.hairline)
+                )
+                .appShadow(shadow)
+        }
     }
 }
 
@@ -78,21 +96,24 @@ struct DSMetricSnapshotCard: View {
     private let items: [Item]
     private let footerText: String?
     private let accessory: AnyView?
+    private let cardStyle: DSCardStyle
 
     init(
         eyebrow: String? = nil,
         items: [Item],
         footerText: String? = nil,
-        accessory: AnyView? = nil
+        accessory: AnyView? = nil,
+        style: DSCardStyle = .standard
     ) {
         self.eyebrow = eyebrow
         self.items = items
         self.footerText = footerText
         self.accessory = accessory
+        self.cardStyle = style
     }
 
     var body: some View {
-        DSCard {
+        DSCard(style: cardStyle) {
             VStack(alignment: .leading, spacing: AppSpacing.x12) {
                 if eyebrow != nil || accessory != nil {
                     HStack(alignment: .center, spacing: AppSpacing.x12) {
@@ -184,21 +205,24 @@ struct DSExplainabilityCard: View {
     private let primaryItems: [Item]
     private let secondaryItems: [Item]
     private let footerText: String?
+    private let cardStyle: DSCardStyle
 
     init(
         eyebrow: String? = nil,
         primaryItems: [Item],
         secondaryItems: [Item] = [],
-        footerText: String? = nil
+        footerText: String? = nil,
+        style: DSCardStyle = .standard
     ) {
         self.eyebrow = eyebrow
         self.primaryItems = primaryItems
         self.secondaryItems = secondaryItems
         self.footerText = footerText
+        self.cardStyle = style
     }
 
     var body: some View {
-        DSCard {
+        DSCard(style: cardStyle) {
             VStack(alignment: .leading, spacing: AppSpacing.x12) {
                 if let eyebrow {
                     Text(eyebrow)

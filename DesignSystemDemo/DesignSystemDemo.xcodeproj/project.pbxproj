@@ -56,6 +56,7 @@
 		F1C300000000000000000015 /* TrainingLoadChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000015 /* TrainingLoadChartView.swift */; };
 		F1C300000000000000000016 /* TrainingLoadDayDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */; };
 		F1C300000000000000000017 /* TrainingLoadDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000017 /* TrainingLoadDTO.swift */; };
+		F1C300000000000000000018 /* HomeTrustState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000018 /* HomeTrustState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +110,7 @@
 		F1B200000000000000000015 /* TrainingLoadChartView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadChartView.swift; sourceTree = "<group>"; };
 		F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadDayDetailSheet.swift; sourceTree = "<group>"; };
 		F1B200000000000000000017 /* TrainingLoadDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadDTO.swift; sourceTree = "<group>"; };
+		F1B200000000000000000018 /* HomeTrustState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeTrustState.swift; sourceTree = "<group>"; };
 		F2A100000000000000000001 /* Runtime.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Runtime.Debug.xcconfig; sourceTree = "<group>"; };
 		F2A100000000000000000002 /* Runtime.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Runtime.Release.xcconfig; sourceTree = "<group>"; };
 		F2A100000000000000000003 /* Runtime.Local.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Runtime.Local.example.xcconfig; sourceTree = "<group>"; };
@@ -230,6 +232,7 @@
 				F1B200000000000000000014 /* TrainingLoadFilterControl.swift */,
 				F1B200000000000000000015 /* TrainingLoadChartView.swift */,
 				F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */,
+				F1B200000000000000000018 /* HomeTrustState.swift */,
 				F1B200000000000000000003 /* TrainingLabRootView.swift */,
 			);
 			path = App;
@@ -402,6 +405,7 @@
 				F1C300000000000000000014 /* TrainingLoadFilterControl.swift in Sources */,
 				F1C300000000000000000015 /* TrainingLoadChartView.swift in Sources */,
 				F1C300000000000000000016 /* TrainingLoadDayDetailSheet.swift in Sources */,
+				F1C300000000000000000018 /* HomeTrustState.swift in Sources */,
 				0A5B2C8D9E1F4A6B7C8D9E01 /* IngestionOrchestrator.swift in Sources */,
 				F1C300000000000000000001 /* APIClient.swift in Sources */,
 				F1C300000000000000000002 /* HealthKitClient.swift in Sources */,

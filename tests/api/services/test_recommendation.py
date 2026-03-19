@@ -7,7 +7,7 @@ from api.schemas.daily_domains import (
     ReadinessSummaryItem,
     ReadinessTraceInput,
 )
-from api.services.recommendation import compute_recommended_today
+from api.services.recommendation_service import compute_recommended_today
 
 
 def _build_readiness(

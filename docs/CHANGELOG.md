@@ -23,8 +23,11 @@ Improved
 
 Notes
 - `Recommended Today` remains guidance-only.
-- no LLM runtime, Coach behavior, planner scope, or workout prescription was introduced in this phase.
+- no LLM runtime, Coach behavior, planner scope, chat surface, or workout prescription was introduced in this phase.
+- no OpenAI API key is used in the phase 5.5 copy implementation.
+- no backend generative copy service was introduced.
 - the backend recommendation logic remains the source of truth for recommendation structure.
+- future LLM-backed copy remains a separate evaluation track, not part of phase 5.5 closure.
 
 ## v0.5.4 - 2026-03-16
 

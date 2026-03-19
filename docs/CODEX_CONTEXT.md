@@ -191,9 +191,13 @@
   - `confidence`
   - `reason_tags`
   - `guidance_only`
-- Home now renders `Recommended Today` between:
+- Home order is now:
+  - `Readiness Hero`
   - `Drivers / Explainability`
+  - `Recommended Today`
   - `Core Metrics`
+  - `Load Trend`
+  - `Trend Card`
 - The temporary fixed copy has been replaced by a controlled Spanish copy-generation layer in the iOS client.
 - Copy generation currently uses only approved structured inputs:
   - `state`
@@ -203,14 +207,20 @@
 - The generation layer is deterministic and templated, not LLM-backed:
   - backend remains the source of truth for recommendation structure
   - no backend contract expansion was required for copy generation
+  - no OpenAI API key is used for this 5.5 copy layer
   - no runtime AI / Coach / planner integration was introduced
 - Guardrails preserved:
   - guidance-only
   - short premium copy
+  - no planner
+  - no coach
+  - no chat
   - no workout prescription
-  - no chat or coach behavior
+  - no adaptive planning
   - no medical framing
   - no contradiction with readiness/explainability context
+- Future work note:
+  - a later phase may evaluate LLM-backed copy only if it adds measurable value without breaking these guardrails or expanding into Coach scope
 - Validation completed locally:
   - production backend already serves `recommended_today`
   - iOS build passed

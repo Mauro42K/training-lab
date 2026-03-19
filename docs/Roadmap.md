@@ -864,7 +864,13 @@ Closure decisions carried into this phase:
   - guidance-only output
   - structured recommendation state from backend
   - no planner, no coach, no chat, no workout prescription
-- iOS Home now renders the block between `Drivers` and `Core Metrics` within the existing Home hierarchy.
+- iOS Home order is now:
+  - `Readiness Hero`
+  - `Drivers / Explainability`
+  - `Recommended Today`
+  - `Core Metrics`
+  - `Load Trend`
+  - `Trend Card`
 - The first UI pass shipped as a temporary card using existing Design System primitives rather than a bespoke surface.
 - The fixed placeholder copy has now been replaced with controlled Spanish copy generation in the client.
 - Copy generation is intentionally deterministic and templated, using only:
@@ -873,12 +879,15 @@ Closure decisions carried into this phase:
   - `reason_tags`
   - `guidance_only`
 - The copy layer did not expand the backend contract and did not introduce an artificial LLM runtime.
+- No OpenAI API key is used for this phase 5.5 copy layer.
+- No backend generative service was introduced.
 - Guardrails remained intact:
   - short premium tone
   - guidance-only semantics
   - no medical framing
   - no contradiction with readiness / explainability context
   - no Coach scope creep
+- A future phase may evaluate LLM-backed copy only if it adds real product value without violating these guardrails.
 - Validation completed:
   - backend production serves `recommended_today`
   - iOS build passed
@@ -1095,11 +1104,12 @@ Closure decisions carried into this phase:
 ---
 
 ## Immediate next actions
-1) Open **Phase 5.5 — Recommended Today**.
+1) Open **Phase 5.6 — Data Completeness / Confidence**.
 2) Keep `Recommended Today` guidance-only and clearly separate from full Coach behavior.
-3) Preserve the Home hierarchy already established in Phases 5.2–5.4:
+3) Preserve the current Home hierarchy:
    - `Readiness Hero`
    - `Drivers / Explainability`
+   - `Recommended Today`
    - `Core Metrics`
    - `Load Trend`
    - `Trend Card`

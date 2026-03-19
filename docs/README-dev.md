@@ -26,6 +26,13 @@
   - `Readiness Explainability` shipped
   - visible v1 scope is `Sleep`, `HRV`, `RHR`, plus `Exertion` as secondary context
   - explainability is delivered as `readiness.explainability` inside `GET /v1/home/summary`
+- Phase 5.5 is closed:
+  - `Recommended Today` shipped and integrated in Home as guidance-only
+  - Home order is `Readiness Hero -> Drivers -> Recommended Today -> Core Metrics -> Load Trend -> Trend Card`
+  - backend-only recommendation structure + UI layer are both implemented
+  - dynamic Spanish copy is generated client-side with controlled templates
+  - phase 5.5 does not use OpenAI API key, does not run a real LLM runtime, and does not introduce backend generative copy
+  - no planner, no coach, no chat, no workout prescription, no adaptive planning
 - Phase 4.4 remains on hold and must not be mixed into the next active phase.
 
 ## Environment targets
@@ -136,6 +143,13 @@ Notas:
 ## Home / readiness notes
 - `Readiness v1` usa como drivers primarios: `Sleep`, `HRV`, `RHR`.
 - `Exertion` aparece como contexto secundario en explainability; no es un driver primario del score.
+- `Recommended Today` vive en `GET /v1/home/summary` como bloque guidance-only con:
+  - `state`
+  - `confidence`
+  - `reason_tags`
+  - `guidance_only`
+- La copy de `Recommended Today` en 5.5 se resuelve en cliente con generación controlada/templated.
+- En 5.5 no hay integración LLM real ni uso de OpenAI API key para copy.
 - `Core Metrics` en Home muestra:
   - `7-Day Load`
   - `Fitness`

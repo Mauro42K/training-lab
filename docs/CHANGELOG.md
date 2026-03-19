@@ -6,6 +6,26 @@ This project follows a simple SemVer-style changelog.
 
 - Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
 
+## v0.5.5 - 2026-03-18
+
+## Phase 5.5 — Recommended Today
+
+Added
+- `recommended_today` Home block in the iOS Home stack between Drivers and Core Metrics.
+- controlled Spanish copy generation for `Recommended Today` using the existing structured recommendation state.
+
+Improved
+- Home guidance quality by replacing fixed placeholder copy with short premium copy modulated by:
+  - `state`
+  - `confidence`
+  - `reason_tags`
+- maintainability by keeping the backend contract structured and stable while generating copy client-side.
+
+Notes
+- `Recommended Today` remains guidance-only.
+- no LLM runtime, Coach behavior, planner scope, or workout prescription was introduced in this phase.
+- the backend recommendation logic remains the source of truth for recommendation structure.
+
 ## v0.5.4 - 2026-03-16
 
 ## Phase 5.4 — Drivers / Explainability

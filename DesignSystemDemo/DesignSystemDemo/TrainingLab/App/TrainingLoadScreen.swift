@@ -30,6 +30,8 @@ struct TrainingLoadScreen: View {
 
                     ReadinessDriversSection(readiness: homeSummary?.readiness)
 
+                    RecommendedTodaySection(recommendedToday: homeSummary?.recommendedToday)
+
                     CoreMetricsSection(coreMetrics: homeSummary?.coreMetrics)
 
                     DSSectionHeader(title: "Load Trend", actionLabel: {
@@ -309,6 +311,21 @@ private struct CoreMetricsSection: View {
     }
 }
 
+private struct RecommendedTodaySection: View {
+    let recommendedToday: RecommendedTodayDTO?
+
+    @ViewBuilder
+    var body: some View {
+        if let recommendedToday {
+            VStack(alignment: .leading, spacing: AppSpacing.x8) {
+                DSSectionHeader(title: "Recommended Today")
+
+                RecommendedTodayCard(recommendedToday: recommendedToday)
+            }
+        }
+    }
+}
+
 private struct ReadinessDriversSection: View {
     let readiness: ReadinessSummaryDTO?
 
@@ -436,6 +453,372 @@ private struct ReadinessDriversCard: View {
         case .notUsed:
             return AppColors.Text.secondary
         }
+    }
+}
+
+private struct RecommendedTodayCard: View {
+    let recommendedToday: RecommendedTodayDTO
+
+    var body: some View {
+        DSCard {
+            VStack(alignment: .leading, spacing: AppSpacing.x16) {
+                HStack(alignment: .center, spacing: AppSpacing.x12) {
+                    HStack(spacing: AppSpacing.x12) {
+                        Image(systemName: presentation.iconSystemName)
+                            .appTextStyle(AppTypography.bodyLarge)
+                            .foregroundStyle(presentation.accent)
+                            .frame(width: AppSpacing.x40, height: AppSpacing.x40)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+                                    .fill(presentation.accent.opacity(0.14))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+                                    .stroke(presentation.accent.opacity(0.18), lineWidth: AppStrokeWidth.hairline)
+                            )
+
+                        VStack(alignment: .leading, spacing: AppSpacing.x4) {
+                            Text(presentation.headline)
+                                .appTextStyle(AppTypography.headingH3)
+                                .foregroundStyle(AppColors.Text.primary)
+
+                            Text(presentation.body)
+                                .appTextStyle(AppTypography.bodyRegular)
+                                .foregroundStyle(AppColors.Text.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+
+                    Spacer(minLength: AppSpacing.x8)
+                }
+
+                HStack(alignment: .center, spacing: AppSpacing.x12) {
+                    Text("Confianza \(confidenceText)")
+                        .appTextStyle(AppTypography.labelSmall)
+                        .foregroundStyle(AppColors.Text.secondary)
+
+                    Spacer(minLength: AppSpacing.x8)
+
+                    if recommendedToday.guidanceOnly {
+                        DSMetricPill("Solo guía", iconSystemName: "arrow.triangle.branch", variant: .neutral)
+                    }
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var presentation: RecommendedTodayPresentation {
+        RecommendedTodayPresentation(recommendedToday: recommendedToday)
+    }
+
+    private var confidenceText: String {
+        "\(Int((recommendedToday.confidence * 100).rounded()))%"
+    }
+}
+
+private struct RecommendedTodayPresentation {
+    let headline: String
+    let body: String
+    let iconSystemName: String
+    let accent: Color
+
+    init(recommendedToday: RecommendedTodayDTO) {
+        let copy = RecommendedTodayCopyGenerator.copy(for: recommendedToday)
+        headline = copy.headline
+        body = copy.body
+
+        switch recommendedToday.state {
+        case .recuperar:
+            iconSystemName = "bed.double.fill"
+            accent = AppColors.Accent.coral
+        case .suave:
+            iconSystemName = "figure.walk"
+            accent = AppColors.Accent.orange
+        case .estable:
+            iconSystemName = "equal.circle.fill"
+            accent = AppColors.Accent.blue
+        case .exigente:
+            iconSystemName = "arrow.up.circle.fill"
+            accent = AppColors.Accent.green
+        case .sinDatos:
+            iconSystemName = "questionmark.circle.fill"
+            accent = AppColors.Text.secondary
+        }
+    }
+}
+
+private struct RecommendedTodayCopy {
+    let headline: String
+    let body: String
+}
+
+private enum RecommendedTodayCopyGenerator {
+    static func copy(for recommendedToday: RecommendedTodayDTO) -> RecommendedTodayCopy {
+        let context = RecommendedTodayCopyContext(recommendedToday: recommendedToday)
+
+        switch recommendedToday.state {
+        case .recuperar:
+            return RecommendedTodayCopy(
+                headline: choose(
+                    [
+                        "Hoy conviene recuperar",
+                        "Mejor bajar un cambio hoy",
+                        "Hoy pide más recuperación",
+                    ],
+                    seed: context.seed
+                ),
+                body: recoveryBody(context: context)
+            )
+        case .suave:
+            return RecommendedTodayCopy(
+                headline: choose(
+                    [
+                        "Hoy conviene ir suave",
+                        "Mejor sostener algo ligero",
+                        "Hoy pide una carga liviana",
+                    ],
+                    seed: context.seed
+                ),
+                body: gentleBody(context: context)
+            )
+        case .estable:
+            return RecommendedTodayCopy(
+                headline: choose(
+                    [
+                        "Hoy conviene mantener",
+                        "Buen día para sostener",
+                        "Mejor seguir con continuidad",
+                    ],
+                    seed: context.seed
+                ),
+                body: steadyBody(context: context)
+            )
+        case .exigente:
+            return RecommendedTodayCopy(
+                headline: choose(
+                    [
+                        "Hoy puedes exigir un poco más",
+                        "Hay margen para empujar un poco",
+                        "Se abre espacio para subir un punto",
+                    ],
+                    seed: context.seed
+                ),
+                body: demandingBody(context: context)
+            )
+        case .sinDatos:
+            return RecommendedTodayCopy(
+                headline: choose(
+                    [
+                        "Hoy faltan señales",
+                        "Señal incompleta hoy",
+                        "Hoy faltan datos clave",
+                    ],
+                    seed: context.seed
+                ),
+                body: noDataBody(context: context)
+            )
+        }
+    }
+
+    private static func recoveryBody(context: RecommendedTodayCopyContext) -> String {
+        if context.hasElevatedExertion {
+            return choose(
+                [
+                    "Vienes con esfuerzo reciente alto; hoy suma más recuperar que exigir.",
+                    "El esfuerzo reciente sigue arriba y hoy conviene dejar más espacio para recuperar.",
+                ],
+                seed: context.seed + 11
+            )
+        }
+
+        if context.hasLowConfidence || context.hasMissingPrimaries {
+            return choose(
+                [
+                    "La lectura ya pide bajar la exigencia y dejar más margen de recuperación.",
+                    "La señal todavía pide prudencia; hoy conviene proteger más el margen que apretar.",
+                ],
+                seed: context.seed + 13
+            )
+        }
+
+        return choose(
+            [
+                "La señal de hoy cae en un punto bajo; conviene priorizar recuperación y bajar la exigencia.",
+                "Tu contexto de hoy favorece recuperar antes que apretar de más.",
+            ],
+            seed: context.seed + 17
+        )
+    }
+
+    private static func gentleBody(context: RecommendedTodayCopyContext) -> String {
+        if context.hasElevatedExertion {
+            return choose(
+                [
+                    "El esfuerzo reciente todavía pesa; hoy encaja mejor una carga liviana y contenida.",
+                    "La señal acompaña, pero el esfuerzo reciente sugiere mantener todo más liviano.",
+                ],
+                seed: context.seed + 19
+            )
+        }
+
+        if context.hasLowConfidence || context.hasMissingPrimaries {
+            return choose(
+                [
+                    "Hay señal para moderar, pero todavía conviene moverse con margen y control.",
+                    "La lectura es útil, aunque aún corta; hoy favorece un enfoque liviano y sin apretar.",
+                ],
+                seed: context.seed + 23
+            )
+        }
+
+        return choose(
+            [
+                "Tu contexto actual favorece una carga liviana y controlada.",
+                "La señal de hoy acompaña mejor una continuidad suave y bien contenida.",
+            ],
+            seed: context.seed + 29
+        )
+    }
+
+    private static func steadyBody(context: RecommendedTodayCopyContext) -> String {
+        if context.hasMixedSignals {
+            return choose(
+                [
+                    "Hay buena base, pero no una señal lo bastante limpia como para subir la exigencia.",
+                    "La lectura acompaña, aunque el contexto sigue mezclado; mejor sostener sin empujar de más.",
+                ],
+                seed: context.seed + 31
+            )
+        }
+
+        if context.hasLowConfidence {
+            return choose(
+                [
+                    "La señal acompaña, aunque todavía con algo de reserva; mejor sostener sin forzar.",
+                    "Hay base para continuidad, pero la lectura aún pide un punto de prudencia.",
+                ],
+                seed: context.seed + 37
+            )
+        }
+
+        return choose(
+            [
+                "La señal actual acompaña una carga estable, sin necesidad de empujar de más.",
+                "Hoy encaja mejor sostener continuidad y ritmo propio, sin forzar la mano.",
+            ],
+            seed: context.seed + 41
+        )
+    }
+
+    private static func demandingBody(context: RecommendedTodayCopyContext) -> String {
+        if context.confidenceBand == .high {
+            return choose(
+                [
+                    "La señal viene sólida y ordenada; hoy hay margen para una carga más exigente, con criterio.",
+                    "El contexto está a favor y abre espacio para exigir un poco más, siempre con control.",
+                ],
+                seed: context.seed + 43
+            )
+        }
+
+        return choose(
+            [
+                "Hay una señal favorable para subir un punto la exigencia, sin salirte de criterio.",
+                "Hoy aparece margen para empujar un poco más, manteniendo la lectura del día al frente.",
+            ],
+            seed: context.seed + 47
+        )
+    }
+
+    private static func noDataBody(context: RecommendedTodayCopyContext) -> String {
+        if context.hasMissingPrimaries {
+            return choose(
+                [
+                    "Faltan señales clave para orientar el día con claridad.",
+                    "Todavía faltan señales suficientes como para sugerir un enfoque con confianza.",
+                ],
+                seed: context.seed + 53
+            )
+        }
+
+        if context.hasLowConfidence {
+            return choose(
+                [
+                    "La lectura todavía es débil; mejor no sacar una conclusión más firme.",
+                    "La señal de hoy aún es demasiado corta para orientar el día con claridad.",
+                ],
+                seed: context.seed + 59
+            )
+        }
+
+        return choose(
+            [
+                "Todavía no hay suficiente información para sugerir un enfoque claro.",
+                "La señal disponible todavía no alcanza para orientar bien el día.",
+            ],
+            seed: context.seed + 61
+        )
+    }
+
+    private static func choose(_ options: [String], seed: Int) -> String {
+        guard !options.isEmpty else { return "" }
+        return options[abs(seed) % options.count]
+    }
+}
+
+private struct RecommendedTodayCopyContext {
+    enum ConfidenceBand {
+        case high
+        case medium
+        case low
+    }
+
+    let state: RecommendedStateDTO
+    let confidenceBand: ConfidenceBand
+    let reasonTags: Set<String>
+    let guidanceOnly: Bool
+    let seed: Int
+
+    init(recommendedToday: RecommendedTodayDTO) {
+        state = recommendedToday.state
+        reasonTags = Set(recommendedToday.reasonTags)
+        guidanceOnly = recommendedToday.guidanceOnly
+
+        if recommendedToday.confidence >= 0.85 {
+            confidenceBand = .high
+        } else if recommendedToday.confidence >= 0.70 {
+            confidenceBand = .medium
+        } else {
+            confidenceBand = .low
+        }
+
+        let seedSource = recommendedToday.state.rawValue
+            + "|"
+            + recommendedToday.reasonTags.sorted().joined(separator: "|")
+            + "|"
+            + String(Int((recommendedToday.confidence * 100).rounded()))
+            + "|"
+            + String(recommendedToday.guidanceOnly)
+        seed = seedSource.unicodeScalars.reduce(0) { partial, scalar in
+            partial + Int(scalar.value)
+        }
+    }
+
+    var hasLowConfidence: Bool {
+        guidanceOnly && (reasonTags.contains("confidence_low") || confidenceBand == .low)
+    }
+
+    var hasMissingPrimaries: Bool {
+        reasonTags.contains("primaries_missing")
+    }
+
+    var hasMixedSignals: Bool {
+        reasonTags.contains("signals_mixed")
+    }
+
+    var hasElevatedExertion: Bool {
+        reasonTags.contains("exertion_elevated")
     }
 }
 
@@ -994,4 +1377,178 @@ private extension TrainingLoadFetchResult {
             )
         )
     }
+}
+
+#Preview("Recommended Today Copy States") {
+    ZStack {
+        AppColors.Background.primary.ignoresSafeArea()
+
+        VStack(alignment: .leading, spacing: AppSpacing.x16) {
+            RecommendedTodaySection(
+                recommendedToday: RecommendedTodayDTO(
+                    state: .recuperar,
+                    confidence: 0.93,
+                    reasonTags: ["readiness_low", "exertion_elevated"],
+                    guidanceOnly: true
+                )
+            )
+
+            RecommendedTodaySection(
+                recommendedToday: RecommendedTodayDTO(
+                    state: .suave,
+                    confidence: 0.68,
+                    reasonTags: ["readiness_moderate", "confidence_low"],
+                    guidanceOnly: true
+                )
+            )
+
+            RecommendedTodaySection(
+                recommendedToday: RecommendedTodayDTO(
+                    state: .estable,
+                    confidence: 0.75,
+                    reasonTags: ["readiness_high", "signals_mixed"],
+                    guidanceOnly: true
+                )
+            )
+
+            RecommendedTodaySection(
+                recommendedToday: RecommendedTodayDTO(
+                    state: .exigente,
+                    confidence: 0.91,
+                    reasonTags: ["readiness_high"],
+                    guidanceOnly: true
+                )
+            )
+
+            RecommendedTodaySection(
+                recommendedToday: RecommendedTodayDTO(
+                    state: .sinDatos,
+                    confidence: 0,
+                    reasonTags: ["primaries_missing"],
+                    guidanceOnly: true
+                )
+            )
+        }
+        .padding(AppSpacing.x16)
+    }
+}
+
+#Preview("Home Stack with Recommended Today") {
+    ScrollView {
+        VStack(alignment: .leading, spacing: AppSpacing.x16) {
+            ReadinessHeroSection(
+                date: Date(),
+                readiness: PreviewFixtures.readiness,
+                errorMessage: nil
+            )
+
+            ReadinessDriversSection(readiness: PreviewFixtures.readiness)
+
+            RecommendedTodaySection(recommendedToday: PreviewFixtures.recommendedToday)
+
+            CoreMetricsSection(coreMetrics: PreviewFixtures.coreMetrics)
+
+            DSSectionHeader(title: "Load Trend", actionLabel: {
+                Text("Last 28 days")
+                    .appTextStyle(AppTypography.labelSmall)
+                    .foregroundStyle(AppColors.Text.secondary)
+            })
+
+            TrainingLoadSummaryRow(
+                today: 42,
+                sevenDays: 182,
+                twentyEightDays: 614
+            )
+        }
+        .padding(AppSpacing.x16)
+    }
+    .background(AppColors.Background.primary)
+}
+
+private enum PreviewFixtures {
+    static let readiness = ReadinessSummaryDTO(
+        score: 78,
+        label: .ready,
+        confidence: 0.91,
+        completenessStatus: .complete,
+        inputsPresent: ["sleep", "hrv", "rhr"],
+        inputsMissing: [],
+        modelVersion: 1,
+        hasEstimatedContext: false,
+        traceSummary: [
+            .init(name: "sleep", role: .primary, present: true, baselineUsed: true, effect: .positive),
+            .init(name: "hrv", role: .primary, present: true, baselineUsed: true, effect: .positive),
+            .init(name: "rhr", role: .primary, present: true, baselineUsed: true, effect: .positive),
+            .init(name: "recent_exertion", role: .context, present: true, baselineUsed: true, effect: .neutral),
+        ],
+        explainability: ReadinessExplainabilityDTO(
+            completenessStatus: .complete,
+            confidence: 0.91,
+            modelVersion: 1,
+            items: [
+                .init(
+                    key: "sleep",
+                    role: .primaryDriver,
+                    status: .measured,
+                    effect: .positive,
+                    displayValue: "8h",
+                    displayUnit: nil,
+                    baselineValue: "7h 20m",
+                    baselineUnit: nil,
+                    isBaselineSufficient: true,
+                    shortReason: "Sleep ran above usual."
+                ),
+                .init(
+                    key: "hrv",
+                    role: .primaryDriver,
+                    status: .measured,
+                    effect: .positive,
+                    displayValue: "61",
+                    displayUnit: "ms",
+                    baselineValue: "55",
+                    baselineUnit: "ms",
+                    isBaselineSufficient: true,
+                    shortReason: "HRV rose above usual."
+                ),
+                .init(
+                    key: "rhr",
+                    role: .primaryDriver,
+                    status: .measured,
+                    effect: .positive,
+                    displayValue: "49",
+                    displayUnit: "bpm",
+                    baselineValue: "52",
+                    baselineUnit: "bpm",
+                    isBaselineSufficient: true,
+                    shortReason: "RHR stayed below usual."
+                ),
+                .init(
+                    key: "recent_exertion",
+                    role: .secondaryContext,
+                    status: .measured,
+                    effect: .neutral,
+                    displayValue: "152",
+                    displayUnit: "load",
+                    baselineValue: "148",
+                    baselineUnit: "load",
+                    isBaselineSufficient: true,
+                    shortReason: "Exertion stayed in range."
+                ),
+            ]
+        )
+    )
+
+    static let recommendedToday = RecommendedTodayDTO(
+        state: .exigente,
+        confidence: 0.91,
+        reasonTags: ["readiness_high"],
+        guidanceOnly: true
+    )
+
+    static let coreMetrics = CoreMetricsSummaryDTO(
+        sevenDayLoad: 182,
+        fitness: 36,
+        fatigue: 33,
+        historyStatus: .available
+    )
 }

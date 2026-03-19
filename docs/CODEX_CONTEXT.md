@@ -5,7 +5,7 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.4 — Drivers / Explainability** (**Closed / ready for 5.5 planning**)
+- **Phase 5.5 — Recommended Today** (**Closed / ready for 5.6 planning**)
 
 - `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
 - `daily_recovery` remains the canonical consolidated-input domain; it was not turned into a persisted final score.
@@ -183,6 +183,39 @@
   - Load Trend
   - Trend Card
 - Phase 5.4 is therefore closed on both implementation and real-environment validation, not only on local mock validation.
+
+### Phase 5.5 Current Summary
+- `GET /v1/home/summary` now includes a stable `recommended_today` guidance block in the Home contract.
+- The structured backend contract remains intentionally minimal:
+  - `state`
+  - `confidence`
+  - `reason_tags`
+  - `guidance_only`
+- Home now renders `Recommended Today` between:
+  - `Drivers / Explainability`
+  - `Core Metrics`
+- The temporary fixed copy has been replaced by a controlled Spanish copy-generation layer in the iOS client.
+- Copy generation currently uses only approved structured inputs:
+  - `state`
+  - `confidence`
+  - `reason_tags`
+  - `guidance_only`
+- The generation layer is deterministic and templated, not LLM-backed:
+  - backend remains the source of truth for recommendation structure
+  - no backend contract expansion was required for copy generation
+  - no runtime AI / Coach / planner integration was introduced
+- Guardrails preserved:
+  - guidance-only
+  - short premium copy
+  - no workout prescription
+  - no chat or coach behavior
+  - no medical framing
+  - no contradiction with readiness/explainability context
+- Validation completed locally:
+  - production backend already serves `recommended_today`
+  - iOS build passed
+  - macOS build passed
+  - visual QA used the Home preview stack plus state-variant previews
 
 ### Phase 5.1.3 Closure Summary
 - macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.
@@ -400,11 +433,11 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 5.5 — Recommended Today** (**Next / planning only**) 
+- **Phase 5.6 — Data Completeness / Confidence** (**Next / planning only**)
 - Focus:
-  - define the first guidance surface that sits on top of Readiness and load context,
-  - keep it guidance-only and clearly separate from full Coach behavior,
-  - preserve the Home hierarchy already established in 5.2–5.4.
+  - define the shared trust layer across Home blocks,
+  - make completeness/confidence behavior explicit end-to-end,
+  - preserve the current Home hierarchy now that Hero, Drivers, Recommended Today, and Core Metrics are all present.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**

@@ -855,8 +855,35 @@ Closure decisions carried into this phase:
 - Separation from Core Metrics and Trend Card
 
 ### Phase 5.5 — Recommended Today
-**Status:** NEXT / PLANNING ONLY
+**Status:** CLOSED (2026-03-18 America/New_York)
 **Goal:** Add the contextual recommendation block without expanding into Coach.
+
+**Closure summary**
+- `recommended_today` now exists as a stable Home contract inside `GET /v1/home/summary`.
+- The recommendation remains explicitly bounded to:
+  - guidance-only output
+  - structured recommendation state from backend
+  - no planner, no coach, no chat, no workout prescription
+- iOS Home now renders the block between `Drivers` and `Core Metrics` within the existing Home hierarchy.
+- The first UI pass shipped as a temporary card using existing Design System primitives rather than a bespoke surface.
+- The fixed placeholder copy has now been replaced with controlled Spanish copy generation in the client.
+- Copy generation is intentionally deterministic and templated, using only:
+  - `state`
+  - `confidence`
+  - `reason_tags`
+  - `guidance_only`
+- The copy layer did not expand the backend contract and did not introduce an artificial LLM runtime.
+- Guardrails remained intact:
+  - short premium tone
+  - guidance-only semantics
+  - no medical framing
+  - no contradiction with readiness / explainability context
+  - no Coach scope creep
+- Validation completed:
+  - backend production serves `recommended_today`
+  - iOS build passed
+  - macOS build passed
+  - visual QA completed against state-variant previews and the full Home stack preview
 
 **Why this block exists**
 - Home must answer "What should I do today?" but without absorbing planner/chat/adaptive coaching scope.
@@ -880,6 +907,7 @@ Closure decisions carried into this phase:
 
 **Definition of Done**
 - The block is explicitly guidance-only and does not introduce Coach behaviors.
+- The user-facing copy is short, dynamic, and controlled without changing the underlying recommendation logic.
 
 **QA focus**
 - No-data day

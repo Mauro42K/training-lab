@@ -57,6 +57,14 @@ enum ReadinessExplainabilityStatusDTO: String, Codable, Equatable, Sendable {
     case missing
 }
 
+enum RecommendedStateDTO: String, Codable, Equatable, Sendable {
+    case recuperar
+    case suave
+    case estable
+    case exigente
+    case sinDatos = "sin_datos"
+}
+
 struct ReadinessExplainabilityItemDTO: Codable, Equatable, Sendable, Identifiable {
     let key: String
     let role: ReadinessExplainabilityRoleDTO
@@ -155,14 +163,30 @@ struct CoreMetricsSummaryDTO: Codable, Equatable, Sendable {
     }
 }
 
+struct RecommendedTodayDTO: Codable, Equatable, Sendable {
+    let state: RecommendedStateDTO
+    let confidence: Double
+    let reasonTags: [String]
+    let guidanceOnly: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case state
+        case confidence
+        case reasonTags = "reason_tags"
+        case guidanceOnly = "guidance_only"
+    }
+}
+
 struct HomeSummaryDTO: Codable, Equatable, Sendable {
     let date: Date
     let readiness: ReadinessSummaryDTO?
     let coreMetrics: CoreMetricsSummaryDTO?
+    let recommendedToday: RecommendedTodayDTO?
 
     enum CodingKeys: String, CodingKey {
         case date
         case readiness
         case coreMetrics = "core_metrics"
+        case recommendedToday = "recommended_today"
     }
 }

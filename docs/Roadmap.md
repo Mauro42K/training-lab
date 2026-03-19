@@ -924,7 +924,21 @@ Closure decisions carried into this phase:
 - Guardrail against Coach scope creep
 
 ### Phase 5.6 — Data Completeness / Confidence
+**Status:** CLOSED (2026-03-19 America/New_York)
 **Goal:** Add the Home-wide trust layer for partial, missing, or mixed data.
+
+**Closure summary**
+- Home trust/completeness is now governed across the Home stack with minimal client-side alignment.
+- Canonical Home states are:
+  - `complete`
+  - `partial`
+  - `missing`
+- The implementation stayed intentionally small:
+  - existing semantics were aligned instead of inventing a new megaobject
+  - `missing` remains fallback-only and never reads like a real value
+  - `partial` preserves useful content and de-emphasizes trust instead of hiding the block
+- The result is a practical Home trust layer, not a new backend contract shape.
+- No new transversal `home_summary` object was introduced.
 
 **Why this block exists**
 - Home cannot be trustworthy without explicit completeness/confidence semantics.
@@ -952,6 +966,50 @@ Closure decisions carried into this phase:
 - Mixed-source days
 - `primary_device_name = null`
 
+### Phase 5.6.1 — Home UX/UI Polish
+**Status:** OPEN
+**Goal:** Refine Home visual cohesion on iPhone without reopening product semantics.
+
+**Why this block exists**
+- The current Home stack is functionally correct but still has room to move closer to the approved dark/premium visual language.
+
+**Scope**
+- Dark premium cohesion across the Home canvas.
+- Reduce nested cards / cards within cards.
+- Refine Drivers so it reads lighter and less dense.
+- Refine Recommended Today toward more editorial/premium intent.
+- Make Core Metrics feel less dashboard/tabular.
+- Refine Trend Card spacing, hierarchy, and balance.
+- Tune surface hierarchy, elevation, stroke, spacing, and typography for Home.
+- Prioritize iPhone-first visual polish.
+
+**Non-goals**
+- No backend changes.
+- No contract changes.
+- No trust semantic changes.
+- No product logic changes.
+- No Coach / planner / chat scope.
+
+**Main dependencies**
+- Phase 5.6 closure
+- Phase 5.4 explainability
+- Phase 5.5 Recommended Today
+- Phase 5.3 Core Metrics
+- Phase 5.1 Trend Card
+
+**Deliverables**
+- Home visual polish passes
+- Design-system alignment for the polished surfaces
+
+**Definition of Done**
+- Home feels more like one cohesive dark canvas and less like independent floating cards.
+
+**QA focus**
+- Nested-card reduction
+- Editorial balance of Drivers / Recommended Today / Core Metrics / Trend Card
+- iPhone-first visual cohesion
+- No semantic regression in trust/completeness behavior
+
 ### Phase 5.7 — Deep QA / Home integration
 **Goal:** Validate Home as one coherent surface once all blocks are present.
 
@@ -963,7 +1021,7 @@ Closure decisions carried into this phase:
 - Validate navigation, state transitions, cross-platform presentation, and regression against the existing load experience.
 
 **Main dependencies**
-- Phases 5.1-5.6
+- Phases 5.1-5.6.1
 - Phase 2 Design System
 - Phase 3 / 4 / 4.5 data foundations
 
@@ -1104,7 +1162,7 @@ Closure decisions carried into this phase:
 ---
 
 ## Immediate next actions
-1) Open **Phase 5.6 — Data Completeness / Confidence**.
+1) Continue **Phase 5.6.1 — Home UX/UI Polish**.
 2) Keep `Recommended Today` guidance-only and clearly separate from full Coach behavior.
 3) Preserve the current Home hierarchy:
    - `Readiness Hero`

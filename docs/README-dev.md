@@ -33,6 +33,14 @@
   - dynamic Spanish copy is generated client-side with controlled templates
   - phase 5.5 does not use OpenAI API key, does not run a real LLM runtime, and does not introduce backend generative copy
   - no planner, no coach, no chat, no workout prescription, no adaptive planning
+- Phase 5.6 is closed:
+  - Home trust/completeness is normalized through `complete`, `partial`, and `missing`
+  - fallback behavior is handled in client/UI using existing semantics
+  - no new transversal `home_summary` object or backend contract expansion was introduced
+- Phase 5.6.1 is open:
+  - UX/UI polish only
+  - dark premium cohesion and reduced nested-card feel
+  - no backend, contract, or trust-semantic changes
 - Phase 4.4 remains on hold and must not be mixed into the next active phase.
 
 ## Environment targets

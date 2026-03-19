@@ -6,6 +6,21 @@ This project follows a simple SemVer-style changelog.
 
 - Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
 
+## v0.5.6 - 2026-03-19
+
+## Phase 5.6 — Data Completeness / Confidence
+
+Closed
+- Home-wide trust/completeness semantics were closed with minimal client-side alignment.
+- Canonical Home states are `complete`, `partial`, and `missing`.
+- `missing` remains fallback-only and never reads like a real value.
+- The implementation stayed aligned to existing semantics and did not introduce a new transversal `home_summary` object or backend contract expansion.
+
+Opened
+- `Phase 5.6.1 — Home UX/UI Polish` is now the active subphase for Home visual refinement.
+- The subphase is limited to dark/premium cohesion, nested-card reduction, and editorial polish for Drivers, Recommended Today, Core Metrics, and Trend Card.
+- No backend, contract, or trust-semantic changes are part of 5.6.1.
+
 ## v0.5.5 - 2026-03-18
 
 ## Phase 5.5 — Recommended Today

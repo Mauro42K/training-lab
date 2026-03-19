@@ -5,7 +5,23 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.5 — Recommended Today** (**Closed / ready for 5.6 planning**)
+- **Phase 5.6.1 — Home UX/UI Polish** (**Open**)
+
+- Phase 5.6 — Data Completeness / Confidence is closed.
+- The phase resolved Home-wide trust/completeness with minimal client-side alignment:
+  - canonical `complete / partial / missing` normalization
+  - block-level fallback and warning behavior
+  - `missing` treated as fallback-only, never as a real-looking value
+  - `partial` preserving useful content instead of hiding it
+- The implementation stayed on the client and did not introduce a new transversal `home_summary` object or backend contract expansion.
+- Phase 5.6.1 is an iPhone-first UX/UI polish subphase only:
+  - dark premium cohesion
+  - reduced nested cards
+  - Drivers visual refinement
+  - Recommended Today editorial refinement
+  - Core Metrics less dashboard-like
+  - Trend Card spacing, hierarchy, and balance
+- Phase 5.6.1 does not reopen backend, contracts, trust semantics, or Coach / planner / chat.
 
 - `Readiness v1` is now implemented as a read-time layer on top of the existing daily domains and exposed through `GET /v1/home/summary`.
 - `daily_recovery` remains the canonical consolidated-input domain; it was not turned into a persisted final score.
@@ -227,6 +243,32 @@
   - macOS build passed
   - visual QA used the Home preview stack plus state-variant previews
 
+### Phase 5.6 Closure Summary
+- Home trust/completeness was resolved as a client-facing normalization problem in this phase.
+- The canonical Home states are:
+  - `complete`
+  - `partial`
+  - `missing`
+- Decision for this phase:
+  - align existing blocks semantically on the client
+  - do **not** add a new transversal `home_summary` object
+  - do **not** expand the backend contract just to carry trust metadata
+- Result:
+  - `Readiness Hero` shows score on `complete` and `partial`, with degraded trust on `partial`
+  - `Drivers` and `Recommended Today` must render a soft fallback instead of disappearing when signal is unavailable
+  - `Core Metrics` and `Load Trend` should treat `insufficient_history` as `partial`
+  - `missing` must remain a fallback state only, never a real-looking value
+
+### Phase 5.6.1 Current Summary
+- Home polish is now scoped as a pure visual iteration.
+- Pending UX/UI targets:
+  - reduce nested-card feel
+  - make Drivers less dense
+  - give Recommended Today more editorial intent
+  - make Core Metrics feel less dashboard/tabular
+  - refine Trend Card spacing, hierarchy, and balance
+  - improve dark premium cohesion on iPhone without changing semantics
+
 ### Phase 5.1.3 Closure Summary
 - macOS and iPhone were confirmed to use the same effective `baseURL`; the divergence came from separate local caches and refresh/fallback behavior, not from different backends.
 - `Today` no longer attaches to the last training-load point unless that point is actually the current calendar day.
@@ -443,11 +485,12 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 5.6 — Data Completeness / Confidence** (**Next / planning only**)
+- **Phase 5.6.1 — Home UX/UI Polish** (**Current / active**)
 - Focus:
-  - define the shared trust layer across Home blocks,
-  - make completeness/confidence behavior explicit end-to-end,
-  - preserve the current Home hierarchy now that Hero, Drivers, Recommended Today, and Core Metrics are all present.
+  - refine Home dark/premium cohesion,
+  - reduce nested cards and dashboard-like surfaces,
+  - polish Drivers, Recommended Today, Core Metrics, and Trend Card presentation,
+  - keep trust/completeness semantics unchanged while improving iPhone-first visual hierarchy.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**

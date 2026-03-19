@@ -16,7 +16,7 @@ from api.schemas.daily_domains import (
     HomeSummaryResponse,
 )
 from api.services.body_measurements_canonicalizer import BodyMeasurementsCanonicalizer
-from api.services.recommendation import compute_recommended_today
+from api.services.recommendation_service import compute_recommended_today
 from api.services.readiness_service import ReadinessService
 from api.services.training_load_service import TrainingLoadService
 

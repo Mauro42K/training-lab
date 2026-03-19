@@ -157,6 +157,7 @@ Each block must preserve its semantic role and must not visually impersonate ano
 - When Home needs visible vertical compaction on iPhone, prefer primitive-level layout decisions over local padding tweaks:
   - `DSExplainabilityCard(layout: .compactColumns)` for three compact primary drivers plus a quieter contextual row
   - `DSMetricSnapshotCard(density: .compact)` for tighter supporting metric snapshots without losing numeric clarity
+- These compact variants are the approved Home pattern for Phase 5.6.1 and should be reused instead of creating local one-off compact cards.
 
 ### Governance Rule for Home
 Before creating a new Home block or changing an existing one, implementation must answer:

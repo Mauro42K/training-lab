@@ -347,7 +347,11 @@ struct DSExplainabilityCard: View {
     @ViewBuilder
     private var secondaryContent: some View {
         if usesCompactColumns {
-            VStack(alignment: .leading, spacing: AppSpacing.x4) {
+            VStack(alignment: .leading, spacing: AppSpacing.x4 + 2) {
+                Rectangle()
+                    .fill(AppColors.Stroke.subtle.opacity(0.65))
+                    .frame(height: 1)
+
                 Text("Context")
                     .appTextStyle(AppTypography.labelSmall)
                     .foregroundStyle(AppColors.Text.secondary)
@@ -573,7 +577,7 @@ private struct DSExplainabilityCompactTile: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text(item.value)
-                    .appTextStyle(item.emphasis == .primary ? AppTypography.headingH3 : AppTypography.heading4)
+                    .appTextStyle(AppTypography.heading4)
                     .foregroundStyle(valueColor)
                     .monospacedDigit()
                     .lineLimit(1)
@@ -592,15 +596,19 @@ private struct DSExplainabilityCompactTile: View {
                     .appTextStyle(AppTypography.labelSmall)
                     .foregroundStyle(AppColors.Text.secondary)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.9)
+                    .truncationMode(.tail)
             }
 
             Text(reasonText)
-                .appTextStyle(AppTypography.bodySmall)
+                .appTextStyle(AppTypography.labelSmall)
                 .foregroundStyle(reasonColor)
                 .lineLimit(1)
+                .minimumScaleFactor(0.9)
+                .truncationMode(.tail)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(minHeight: AppSpacing.x64, alignment: .topLeading)
+        .frame(minHeight: AppSpacing.x48 + AppSpacing.x8, alignment: .topLeading)
         .accessibilityElement(children: .combine)
     }
 
@@ -611,7 +619,7 @@ private struct DSExplainabilityCompactTile: View {
     private var reasonText: String {
         switch item.status {
         case .measured:
-            return item.reason
+            return compactMeasuredReason(item.reason)
         case .estimated:
             return "Estimated"
         case .proxy:
@@ -619,6 +627,31 @@ private struct DSExplainabilityCompactTile: View {
         case .missing:
             return "Missing"
         }
+    }
+
+    private func compactMeasuredReason(_ text: String) -> String {
+        let lowercased = text.lowercased()
+
+        if lowercased.contains("above usual") {
+            return "Above usual"
+        }
+        if lowercased.contains("below usual") {
+            return "Below usual"
+        }
+        if lowercased.contains("near baseline") {
+            return "Near baseline"
+        }
+        if lowercased.contains("baseline") {
+            return "At baseline"
+        }
+        if lowercased.contains("elevated") {
+            return "Elevated"
+        }
+        if lowercased.contains("missing") {
+            return "Missing"
+        }
+
+        return text
     }
 
     private var valueColor: Color {
@@ -649,7 +682,7 @@ private struct DSExplainabilityContextRow: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: AppSpacing.x8) {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(item.title)
                     .appTextStyle(AppTypography.labelSmall)
                     .foregroundStyle(AppColors.Text.secondary)
@@ -673,10 +706,10 @@ private struct DSExplainabilityContextRow: View {
             Text(contextDescriptor)
                 .appTextStyle(AppTypography.labelSmall)
                 .foregroundStyle(AppColors.Text.secondary)
-                .multilineTextAlignment(.trailing)
-                .lineLimit(2)
+                .lineLimit(1)
+                .minimumScaleFactor(0.9)
+                .truncationMode(.tail)
         }
-        .padding(.top, 2)
         .accessibilityElement(children: .combine)
     }
 
@@ -692,14 +725,33 @@ private struct DSExplainabilityContextRow: View {
     private var contextDescriptor: String {
         switch item.status {
         case .measured:
-            return item.reason
+            return compactMeasuredContext(item.reason)
         case .estimated:
-            return "Estimated context"
+            return "Estimated"
         case .proxy:
-            return "Proxy context"
+            return "Proxy"
         case .missing:
-            return "Missing context"
+            return "Missing"
         }
+    }
+
+    private func compactMeasuredContext(_ text: String) -> String {
+        let lowercased = text.lowercased()
+
+        if lowercased.contains("elevated") {
+            return "Elevated"
+        }
+        if lowercased.contains("above") {
+            return "Above usual"
+        }
+        if lowercased.contains("below") {
+            return "Below usual"
+        }
+        if lowercased.contains("baseline") {
+            return "At baseline"
+        }
+
+        return text
     }
 }
 

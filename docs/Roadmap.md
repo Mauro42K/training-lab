@@ -1023,10 +1023,19 @@ Closure decisions carried into this phase:
 - No backend, contract, trust-semantic, or Coach/planner/chat changes were introduced.
 
 ### Phase 5.7 — Deep QA / Home integration
+**Status:** CLOSED (2026-03-25 America/New_York)
 **Goal:** Validate Home as one coherent surface once all blocks are present.
 
 **Why this block exists**
 - Block-level delivery is not enough; Home must work as a single product surface.
+
+**Closure summary**
+- Integrated Home v1 was validated as one surface across the approved real scenarios.
+- No semantic contradictions were found between Hero, Drivers, Recommended Today, Core Metrics, and Trend Card.
+- `missing` stayed fallback-only and never read like a real value.
+- `partial` preserved useful content without pretending completeness.
+- iPhone and Mac shared the same Home story; only density differs between platforms.
+- `Steps-only day` remains a QA coverage gap, not a confirmed product bug.
 
 **Scope**
 - Integrate Trend Card, Hero, Core Metrics, Drivers, Recommended Today, and Completeness layers.
@@ -1046,7 +1055,9 @@ Closure decisions carried into this phase:
 
 **QA focus**
 - Missing-data days
+- Partial physiology day
 - Very high load day
+- Normal balanced day
 - Steps-only day
 - Multi-session day
 - iPhone + Mac consistency
@@ -1174,9 +1185,9 @@ Closure decisions carried into this phase:
 ---
 
 ## Immediate next actions
-1) Continue **Phase 5.7 — Deep QA / Home integration**.
+1) Open **Phase 6 — Trends v1** when the team is ready to start analytics work.
 2) Keep `Recommended Today` guidance-only and clearly separate from full Coach behavior.
-3) Preserve the current Home hierarchy:
+3) Preserve the validated Home hierarchy:
    - `Readiness Hero`
    - `Drivers / Explainability`
    - `Recommended Today`

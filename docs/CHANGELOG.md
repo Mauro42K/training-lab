@@ -6,6 +6,30 @@ This project follows a simple SemVer-style changelog.
 
 - Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
 
+## v0.5.7 - 2026-03-25
+
+## Phase 5.7 — Deep QA / Home integration
+
+Closed
+- Home was validated as one coherent surface, not just as independent blocks.
+- Real coverage scenarios validated:
+  - `2026-03-11` missing-data day
+  - `2026-01-28` partial physiology day
+  - `2026-03-13` multi-session day
+  - `2026-03-15` very high load day
+  - `2026-03-17` normal balanced day
+  - `2026-03-14` iPhone + Mac consistency baseline
+- No semantic contradictions were found between `Hero`, `Drivers`, `Recommended Today`, `Core Metrics`, and `Trend Card`.
+- `missing` remained fallback-only and never read like a real value.
+- `partial` preserved useful content without pretending completeness.
+- iPhone and Mac shared the same Home story; only density differs between platforms.
+- `Steps-only day` remains a QA coverage gap because real data coverage is not clear enough to treat it as a product bug.
+
+Notes
+- No backend changes were made.
+- No contract changes were made.
+- Phase 5.7 closes the integrated Home QA track on the current Home stack.
+
 ## v0.5.6.1 - 2026-03-19
 
 ## Phase 5.6.1 — Home UX/UI Polish

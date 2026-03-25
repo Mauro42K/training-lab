@@ -42,10 +42,13 @@
   - dark premium cohesion and reduced nested-card feel
   - compact `Drivers` / `Recommended Today` / `Core Metrics` layouts shipped
   - no backend, contract, or trust-semantic changes
-- Phase 5.7 is now the active next phase:
-  - deep QA / Home integration
-  - validate the already delivered Home blocks as a single surface
-  - keep trust semantics unchanged
+- Phase 5.7 is closed:
+  - deep QA / Home integration completed on the current Home stack
+  - validated the already delivered Home blocks as a single surface
+  - no semantic contradictions were found in the validated scenarios
+  - `missing` stayed fallback-only and `partial` stayed useful
+  - iPhone + Mac consistency was validated on the shared baseline
+  - `Steps-only day` remains a coverage gap, not a confirmed product bug
 - Phase 4.4 remains on hold and must not be mixed into the next active phase.
 
 ## Environment targets

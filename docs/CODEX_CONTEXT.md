@@ -5,7 +5,26 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
-- **Phase 5.7 — Deep QA / Home integration** (**Open**)
+- **Phase 5.7 — Deep QA / Home integration** (**Closed**)
+
+- Phase 5.7 was validated as a single integrated Home surface, not as isolated blocks.
+- Real coverage scenarios validated:
+  - `2026-03-11` missing-data day
+  - `2026-01-28` partial physiology day
+  - `2026-03-13` multi-session day
+  - `2026-03-15` very high load day
+  - `2026-03-17` normal balanced day
+  - `2026-03-14` iPhone + Mac consistency baseline
+- No semantic contradictions were found across:
+  - `Readiness Hero`
+  - `Drivers`
+  - `Recommended Today`
+  - `Core Metrics`
+  - `Load Trend` / `Trend Card`
+- `missing` remained fallback-only and never read like a real value.
+- `partial` preserved useful content without pretending completeness.
+- iPhone and Mac shared the same Home story; only density differs between platforms.
+- `Steps-only day` remains a QA coverage gap because real data coverage is not clear enough to treat it as a product bug.
 
 - Phase 5.6 — Data Completeness / Confidence is closed.
 - The phase resolved Home-wide trust/completeness with minimal client-side alignment:
@@ -490,11 +509,10 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 5.7 — Deep QA / Home integration** (**Current / active**)
+- **Phase 6 — Trends v1** (**Planned**)
 - Focus:
-  - integrate the already delivered Home blocks as a single surface,
-  - validate state transitions, missing-data days, and cross-platform presentation,
-  - keep the current Home hierarchy and trust semantics intact.
+  - long-range analytics and chart surfaces after the validated Home integration work,
+  - keep the validated Home hierarchy and trust semantics intact.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**

@@ -9,13 +9,16 @@ struct PermissionGateView: View {
     }
 
     let environment: AppEnvironment
-    let openGallery: () -> Void
 
     @State private var state: GateState = .loading
     var body: some View {
         Group {
-            if shouldShowTrainingLoad {
-                TrainingLoadScreen(environment: environment)
+            #if os(macOS)
+            // macOS enters the real shell directly; HealthKit is a data limitation, not a gate blocker.
+            shellView
+            #else
+            if shouldShowShell {
+                shellView
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: AppSpacing.x16) {
@@ -26,43 +29,32 @@ struct PermissionGateView: View {
                         })
 
                         content
-
-                        DSCard(style: .muted) {
-                            VStack(alignment: .leading, spacing: AppSpacing.x12) {
-                                Text("Demo access")
-                                    .appTextStyle(AppTypography.headingH3)
-                                    .foregroundStyle(AppColors.Text.primary)
-
-                                Text("Open Design System Gallery while sync pipelines are bootstrapping.")
-                                    .appTextStyle(AppTypography.bodySmall)
-                                    .foregroundStyle(AppColors.Text.secondary)
-
-                                Button(action: openGallery) {
-                                    Text("Open Design System Gallery")
-                                        .appTextStyle(AppTypography.buttonMedium)
-                                        .foregroundStyle(AppColors.Accent.blue)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
                     }
                     .padding(AppSpacing.x16)
                 }
             }
+            #endif
         }
         .background(AppColors.Background.primary.ignoresSafeArea())
+        #if !os(macOS)
         .task {
             await bootstrap()
         }
+        #endif
     }
 
-    private var shouldShowTrainingLoad: Bool {
+    private var shouldShowShell: Bool {
         switch state {
-        case .ready, .error:
+        case .ready:
             return true
-        case .loading, .needsPermission:
+        case .loading, .needsPermission, .error:
             return false
         }
+    }
+
+    @ViewBuilder
+    private var shellView: some View {
+        TrainingLabShellView(environment: environment)
     }
 
     @ViewBuilder
@@ -144,5 +136,5 @@ struct PermissionGateView: View {
 }
 
 #Preview {
-    PermissionGateView(environment: .stub(), openGallery: {})
+    PermissionGateView(environment: .stub())
 }

@@ -6,6 +6,23 @@ This project follows a simple SemVer-style changelog.
 
 - Recorded roadmap decision: Phase 4.4 remains on hold / conditional; Phase 4.4.1 created as targeted historical dedupe and recompute subphase.
 
+## v0.6.0 - 2026-03-26
+
+## Phase 6 — Trends v1
+
+Closed
+- Delivered the real product navigation shell with a shared section model.
+- Mounted validated Home inside the shell without reopening Home semantics.
+- Added the Trends host scaffold and controlled placeholders for Workouts, Calendar, Body, and More.
+- Removed Gallery/demo-visible UI from the visible product flow.
+- Closed macOS shell hardening by resolving the gate policy and aligning the Mac app icon with the branded asset set.
+
+Notes
+- No backend/API changes were made.
+- No metrics changes were made.
+- No Trends charts were added yet.
+- This is the release closeout for Phase 6.0 and Phase 6.0.1.
+
 ## v0.5.7 - 2026-03-25
 
 ## Phase 5.7 — Deep QA / Home integration

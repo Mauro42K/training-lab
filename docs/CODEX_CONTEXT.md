@@ -5,6 +5,23 @@
 - This file is the source of truth for every Codex run.
 
 ## Current Phase
+- **Phase 6.1 — Trends Hero / Training Status** (**Open**)
+
+- Phase 6.0 and Phase 6.0.1 are now closed:
+  - real navigation shell
+  - single section model
+  - iPhone tab shell
+  - Mac split/sidebar shell structure
+  - Home integrated into the shell
+  - Trends host scaffold
+  - controlled placeholders for the remaining sections
+  - Gallery/demo-visible UI removed from the visible product flow
+  - macOS gate/bootstrap policy resolved so Mac enters the real shell cleanly
+  - macOS app icon aligned with the branded icon set
+- Home remains the validated runtime surface inside the shell.
+- The Trends host is ready for the first analytical surface in Phase 6.1.
+- Next priority is Phase 6.1, not further shell hardening.
+
 - **Phase 5.7 — Deep QA / Home integration** (**Closed**)
 
 - Phase 5.7 was validated as a single integrated Home surface, not as isolated blocks.
@@ -509,10 +526,11 @@ Closure note:
 - Phase 4.5 is now fully closed with implementation, QA evidence, and operational validation.
 
 ## Next Phase
-- **Phase 6 — Trends v1** (**Planned**)
+- **Phase 6.1 — Trends Hero / Training Status** (**Open**)
 - Focus:
-  - long-range analytics and chart surfaces after the validated Home integration work,
-  - keep the validated Home hierarchy and trust semantics intact.
+  - establish the first dominant analytical surface for Trends,
+  - keep the load-domain semantics clean and separate from readiness,
+  - build on the now-validated cross-platform shell entry.
 
 ### Tactical Remediation Track
 - Tactical remediation track approved: **Phase 4.4.1 — Workout History Dedup & Recompute**

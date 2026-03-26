@@ -57,6 +57,10 @@
 		F1C300000000000000000016 /* TrainingLoadDayDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */; };
 		F1C300000000000000000017 /* TrainingLoadDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000017 /* TrainingLoadDTO.swift */; };
 		F1C300000000000000000018 /* HomeTrustState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000018 /* HomeTrustState.swift */; };
+		F1C300000000000000000019 /* TrainingLabSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B200000000000000000019 /* TrainingLabSection.swift */; };
+		F1C30000000000000000001A /* TrainingLabShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000001A /* TrainingLabShellView.swift */; };
+		F1C30000000000000000001B /* TrendsHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000001B /* TrendsHostView.swift */; };
+		F1C30000000000000000001C /* SectionPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B20000000000000000001C /* SectionPlaceholderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -111,6 +115,10 @@
 		F1B200000000000000000016 /* TrainingLoadDayDetailSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadDayDetailSheet.swift; sourceTree = "<group>"; };
 		F1B200000000000000000017 /* TrainingLoadDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLoadDTO.swift; sourceTree = "<group>"; };
 		F1B200000000000000000018 /* HomeTrustState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeTrustState.swift; sourceTree = "<group>"; };
+		F1B200000000000000000019 /* TrainingLabSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLabSection.swift; sourceTree = "<group>"; };
+		F1B20000000000000000001A /* TrainingLabShellView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrainingLabShellView.swift; sourceTree = "<group>"; };
+		F1B20000000000000000001B /* TrendsHostView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrendsHostView.swift; sourceTree = "<group>"; };
+		F1B20000000000000000001C /* SectionPlaceholderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SectionPlaceholderView.swift; sourceTree = "<group>"; };
 		F2A100000000000000000001 /* Runtime.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Runtime.Debug.xcconfig; sourceTree = "<group>"; };
 		F2A100000000000000000002 /* Runtime.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Runtime.Release.xcconfig; sourceTree = "<group>"; };
 		F2A100000000000000000003 /* Runtime.Local.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Runtime.Local.example.xcconfig; sourceTree = "<group>"; };
@@ -227,6 +235,10 @@
 			children = (
 				F1B200000000000000000001 /* AppEnvironment.swift */,
 				F1B200000000000000000002 /* PermissionGateView.swift */,
+				F1B200000000000000000019 /* TrainingLabSection.swift */,
+				F1B20000000000000000001A /* TrainingLabShellView.swift */,
+				F1B20000000000000000001B /* TrendsHostView.swift */,
+				F1B20000000000000000001C /* SectionPlaceholderView.swift */,
 				F1B200000000000000000012 /* TrainingLoadScreen.swift */,
 				F1B200000000000000000013 /* TrainingLoadSummaryRow.swift */,
 				F1B200000000000000000014 /* TrainingLoadFilterControl.swift */,
@@ -400,6 +412,10 @@
 				F1C30000000000000000000F /* AppEnvironment.swift in Sources */,
 				F1C300000000000000000010 /* PermissionGateView.swift in Sources */,
 				F1C300000000000000000011 /* TrainingLabRootView.swift in Sources */,
+				F1C300000000000000000019 /* TrainingLabSection.swift in Sources */,
+				F1C30000000000000000001A /* TrainingLabShellView.swift in Sources */,
+				F1C30000000000000000001B /* TrendsHostView.swift in Sources */,
+				F1C30000000000000000001C /* SectionPlaceholderView.swift in Sources */,
 				F1C300000000000000000012 /* TrainingLoadScreen.swift in Sources */,
 				F1C300000000000000000013 /* TrainingLoadSummaryRow.swift in Sources */,
 				F1C300000000000000000014 /* TrainingLoadFilterControl.swift in Sources */,
